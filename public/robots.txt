@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Block nothing - all pages are indexable
+# Sitemaps
+Sitemap: https://alshafra.com/sitemap.xml
