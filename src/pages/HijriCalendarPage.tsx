@@ -26,9 +26,14 @@ export default function HijriCalendarPage() {
     keywords: 'التقويم الهجري, تقويم أم القرى, 1448هـ, التقويم الإسلامي, المناسبات الدينية',
     jsonLd: {
       '@context': 'https://schema.org',
-      '@type': 'Calendar',
-      name: 'التقويم الهجري 1448هـ',
-      calendarType: 'Hijri',
+      '@type': 'WebApplication',
+      name: 'التقويم الهجري 1448هـ — تقويم أم القرى الرسمي',
+      description: 'التقويم الهجري الكامل وفق تقويم أم القرى الرسمي المعتمد في المملكة العربية السعودية.',
+      applicationCategory: 'LifestyleApplication',
+      operatingSystem: 'Web',
+      inLanguage: 'ar-SA',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'SAR' },
+      url: 'https://alshafra.com/hijri-calendar',
     },
   });
 

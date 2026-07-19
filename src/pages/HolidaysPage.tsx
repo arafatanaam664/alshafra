@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Flag, Calendar, Star } from 'lucide-react';
 import { useSeo } from '../lib/seo';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
 import {
   SAUDI_EVENTS,
@@ -35,19 +36,39 @@ export default function HolidaysPage() {
       'قائمة كاملة بالإجازات الرسمية في المملكة العربية السعودية للعام 2026-2027م مع تواريخها الهجرية والميلادية ومدة كل إجازة. تشمل الإجازات الدينية والوطنية والإجازات الدراسية.',
     canonical: 'https://alshafra.com/holidays',
     keywords: 'الإجازات الرسمية, عطلات السعودية, إجازة عيد الفطر, إجازة عيد الأضحى, اليوم الوطني, يوم التأسيس',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      itemListElement: SAUDI_EVENTS.filter((e) => e.isHoliday).map((e, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        item: {
-          '@type': 'Event',
-          name: e.title,
-          startDate: `${e.date.year}-${String(e.date.month).padStart(2, '0')}-${String(e.date.day).padStart(2, '0')}`,
+    jsonLd: SAUDI_EVENTS.filter((e) => e.isHoliday).map((e) => {
+      const startDate = `${e.date.year}-${String(e.date.month).padStart(2, '0')}-${String(e.date.day).padStart(2, '0')}`;
+      const endDateObj = e.holidayDays && e.holidayDays > 1
+        ? (() => {
+            const d = new Date(e.date.year, e.date.month - 1, e.date.day + e.holidayDays - 1);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          })()
+        : startDate;
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'Event',
+        name: e.title,
+        description: e.description,
+        startDate,
+        endDate: endDateObj,
+        eventStatus: 'https://schema.org/EventScheduled',
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        location: {
+          '@type': 'Place',
+          name: 'المملكة العربية السعودية',
+          address: {
+            '@type': 'PostalAddress',
+            addressCountry: 'SA',
+          },
         },
-      })),
-    },
+        organizer: {
+          '@type': 'GovernmentOrganization',
+          name: 'حكومة المملكة العربية السعودية',
+          url: 'https://www.saudi.gov.sa',
+        },
+        inLanguage: 'ar-SA',
+      };
+    }),
   });
 
   const filters: { key: Filter; label: string }[] = [
@@ -59,7 +80,8 @@ export default function HolidaysPage() {
 
   return (
     <div className="container-page py-10">
-      <header className="max-w-2xl">
+      <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'الإجازات الرسمية' }]} />
+      <header className="mt-4 max-w-2xl">
         <h1 className="section-title">الإجازات الرسمية في السعودية</h1>
         <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
           قائمة كاملة بالإجازات الرسمية في المملكة العربية السعودية للعام 2026-2027م مع تواريخها

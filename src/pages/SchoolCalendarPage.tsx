@@ -17,13 +17,36 @@ export default function SchoolCalendarPage() {
       'التقويم الدراسي الرسمي للعام 1448-1449هـ (2026-2027م) وفق وزارة التعليم السعودية وتقويم أم القرى — مواعيد بداية الدراسة وإجازات المدارس لجميع مراحل التعليم.',
     canonical: 'https://alshafra.com/school-calendar',
     keywords: 'التقويم الدراسي, 1448, بداية الدراسة, إجازات المدارس, وزارة التعليم, التقويم المدرسي',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'EventSeries',
-      name: 'التقويم الدراسي 1448-1449هـ',
-      startDate: '2026-08-23',
-      endDate: '2027-05-27',
-    },
+    jsonLd: schoolEvents.map((e) => {
+      const startDate = `${e.date.year}-${String(e.date.month).padStart(2, '0')}-${String(e.date.day).padStart(2, '0')}`;
+      const endDateObj = e.holidayDays && e.holidayDays > 1
+        ? (() => {
+            const d = new Date(e.date.year, e.date.month - 1, e.date.day + e.holidayDays - 1);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          })()
+        : startDate;
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'Event',
+        name: e.title,
+        description: e.description,
+        startDate,
+        endDate: endDateObj,
+        eventStatus: 'https://schema.org/EventScheduled',
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        location: {
+          '@type': 'Place',
+          name: 'مدارس المملكة العربية السعودية',
+          address: { '@type': 'PostalAddress', addressCountry: 'SA' },
+        },
+        organizer: {
+          '@type': 'GovernmentOrganization',
+          name: 'وزارة التعليم السعودية',
+          url: 'https://www.moe.gov.sa',
+        },
+        inLanguage: 'ar-SA',
+      };
+    }),
   });
 
   return (
