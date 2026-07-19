@@ -14,7 +14,7 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
       '@type': 'ListItem',
       position: i + 1,
       name: item.name,
-      item: item.path ? `${SITE_URL}/#${item.path}` : `${SITE_URL}/`,
+      item: item.path ? `${SITE_URL}${item.path}` : `${SITE_URL}/`,
     })),
   };
   useSeo({ jsonLd });
@@ -27,7 +27,7 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
           <span key={i} className="flex items-center gap-1">
             {i === 0 && <Home className="h-3.5 w-3.5" />}
             {item.path && !isLast ? (
-              <a href={`#${item.path}`} className="hover:text-brand-700 hover:underline">
+              <a href={item.path} className="hover:text-brand-700 hover:underline">
                 {item.name}
               </a>
             ) : (

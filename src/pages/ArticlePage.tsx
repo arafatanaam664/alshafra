@@ -2,6 +2,7 @@ import { Calendar, Clock, ArrowLeft, FileText } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { articleBySlug, ARTICLES, CATEGORY_LABELS_ARTICLE, type Article } from '../lib/articles';
+import AdSlot from '../components/AdSlot';
 
 export default function ArticlePage({ slug }: { slug: string }) {
   const article = articleBySlug(slug);
@@ -53,7 +54,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
         <FileText className="mx-auto h-12 w-12 text-brand-400" />
         <h1 className="mt-4 font-display text-2xl font-bold text-brand-900">المقال غير موجود</h1>
         <p className="mt-2 text-sm text-brand-700/70">عذراً، المقال الذي تبحث عنه غير متوفر.</p>
-        <a href="#/" className="btn-primary mt-6 inline-flex">
+        <a href="/" className="btn-primary mt-6 inline-flex">
           <ArrowLeft className="h-4 w-4" />
           العودة للرئيسية
         </a>
@@ -96,6 +97,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
             <section key={i}>
               <h2 className="font-display text-xl font-bold text-brand-900">{s.heading}</h2>
               <p className="mt-2 whitespace-pre-line text-[15px] leading-loose text-brand-800/90">{s.body}</p>
+              {i === 1 && <AdSlot slot="2222222222" className="my-6" />}
             </section>
           ))}
         </div>
@@ -120,7 +122,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
           <h2 className="font-display text-lg font-bold text-brand-900">مقالات ذات صلة</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             {related.map((a) => (
-              <a key={a.slug} href={`#/articles/${a.slug}`} className="card group p-5 transition-all hover:-translate-y-0.5 hover:shadow-soft">
+              <a key={a.slug} href={`/articles/${a.slug}`} className="card group p-5 transition-all hover:-translate-y-0.5 hover:shadow-soft">
                 <span className="chip bg-brand-50 text-brand-700 ring-1 ring-brand-200">
                   {CATEGORY_LABELS_ARTICLE[a.category]}
                 </span>
@@ -170,7 +172,7 @@ export function ArticlesListPage() {
         {ARTICLES.map((a) => (
           <a
             key={a.slug}
-            href={`#/articles/${a.slug}`}
+            href={`/articles/${a.slug}`}
             className="card group flex flex-col p-5 transition-all hover:-translate-y-0.5 hover:shadow-soft"
           >
             <div className="flex items-center justify-between">

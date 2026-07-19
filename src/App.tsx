@@ -11,6 +11,7 @@ import SchoolCalendarPage from './pages/SchoolCalendarPage';
 import HolidaysPage from './pages/HolidaysPage';
 import FaqPage from './pages/FaqPage';
 import ArticlePage, { ArticlesListPage } from './pages/ArticlePage';
+import { PrivacyPage, TermsPage, AboutPage, ContactPage } from './pages/LegalPages';
 
 export default function App() {
   const [path, navigate] = useRoute();
@@ -29,6 +30,10 @@ export default function App() {
         {name === 'faq' && <FaqPage />}
         {name === 'articles' && param && <ArticlePage slug={param} />}
         {name === 'articles' && !param && <ArticlesListPage />}
+        {name === 'privacy' && <PrivacyPage />}
+        {name === 'terms' && <TermsPage />}
+        {name === 'about' && <AboutPage />}
+        {name === 'contact' && <ContactPage />}
         {name === 'home' && <HomePage navigate={navigate} />}
       </main>
       <Footer navigate={navigate} />

@@ -38,6 +38,7 @@ import {
 } from '../lib/events';
 import { ARTICLES, CATEGORY_LABELS_ARTICLE } from '../lib/articles';
 import Countdown from '../components/Countdown';
+import AdSlot from '../components/AdSlot';
 import type { RoutePath } from '../lib/router';
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -66,7 +67,7 @@ export default function HomePage({ navigate }: HomePageProps) {
     title: 'تقويم السعودية | مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي',
     description:
       'بوابة سعودية شاملة لمواعيد صرف الرواتب الحكومية، حساب المواطن، الضمان الاجتماعي المطوّر، رواتب المتقاعدين، التقويم الهجري والميلادي، التقويم الدراسي، الإجازات الرسمية، وتحويل التاريخ وحاسبة العمر — وفق تقويم أم القرى الرسمي.',
-    canonical: 'https://saudicalendar.sa/',
+    canonical: 'https://alshafra.com/',
     keywords:
       'التقويم الهجري, التقويم الميلادي, مواعيد الرواتب, حساب المواطن, رواتب المتقاعدين, الضمان الاجتماعي, التقويم الدراسي, الإجازات الرسمية, تحويل التاريخ, حاسبة العمر, تقويم أم القرى, السعودية',
     jsonLd: [
@@ -74,14 +75,14 @@ export default function HomePage({ navigate }: HomePageProps) {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
         name: 'تقويم السعودية',
-        url: 'https://saudicalendar.sa/',
+        url: 'https://alshafra.com/',
         inLanguage: 'ar-SA',
       },
       {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: 'https://saudicalendar.sa/' },
+          { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: 'https://alshafra.com/' },
         ],
       },
     ],
@@ -358,6 +359,7 @@ export default function HomePage({ navigate }: HomePageProps) {
 
       {/* Articles + FAQ */}
       <section className="container-page mt-14">
+        <AdSlot slot="1111111111" />
         <div className="flex items-end justify-between">
           <div>
             <h2 className="section-title">مقالات ودلائل</h2>

@@ -18,7 +18,7 @@ export default function AgeCalculatorPage() {
     title: 'حاسبة العمر بالهجري والميلادي | تقويم السعودية',
     description:
       'احسب عمرك بدقة بالسنوات والأشهر والأيام بالتقويمين الهجري والميلادي. أدخل تاريخ ميلادك واحصل على عمرك الكامل والقادم مع عدد الأيام التي عشتها.',
-    canonical: 'https://saudicalendar.sa/age-calculator',
+    canonical: 'https://alshafra.com/age-calculator',
     keywords: 'حاسبة العمر, حساب العمر, العمر بالهجري, العمر بالميلادي, كم عمري',
     jsonLd: {
       '@context': 'https://schema.org',

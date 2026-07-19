@@ -15,7 +15,7 @@ export default function SchoolCalendarPage() {
     title: 'التقويم الدراسي 1448-1449هـ (2026-2027م) | تقويم السعودية',
     description:
       'التقويم الدراسي الرسمي للعام 1448-1449هـ (2026-2027م) وفق وزارة التعليم السعودية وتقويم أم القرى — مواعيد بداية الدراسة وإجازات المدارس لجميع مراحل التعليم.',
-    canonical: 'https://saudicalendar.sa/school-calendar',
+    canonical: 'https://alshafra.com/school-calendar',
     keywords: 'التقويم الدراسي, 1448, بداية الدراسة, إجازات المدارس, وزارة التعليم, التقويم المدرسي',
     jsonLd: {
       '@context': 'https://schema.org',

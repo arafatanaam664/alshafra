@@ -33,7 +33,7 @@ export default function HolidaysPage() {
     title: 'الإجازات الرسمية في السعودية 2026-2027 | تقويم السعودية',
     description:
       'قائمة كاملة بالإجازات الرسمية في المملكة العربية السعودية للعام 2026-2027م مع تواريخها الهجرية والميلادية ومدة كل إجازة. تشمل الإجازات الدينية والوطنية والإجازات الدراسية.',
-    canonical: 'https://saudicalendar.sa/holidays',
+    canonical: 'https://alshafra.com/holidays',
     keywords: 'الإجازات الرسمية, عطلات السعودية, إجازة عيد الفطر, إجازة عيد الأضحى, اليوم الوطني, يوم التأسيس',
     jsonLd: {
       '@context': 'https://schema.org',

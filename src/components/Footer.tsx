@@ -62,12 +62,18 @@ export default function Footer({ navigate }: { navigate: (to: string) => void })
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-gold-400" />
-                <span>info@saudicalendar.sa</span>
+                <span>info@alshafra.com</span>
               </li>
               <li className="flex items-center gap-2">
                 <Github className="h-4 w-4 text-gold-400" />
                 <span>تحديثات يومية تلقائية</span>
               </li>
+            </ul>
+            <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-brand-200/70">
+              <li><button onClick={() => navigate('/about')} className="hover:text-white">عن الموقع</button></li>
+              <li><button onClick={() => navigate('/contact')} className="hover:text-white">اتصل بنا</button></li>
+              <li><button onClick={() => navigate('/privacy')} className="hover:text-white">سياسة الخصوصية</button></li>
+              <li><button onClick={() => navigate('/terms')} className="hover:text-white">شروط الاستخدام</button></li>
             </ul>
           </div>
         </div>

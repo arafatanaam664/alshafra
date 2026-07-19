@@ -3,20 +3,21 @@ import { useEffect, useState } from 'react';
 export type RoutePath = string;
 
 export function useRoute(): [RoutePath, (path: RoutePath) => void] {
-  const [path, setPath] = useState<RoutePath>(() => normalize(window.location.hash));
+  const [path, setPath] = useState<RoutePath>(() => normalize(window.location.pathname));
 
   useEffect(() => {
-    const onChange = () => setPath(normalize(window.location.hash));
-    window.addEventListener('hashchange', onChange);
-    return () => window.removeEventListener('hashchange', onChange);
+    const onChange = () => setPath(normalize(window.location.pathname));
+    window.addEventListener('popstate', onChange);
+    return () => window.removeEventListener('popstate', onChange);
   }, []);
 
   const navigate = (next: RoutePath) => {
     const target = next.startsWith('/') ? next : `/${next}`;
-    if (normalize(window.location.hash) === target) {
+    if (normalize(window.location.pathname) === target) {
       setPath(target);
     } else {
-      window.location.hash = target;
+      window.history.pushState({}, '', target);
+      setPath(target);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -24,9 +25,9 @@ export function useRoute(): [RoutePath, (path: RoutePath) => void] {
   return [path, navigate];
 }
 
-function normalize(hash: string): RoutePath {
-  if (!hash || hash === '#') return '/';
-  const stripped = hash.startsWith('#') ? hash.slice(1) : hash;
+function normalize(pathname: string): RoutePath {
+  if (!pathname || pathname === '#') return '/';
+  const stripped = pathname.startsWith('#') ? pathname.slice(1) : pathname;
   return stripped.startsWith('/') ? stripped : `/${stripped}`;
 }
 

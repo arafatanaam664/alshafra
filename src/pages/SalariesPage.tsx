@@ -35,7 +35,7 @@ export default function SalariesPage() {
     title: 'مواعيد صرف الرواتب وحساب المواطن والمتقاعدين | تقويم السعودية',
     description:
       'مواعيد صرف رواتب الموظفين الحكوميين، حساب المواطن، رواتب المتقاعدين، الضمان الاجتماعي المطوّر، والدعم السكني في المملكة العربية السعودية مع عدّ تنازلي مباشر لكل موعد.',
-    canonical: 'https://saudicalendar.sa/salaries',
+    canonical: 'https://alshafra.com/salaries',
     keywords: 'مواعيد الرواتب, حساب المواطن, رواتب المتقاعدين, الضمان الاجتماعي, الدعم السكني, موعد الصرف',
     jsonLd: {
       '@context': 'https://schema.org',

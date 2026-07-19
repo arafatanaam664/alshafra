@@ -22,7 +22,7 @@ export default function HijriCalendarPage() {
     title: 'التقويم الهجري 1448هـ — تقويم أم القرى الرسمي | تقويم السعودية',
     description:
       'التقويم الهجري الكامل وفق تقويم أم القرى الرسمي المعتمد في المملكة العربية السعودية، مع عرض جميع المناسبات الدينية والوطنية والإجازات الرسمية لكل شهر هجري.',
-    canonical: 'https://saudicalendar.sa/hijri-calendar',
+    canonical: 'https://alshafra.com/hijri-calendar',
     keywords: 'التقويم الهجري, تقويم أم القرى, 1448هـ, التقويم الإسلامي, المناسبات الدينية',
     jsonLd: {
       '@context': 'https://schema.org',

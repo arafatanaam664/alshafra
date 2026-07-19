@@ -31,7 +31,7 @@ export default function DateConverterPage() {
     title: 'تحويل التاريخ بين الهجري والميلادي | تقويم السعودية',
     description:
       'أداة مجانية لتحويل التاريخ بين التقويم الهجري والميلادي بدقة وفق تقويم أم القرى الرسمي. حوّل أي تاريخ هجري إلى ميلادي أو العكس مع عرض اليوم من الأسبوع.',
-    canonical: 'https://saudicalendar.sa/date-converter',
+    canonical: 'https://alshafra.com/date-converter',
     keywords: 'تحويل التاريخ, الهجري إلى الميلادي, الميلادي إلى الهجري, تقويم أم القرى, حاسبة تاريخ',
     jsonLd: {
       '@context': 'https://schema.org',
