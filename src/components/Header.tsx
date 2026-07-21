@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText } from 'lucide-react';
+import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText, Wand2 } from 'lucide-react';
 import { useRoute } from '../lib/router';
 
 const NAV = [
@@ -10,6 +10,7 @@ const NAV = [
   { to: '/holidays', label: 'الإجازات الرسمية', icon: Flag },
   { to: '/date-converter', label: 'تحويل التاريخ', icon: Clock },
   { to: '/age-calculator', label: 'حاسبة العمر', icon: Sparkles },
+  { to: '/name-decoration', label: 'زخرفة الأسماء', icon: Wand2 },
   { to: '/articles', label: 'مقالات', icon: FileText },
   { to: '/faq', label: 'الأسئلة الشائعة', icon: HelpCircle },
 ];

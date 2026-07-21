@@ -15,6 +15,7 @@ import {
   TrendingUp,
   FileText,
   HelpCircle,
+  Wand2,
 } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import { useNow } from '../lib/useNow';
@@ -268,6 +269,12 @@ export default function HomePage({ navigate }: HomePageProps) {
             title="حاسبة العمر"
             desc="احسب عمرك بالسنوات والأشهر والأيام بالتقويمين الهجري والميلادي."
             onClick={() => navigate('/age-calculator')}
+          />
+          <ServiceCard
+            icon={Wand2}
+            title="زخرفة الأسماء"
+            desc="زخرف اسمك بأكثر من 75 نمط مجاناً — عربي، ببجي، إنجليزي، فري فاير، وفرنسي."
+            onClick={() => navigate('/name-decoration')}
           />
         </div>
       </section>

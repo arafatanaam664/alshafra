@@ -8,6 +8,7 @@ const LINKS = [
   { to: '/holidays', label: 'الإجازات الرسمية' },
   { to: '/date-converter', label: 'تحويل التاريخ' },
   { to: '/age-calculator', label: 'حاسبة العمر' },
+  { to: '/name-decoration', label: 'زخرفة الأسماء' },
   { to: '/articles', label: 'مقالات' },
   { to: '/faq', label: 'الأسئلة الشائعة' },
 ];

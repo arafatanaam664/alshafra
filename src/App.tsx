@@ -11,6 +11,7 @@ import SchoolCalendarPage from './pages/SchoolCalendarPage';
 import HolidaysPage from './pages/HolidaysPage';
 import FaqPage from './pages/FaqPage';
 import ArticlePage, { ArticlesListPage } from './pages/ArticlePage';
+import NameDecorationToolPage, { NameDecorationHubPage } from './pages/NameDecorationPage';
 import { PrivacyPage, TermsPage, AboutPage, ContactPage } from './pages/LegalPages';
 
 export default function App() {
@@ -30,6 +31,8 @@ export default function App() {
         {name === 'faq' && <FaqPage />}
         {name === 'articles' && param && <ArticlePage slug={param} />}
         {name === 'articles' && !param && <ArticlesListPage />}
+        {name === 'name-decoration' && param && <NameDecorationToolPage slug={param} />}
+        {name === 'name-decoration' && !param && <NameDecorationHubPage />}
         {name === 'privacy' && <PrivacyPage />}
         {name === 'terms' && <TermsPage />}
         {name === 'about' && <AboutPage />}
