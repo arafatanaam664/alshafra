@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText, Wand2 } from 'lucide-react';
 import { useRoute } from '../lib/router';
+import Link from './Link';
 
 const NAV = [
   { to: '/', label: 'الرئيسية', icon: Calendar },
@@ -16,19 +17,16 @@ const NAV = [
 ];
 
 export default function Header() {
-  const [path, navigate] = useRoute();
+  const [path] = useRoute();
   const [open, setOpen] = useState(false);
-
-  const go = (to: string) => {
-    navigate(to);
-    setOpen(false);
-  };
+  const close = () => setOpen(false);
 
   return (
     <header className="sticky top-0 z-40 border-b border-brand-900/5 bg-white/85 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between gap-4">
-        <button
-          onClick={() => go('/')}
+        <Link
+          to="/"
+          onClick={close}
           className="group flex items-center gap-2.5"
           aria-label="تقويم السعودية - الصفحة الرئيسية"
         >
@@ -39,21 +37,23 @@ export default function Header() {
             <span className="block font-display text-base font-bold text-brand-900">تقويم السعودية</span>
             <span className="block text-[11px] text-brand-600/70">بوابة المواعيد الرسمية</span>
           </span>
-        </button>
+        </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
           {NAV.map((item) => {
             const active = path === item.to;
             const Icon = item.icon;
             return (
-              <button
+              <Link
                 key={item.to}
-                onClick={() => go(item.to)}
+                to={item.to}
+                onClick={close}
+                aria-current={active ? 'page' : undefined}
                 className={`nav-link flex items-center gap-1.5 ${active ? 'nav-link-active' : ''}`}
               >
                 <Icon className="h-4 w-4" />
                 {item.label}
-              </button>
+              </Link>
             );
           })}
         </nav>
@@ -74,16 +74,18 @@ export default function Header() {
               const active = path === item.to;
               const Icon = item.icon;
               return (
-                <button
+                <Link
                   key={item.to}
-                  onClick={() => go(item.to)}
+                  to={item.to}
+                  onClick={close}
+                  aria-current={active ? 'page' : undefined}
                   className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium ${
                     active ? 'bg-brand-600 text-white' : 'text-brand-800 hover:bg-brand-50'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
                   {item.label}
-                </button>
+                </Link>
               );
             })}
           </nav>

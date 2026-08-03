@@ -196,7 +196,6 @@ export const ENGLISH_STYLES: DecorationStyle[] = [
 
 // --- PUBG decoration styles -------------------------------------------------
 
-const PUBG_SYMBOLS = ['★', '♛', '✦', '⚔', '◤', '◥', '★', '☆', '✧', '◈', '♔', '♕'];
 
 export const PUBG_STYLES: DecorationStyle[] = [
   { id: 'pubg_wings', label: 'زخرفة ببجي بالأجنحة', transform: (n) => `◤ ${n} ◥` },

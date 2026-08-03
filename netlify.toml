@@ -2,7 +2,13 @@
   command = "npm run build"
   publish = "dist"
 
-# Old irrelevant pages — 410 Gone so Google removes them from index
+# NOTE: every valid route is emitted as a real static file by
+# `scripts/prerender.mjs`, so there is deliberately NO catch-all
+# `/* -> /index.html 200` rule here. A missing URL must return a genuine 404
+# (or 410) instead of a 200 with an empty SPA shell, otherwise Google keeps
+# thousands of ghost URLs from the site's previous incarnation in its index.
+
+# Old, unrelated pages from the previous site — 410 Gone so Google drops them fast.
 [[redirects]]
   from = "/category/*"
   to = "/410.html"
@@ -18,19 +24,19 @@
   to = "/410.html"
   status = 410
 
-# SPA fallback for valid routes (must be last)
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  from = "/index.html"
+  to = "/"
+  status = 301
+  force = true
 
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
 
 [[headers]]
   for = "/assets/*"
@@ -40,7 +46,7 @@
 [[headers]]
   for = "/*.html"
   [headers.values]
-    Cache-Control = "public, max-age=3600"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/sitemap.xml"

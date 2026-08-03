@@ -1,5 +1,13 @@
 import type { GregorianDate } from './hijri';
-import { gregorianToHijri, formatHijri, formatGregorian, weekdayName, gregorianToJdn } from './hijri';
+import {
+  gregorianToHijri,
+  formatHijri,
+  formatGregorian,
+  weekdayName,
+  weekdayIndex,
+  gregorianToJdn,
+  jdnToGregorian,
+} from './hijri';
 
 export type EventCategory =
   | 'religious'
@@ -13,7 +21,6 @@ export interface SaudiEvent {
   title: string;
   category: EventCategory;
   date: GregorianDate;
-  hijriNote?: string;
   description: string;
   isHoliday: boolean;
   holidayDays?: number;
@@ -26,7 +33,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'رأس السنة الهجرية 1448هـ',
     category: 'religious',
     date: { year: 2026, month: 6, day: 15 },
-    hijriNote: '1 محرم 1448هـ',
     description:
       'بداية العام الهجري الجديد 1448هـ. عطلة رسمية في المملكة تُحيي ذكرى هجرة النبي محمد ﷺ من مكة إلى المدينة المنورة.',
     isHoliday: true,
@@ -38,7 +44,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'عودة المعلمين والمعلمات',
     category: 'school',
     date: { year: 2026, month: 8, day: 16 },
-    hijriNote: '3 ربيع الأول 1448هـ',
     description: 'موعد عودة المعلمين والمعلمات إلى المدارس لبداية العام الدراسي 1448-1449هـ.',
     isHoliday: false,
     emoji: '🏫',
@@ -48,7 +53,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'بداية العام الدراسي 1448-1449هـ',
     category: 'school',
     date: { year: 2026, month: 8, day: 23 },
-    hijriNote: '10 ربيع الأول 1448هـ',
     description:
       'بداية الدراسة للعام الدراسي 1448-1449هـ لجميع مراحل التعليم العام في المملكة العربية السعودية وفق تقويم وزارة التعليم.',
     isHoliday: false,
@@ -59,7 +63,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'اليوم الوطني السعودي',
     category: 'national',
     date: { year: 2026, month: 9, day: 23 },
-    hijriNote: '23 ربيع الأول 1448هـ',
     description:
       'يصادف 23 سبتمبر من كل عام ذكرى توحيد المملكة العربية السعودية على يد الملك عبدالعزيز آل سعود عام 1351هـ/1932م. عطلة رسمية وطنية.',
     isHoliday: true,
@@ -71,7 +74,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'إجازة منتصف الفصل الدراسي الأول',
     category: 'school',
     date: { year: 2026, month: 10, day: 25 },
-    hijriNote: '14 ربيع الآخر 1448هـ',
     description: 'إجازة منتصف الفصل الدراسي الأول للعام الدراسي 1448-1449هـ وفق تقويم وزارة التعليم.',
     isHoliday: true,
     holidayDays: 4,
@@ -82,7 +84,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'يوم القوات المسلحة السعودية',
     category: 'national',
     date: { year: 2026, month: 10, day: 6 },
-    hijriNote: '24 ربيع الآخر 1448هـ',
     description:
       'يُصادف 6 أكتوبر من كل عام ذكرى انتصارات حرب أكتوبر 1973م. يُحتفل به تكريماً للقوات المسلحة السعودية.',
     isHoliday: false,
@@ -93,7 +94,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'إجازة منتصف العام الدراسي',
     category: 'school',
     date: { year: 2027, month: 1, day: 24 },
-    hijriNote: '15 جمادى الأولى 1448هـ',
     description: 'إجازة منتصف العام الدراسي 1448-1449هـ بين الفصلين الأول والثاني.',
     isHoliday: true,
     holidayDays: 9,
@@ -104,7 +104,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'يوم العلم السعودي',
     category: 'national',
     date: { year: 2027, month: 3, day: 11 },
-    hijriNote: '11 ذو القعدة 1448هـ',
     description:
       'يُحتفل باليوم الوطني للعلم السعودي في 11 مارس من كل عام، إحياءً لذكرى توحيد العلم السعودي على شكله الحالي عام 1937م.',
     isHoliday: false,
@@ -115,7 +114,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'إجازة منتصف الفصل الدراسي الثاني',
     category: 'school',
     date: { year: 2027, month: 3, day: 28 },
-    hijriNote: '18 ذو القعدة 1448هـ',
     description: 'إجازة منتصف الفصل الدراسي الثاني للعام الدراسي 1448-1449هـ.',
     isHoliday: true,
     holidayDays: 4,
@@ -126,7 +124,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'يوم التأسيس السعودي',
     category: 'national',
     date: { year: 2027, month: 2, day: 22 },
-    hijriNote: '22 شوال 1448هـ',
     description:
       'يصادف 22 شوال من كل عام هجري ذكرى تأسيس الدولة السعودية الأولى عام 1139هـ على يد الإمام محمد بن سعود. يوم وطني يُحيي فيه السعوديون إرثهم التاريخي.',
     isHoliday: true,
@@ -138,7 +135,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'مطلع شهر رمضان المبارك 1448هـ',
     category: 'religious',
     date: { year: 2027, month: 2, day: 18 },
-    hijriNote: '1 رمضان 1448هـ',
     description:
       'بداية شهر رمضان المبارك للعام الهجري 1448هـ، شهر الصيام والقيام وتلاوة القرآن. تُعلن رؤية الهلال رسمياً من قبل المحكمة العليا.',
     isHoliday: false,
@@ -149,7 +145,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'عيد الفطر المبارك 1448هـ',
     category: 'religious',
     date: { year: 2027, month: 3, day: 19 },
-    hijriNote: '1 شوال 1448هـ',
     description:
       'يبدأ عيد الفطر المبارك في 1 شوال 1448هـ بعد صيام شهر رمضان. تُقام صلاة العيد في المساجد والمصليات وتستمر الإجازة الرسمية عدة أيام.',
     isHoliday: true,
@@ -161,7 +156,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'وقفة عرفة 1448هـ',
     category: 'religious',
     date: { year: 2027, month: 7, day: 18 },
-    hijriNote: '9 ذو الحجة 1448هـ',
     description:
       'يوم عرفة، أعظم أيام السنة عند المسلمين، يقف فيه حجاج بيت الله الحرام على عرفات. يُستحب صيامه لغير الحجاج.',
     isHoliday: true,
@@ -173,7 +167,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'عيد الأضحى المبارك 1448هـ',
     category: 'religious',
     date: { year: 2027, month: 7, day: 19 },
-    hijriNote: '10 ذو الحجة 1448هـ',
     description:
       'يبدأ عيد الأضحى المبارك في 10 ذو الحجة 1448هـ، ويستمر أربعة أيام. تُقام صلاة العيد ويُضحى بالأضاحي تقرّباً إلى الله.',
     isHoliday: true,
@@ -185,7 +178,6 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     title: 'نهاية العام الدراسي 1448-1449هـ',
     category: 'school',
     date: { year: 2027, month: 5, day: 27 },
-    hijriNote: '21 محرم 1449هـ',
     description: 'نهاية اختبارات الفصل الدراسي الثالث وبداية إجازة الصيف للعام الدراسي 1448-1449هـ.',
     isHoliday: true,
     holidayDays: 75,
@@ -201,6 +193,8 @@ export interface SalarySchedule {
   category: 'employee' | 'citizen' | 'retiree' | 'pension' | 'housing';
   accent: string;
   icon: string;
+  /** Official reference the date is based on — an E-E-A-T signal for Google. */
+  source?: { label: string; url: string };
 }
 
 export const SALARY_SCHEDULES: SalarySchedule[] = [
@@ -208,51 +202,56 @@ export const SALARY_SCHEDULES: SalarySchedule[] = [
     id: 'employee-salaries',
     title: 'رواتب الموظفين الحكوميين',
     description:
-      'تصرف رواتب موظفي الحكومة في المملكة عادةً في اليوم الأخير من كل شهر ميلادي أو بداية الشهر التالي، وفق تقويم وزارة المالية.',
+      'تُصرف رواتب موظفي الدولة في اليوم 27 من كل شهر ميلادي وفق جدول وزارة المالية المعتمد. إذا صادف يوم 27 يوم الجمعة يُصرف الراتب يوم الخميس الذي قبله، وإذا صادف يوم السبت يُصرف يوم الأحد الذي بعده.',
     dayOfMonth: 27,
     category: 'employee',
     accent: 'from-brand-600 to-brand-500',
     icon: 'Briefcase',
+    source: { label: 'وزارة المالية', url: 'https://www.mof.gov.sa/mediacenter/Payroll/Pages/default.aspx' },
   },
   {
     id: 'citizen-account',
     title: 'حساب المواطن',
     description:
-      'يُصرف دعم حساب المواطن في اليوم العاشر من كل شهر ميلادي. يهدف البرنامج إلى إعادة توجيه الدعم الحكومي للأسر المستحقة.',
+      'يُصرف دعم حساب المواطن في اليوم العاشر من كل شهر ميلادي للأسر المستحقة. إذا صادف اليوم العاشر يوم جمعة يُصرف الخميس الذي قبله، وإذا صادف السبت يُصرف الأحد الذي بعده.',
     dayOfMonth: 10,
     category: 'citizen',
     accent: 'from-gold-600 to-gold-500',
     icon: 'Users',
+    source: { label: 'بوابة حساب المواطن', url: 'https://ca.gov.sa/' },
   },
   {
     id: 'retiree-salaries',
     title: 'رواتب المتقاعدين',
     description:
-      'تُودع رواتب المتقاعدين في اليوم الخامس والعشرين من كل شهر ميلادي وفق المؤسسة العامة للتقاعد.',
-    dayOfMonth: 25,
+      'وحّدت المؤسسة العامة للتأمينات الاجتماعية موعد صرف معاشات المتقاعدين (المدني والعسكري والتأمينات) ليكون اليوم الأول من كل شهر ميلادي. إذا صادف يوم جمعة يُصرف الخميس الذي قبله، وإذا صادف يوم سبت يُصرف الأحد الذي بعده.',
+    dayOfMonth: 1,
     category: 'retiree',
     accent: 'from-brand-700 to-brand-600',
     icon: 'HandCoins',
+    source: { label: 'التأمينات الاجتماعية', url: 'https://www.gosi.gov.sa/' },
   },
   {
     id: 'social-security',
     title: 'الضمان الاجتماعي المطوّر',
     description:
-      'يُصرف راتب الضمان الاجتماعي المطوّر في اليوم الأول من كل شهر ميلادي للمستفيدين المستحقين وفق وزارة الموارد البشرية والتنمية الاجتماعية.',
+      'يُصرف معاش الضمان الاجتماعي المطوّر في اليوم الأول من كل شهر ميلادي للمستفيدين المستحقين وفق وزارة الموارد البشرية والتنمية الاجتماعية، مع التقديم إلى آخر يوم عمل إذا صادف عطلة نهاية الأسبوع.',
     dayOfMonth: 1,
     category: 'pension',
     accent: 'from-emerald-700 to-emerald-500',
     icon: 'ShieldCheck',
+    source: { label: 'وزارة الموارد البشرية', url: 'https://hrsd.gov.sa/' },
   },
   {
     id: 'housing-support',
     title: 'الدعم السكني',
     description:
-      'يُصرف الدعم السكني في الرابع والعشرين من كل شهر ميلادي للمستفيدين من برنامج سكني.',
+      'يُصرف الدعم السكني لمستفيدي برنامج «سكني» في اليوم 24 من كل شهر ميلادي. إذا صادف يوم جمعة يُصرف الخميس الذي قبله، وإذا صادف السبت يُصرف الأحد الذي بعده.',
     dayOfMonth: 24,
     category: 'housing',
     accent: 'from-amber-700 to-amber-500',
     icon: 'Home',
+    source: { label: 'منصة سكني', url: 'https://sakani.sa/' },
   },
 ];
 
@@ -265,15 +264,36 @@ export interface SalaryInstance {
   daysRemaining: number;
 }
 
+/**
+ * Official Saudi disbursement rule: if the scheduled day falls on Friday the
+ * payment is moved BACK to Thursday; if it falls on Saturday it is moved
+ * FORWARD to Sunday. Applied by وزارة المالية، التأمينات الاجتماعية،
+ * حساب المواطن and سكني alike.
+ */
+export function applyWeekendRule(date: GregorianDate): GregorianDate {
+  const jdn = gregorianToJdn(date.year, date.month, date.day);
+  const wd = weekdayIndex(date); // 0=Sunday .. 5=Friday, 6=Saturday
+  if (wd === 5) return jdnToGregorian(jdn - 1); // Friday -> Thursday
+  if (wd === 6) return jdnToGregorian(jdn + 1); // Saturday -> Sunday
+  return date;
+}
+
+/** The scheduled (pre-adjustment) date for a given month. */
+function scheduledDate(schedule: SalarySchedule, year: number, month: number): GregorianDate {
+  return { year, month, day: schedule.dayOfMonth };
+}
+
 export function nextSalaryDate(schedule: SalarySchedule, from: GregorianDate): GregorianDate {
-  if (from.day > schedule.dayOfMonth) {
-    return {
-      year: from.month === 12 ? from.year + 1 : from.year,
-      month: from.month === 12 ? 1 : from.month + 1,
-      day: schedule.dayOfMonth,
-    };
+  const fromJdn = gregorianToJdn(from.year, from.month, from.day);
+  // Check this month, then the next two, and return the first adjusted date
+  // that has not already passed (the weekend rule can pull a date backwards).
+  for (let offset = 0; offset < 3; offset++) {
+    const month = ((from.month - 1 + offset) % 12) + 1;
+    const year = from.year + Math.floor((from.month - 1 + offset) / 12);
+    const adjusted = applyWeekendRule(scheduledDate(schedule, year, month));
+    if (gregorianToJdn(adjusted.year, adjusted.month, adjusted.day) >= fromJdn) return adjusted;
   }
-  return { year: from.year, month: from.month, day: schedule.dayOfMonth };
+  return applyWeekendRule(scheduledDate(schedule, from.year, from.month));
 }
 
 export function buildSalaryInstances(from: GregorianDate): SalaryInstance[] {
@@ -312,11 +332,25 @@ export function upcomingEvents(from: GregorianDate, limit = 6): SaudiEvent[] {
 }
 
 export function daysUntilEvent(event: SaudiEvent, from: GregorianDate): number {
-  return Math.max(
-    0,
+  return Math.max(0, rawDaysUntilEvent(event, from));
+}
+
+/** Signed day difference — negative for events that already happened. */
+export function rawDaysUntilEvent(event: SaudiEvent, from: GregorianDate): number {
+  return (
     gregorianToJdn(event.date.year, event.date.month, event.date.day) -
-      gregorianToJdn(from.year, from.month, from.day),
+    gregorianToJdn(from.year, from.month, from.day)
   );
+}
+
+/** The next holiday that has NOT passed yet (never a stale past holiday). */
+export function nextHolidayAfter(from: GregorianDate): SaudiEvent | undefined {
+  return upcomingEvents(from, SAUDI_EVENTS.length).find((e) => e.isHoliday);
+}
+
+/** Hijri text for an event, derived from the Umm Al-Qura table (never hardcoded). */
+export function eventHijriText(event: SaudiEvent): string {
+  return formatHijri(gregorianToHijri(event.date.year, event.date.month, event.date.day));
 }
 
 export const CATEGORY_LABELS: Record<EventCategory, string> = {

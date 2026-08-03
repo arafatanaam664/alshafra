@@ -32,6 +32,8 @@ import {
   upcomingEvents,
   buildSalaryInstances,
   daysUntilEvent,
+  eventHijriText,
+  nextHolidayAfter,
   CATEGORY_LABELS,
   CATEGORY_STYLES,
   SAUDI_EVENTS,
@@ -39,8 +41,8 @@ import {
 } from '../lib/events';
 import { ARTICLES, CATEGORY_LABELS_ARTICLE } from '../lib/articles';
 import Countdown from '../components/Countdown';
+import Link from '../components/Link';
 import AdSlot from '../components/AdSlot';
-import type { RoutePath } from '../lib/router';
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Briefcase,
@@ -50,11 +52,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Home: HomeIcon,
 };
 
-interface HomePageProps {
-  navigate: (to: RoutePath) => void;
-}
-
-export default function HomePage({ navigate }: HomePageProps) {
+export default function HomePage() {
   const now = useNow(1000);
   const today = todayGregorian();
   const hijri = todayHijri();
@@ -62,7 +60,7 @@ export default function HomePage({ navigate }: HomePageProps) {
   const upcoming = upcomingEvents(today, 6);
   const salaries = buildSalaryInstances(today);
   const nextEvent = upcoming[0];
-  const nextHoliday = SAUDI_EVENTS.find((e) => e.isHoliday && daysUntilEvent(e, today) >= 0) ?? upcoming[0];
+  const nextHoliday = nextHolidayAfter(today) ?? upcoming[0];
 
   useSeo({
     title: 'تقويم السعودية | مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي',
@@ -118,18 +116,18 @@ export default function HomePage({ navigate }: HomePageProps) {
                 الرسمية، مع أدوات تحويل التاريخ وحاسبة العمر — وفق تقويم أم القرى الرسمي.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <button onClick={() => navigate('/salaries')} className="btn bg-gold-500 text-brand-900 hover:bg-gold-400">
+                <Link to="/salaries" className="btn bg-gold-500 text-brand-900 hover:bg-gold-400">
                   <Coins className="h-4 w-4" />
                   مواعيد الرواتب
-                </button>
-                <button onClick={() => navigate('/date-converter')} className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
+                </Link>
+                <Link to="/date-converter" className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
                   <Clock className="h-4 w-4" />
                   تحويل التاريخ
-                </button>
-                <button onClick={() => navigate('/hijri-calendar')} className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
+                </Link>
+                <Link to="/hijri-calendar" className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
                   <CalendarDays className="h-4 w-4" />
                   التقويم الهجري
-                </button>
+                </Link>
               </div>
             </div>
 
@@ -187,7 +185,7 @@ export default function HomePage({ navigate }: HomePageProps) {
                 <div>
                   <h3 className="font-display text-xl font-bold text-brand-900">{nextEvent.title}</h3>
                   <p className="mt-1 text-sm text-brand-700/80">
-                    {formatGregorian(nextEvent.date)} — {nextEvent.hijriNote}
+                    {formatGregorian(nextEvent.date)} — {eventHijriText(nextEvent)}
                   </p>
                 </div>
               </div>
@@ -208,7 +206,7 @@ export default function HomePage({ navigate }: HomePageProps) {
                 <div>
                   <h3 className="font-display text-lg font-bold text-brand-900">{nextHoliday.title}</h3>
                   <p className="mt-1 text-sm text-brand-700/80">
-                    {formatGregorian(nextHoliday.date)} — {nextHoliday.hijriNote}
+                    {formatGregorian(nextHoliday.date)} — {eventHijriText(nextHoliday)}
                   </p>
                 </div>
               </div>
@@ -238,43 +236,43 @@ export default function HomePage({ navigate }: HomePageProps) {
             icon={Coins}
             title="مواعيد الرواتب"
             desc="رواتب الموظفين، حساب المواطن، المتقاعدين، الضمان الاجتماعي، والدعم السكني."
-            onClick={() => navigate('/salaries')}
+            to="/salaries"
           />
           <ServiceCard
             icon={CalendarDays}
             title="التقويم الهجري"
             desc="تقويم أم القرى الرسمي لكل الشهور الهجرية مع المناسبات الدينية والوطنية."
-            onClick={() => navigate('/hijri-calendar')}
+            to="/hijri-calendar"
           />
           <ServiceCard
             icon={BookOpen}
             title="التقويم الدراسي"
             desc="موعد بداية الدراسة وإجازات المدارس وفق تقويم وزارة التعليم السعودية."
-            onClick={() => navigate('/school-calendar')}
+            to="/school-calendar"
           />
           <ServiceCard
             icon={Flag}
             title="الإجازات الرسمية"
             desc="قائمة كاملة بالإجازات الدينية والوطنية مع مدة كل إجازة وتاريخها الهجري."
-            onClick={() => navigate('/holidays')}
+            to="/holidays"
           />
           <ServiceCard
             icon={Clock}
             title="تحويل التاريخ"
             desc="حوّل بين التاريخ الهجري والميلادي بدقة وفق تقويم أم القرى."
-            onClick={() => navigate('/date-converter')}
+            to="/date-converter"
           />
           <ServiceCard
             icon={Sparkles}
             title="حاسبة العمر"
             desc="احسب عمرك بالسنوات والأشهر والأيام بالتقويمين الهجري والميلادي."
-            onClick={() => navigate('/age-calculator')}
+            to="/age-calculator"
           />
           <ServiceCard
             icon={Wand2}
             title="زخرفة الأسماء"
             desc="زخرف اسمك بأكثر من 75 نمط مجاناً — عربي، ببجي، إنجليزي، فري فاير، وفرنسي."
-            onClick={() => navigate('/name-decoration')}
+            to="/name-decoration"
           />
         </div>
       </section>
@@ -286,14 +284,14 @@ export default function HomePage({ navigate }: HomePageProps) {
             <h2 className="section-title">مواعيد الصرف القادمة</h2>
             <p className="mt-1 text-sm text-brand-700/70">أقرب مواعيد صرف البرامج الحكومية والدعم</p>
           </div>
-          <button onClick={() => navigate('/salaries')} className="btn-ghost">
+          <Link to="/salaries" className="btn-ghost">
             عرض الكل
             <ArrowLeft className="h-4 w-4" />
-          </button>
+          </Link>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {salaries.slice(0, 6).map((s) => (
-            <SalaryMiniCard key={s.schedule.id} instance={s} onClick={() => navigate('/salaries')} />
+            <SalaryMiniCard key={s.schedule.id} instance={s} to="/salaries" />
           ))}
         </div>
       </section>
@@ -310,10 +308,10 @@ export default function HomePage({ navigate }: HomePageProps) {
           {upcoming.map((e) => {
             const days = daysUntilEvent(e, today);
             return (
-              <button
+              <Link
                 key={e.id}
-                onClick={() => navigate('/holidays')}
-                className="card group p-5 text-right transition-all hover:-translate-y-0.5 hover:shadow-soft"
+                to={e.category === 'school' ? '/school-calendar' : '/holidays'}
+                className="card group block p-5 text-right transition-all hover:-translate-y-0.5 hover:shadow-soft"
               >
                 <div className="flex items-start justify-between">
                   <span className="text-2xl">{e.emoji}</span>
@@ -323,7 +321,7 @@ export default function HomePage({ navigate }: HomePageProps) {
                 </div>
                 <h3 className="mt-3 font-display text-base font-bold text-brand-900">{e.title}</h3>
                 <p className="mt-1 text-xs text-brand-700/70">
-                  {formatGregorian(e.date)} — {e.hijriNote}
+                  {formatGregorian(e.date)} — {eventHijriText(e)}
                 </p>
                 <div className="mt-4 flex items-center justify-between">
                   <span className="font-display text-2xl font-bold tabular-nums text-brand-700">{days}</span>
@@ -335,7 +333,7 @@ export default function HomePage({ navigate }: HomePageProps) {
                     style={{ width: `${Math.max(8, 100 - days * 2)}%` }}
                   />
                 </div>
-              </button>
+              </Link>
             );
           })}
         </div>
@@ -355,10 +353,10 @@ export default function HomePage({ navigate }: HomePageProps) {
               </p>
             </div>
             <div className="flex md:justify-end">
-              <button onClick={() => navigate('/hijri-calendar')} className="btn-primary">
+              <Link to="/hijri-calendar" className="btn-primary">
                 <Download className="h-4 w-4" />
                 تحميل التقويم PDF
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -372,16 +370,16 @@ export default function HomePage({ navigate }: HomePageProps) {
             <h2 className="section-title">مقالات ودلائل</h2>
             <p className="mt-1 text-sm text-brand-700/70">دلائل شاملة لكل ما يهمك معرفته عن المواعيد في السعودية</p>
           </div>
-          <button onClick={() => navigate('/articles')} className="btn-ghost">
+          <Link to="/articles" className="btn-ghost">
             كل المقالات
             <ArrowLeft className="h-4 w-4" />
-          </button>
+          </Link>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {ARTICLES.slice(0, 6).map((a) => (
-            <button
+            <Link
               key={a.slug}
-              onClick={() => navigate(`/articles/${a.slug}`)}
+              to={`/articles/${a.slug}`}
               className="card group flex flex-col p-5 text-right transition-all hover:-translate-y-0.5 hover:shadow-soft"
             >
               <div className="flex items-center justify-between">
@@ -394,7 +392,7 @@ export default function HomePage({ navigate }: HomePageProps) {
                 {a.title}
               </h3>
               <p className="mt-2 text-xs leading-relaxed text-brand-700/70 line-clamp-2">{a.description}</p>
-            </button>
+            </Link>
           ))}
         </div>
       </section>
@@ -412,10 +410,10 @@ export default function HomePage({ navigate }: HomePageProps) {
               </p>
             </div>
             <div className="flex md:justify-end">
-              <button onClick={() => navigate('/faq')} className="btn-primary">
+              <Link to="/faq" className="btn-primary">
                 <HelpCircle className="h-4 w-4" />
                 الأسئلة الشائعة
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -462,16 +460,16 @@ function ServiceCard({
   icon: Icon,
   title,
   desc,
-  onClick,
+  to,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   desc: string;
-  onClick: () => void;
+  to: string;
 }) {
   return (
-    <button
-      onClick={onClick}
+    <Link
+      to={to}
       className="card group flex flex-col items-start p-5 text-right transition-all hover:-translate-y-0.5 hover:shadow-soft"
     >
       <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-colors group-hover:bg-brand-600 group-hover:text-white">
@@ -483,16 +481,16 @@ function ServiceCard({
         اكتشف المزيد
         <ArrowLeft className="h-3.5 w-3.5" />
       </span>
-    </button>
+    </Link>
   );
 }
 
-function SalaryMiniCard({ instance, onClick }: { instance: SalaryInstance; onClick: () => void }) {
+function SalaryMiniCard({ instance, to }: { instance: SalaryInstance; to: string }) {
   const Icon = ICONS[instance.schedule.icon] ?? Coins;
   return (
-    <button
-      onClick={onClick}
-      className="card group p-5 text-right transition-all hover:-translate-y-0.5 hover:shadow-soft"
+    <Link
+      to={to}
+      className="card group block p-5 text-right transition-all hover:-translate-y-0.5 hover:shadow-soft"
     >
       <div className="flex items-center justify-between">
         <span className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${instance.schedule.accent} text-white`}>
@@ -511,6 +509,6 @@ function SalaryMiniCard({ instance, onClick }: { instance: SalaryInstance; onCli
         <TrendingUp className="h-3.5 w-3.5" />
         {instance.hijriText}
       </div>
-    </button>
+    </Link>
   );
 }

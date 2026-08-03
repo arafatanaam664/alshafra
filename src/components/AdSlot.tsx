@@ -7,22 +7,35 @@ interface AdSlotProps {
   label?: string;
 }
 
+/**
+ * Real ad unit ids, once they exist in your AdSense account.
+ * An <ins> with a placeholder slot ("0000000000") never fills, and repeatedly
+ * requesting an unknown slot is a policy/quality risk during AdSense review —
+ * so we render nothing at all until a real id is configured here.
+ */
+const VALID_SLOT = /^\d{8,}$/;
+const PLACEHOLDER_SLOT = '0000000000';
+
 export default function AdSlot({
-  slot = '0000000000',
+  slot = PLACEHOLDER_SLOT,
   format = 'auto',
   className = '',
   label = 'إعلان',
 }: AdSlotProps) {
   const insRef = useRef<HTMLModElement>(null);
+  const enabled = slot !== PLACEHOLDER_SLOT && VALID_SLOT.test(slot);
 
   useEffect(() => {
+    if (!enabled) return;
     try {
       // @ts-expect-error adsbygoogle is injected by external script
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
       // AdSense not loaded yet — silent fail
     }
-  }, []);
+  }, [enabled]);
+
+  if (!enabled) return null;
 
   return (
     <div className={`my-6 ${className}`}>

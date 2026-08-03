@@ -17,7 +17,9 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
       item: item.path ? `${SITE_URL}${item.path}` : `${SITE_URL}/`,
     })),
   };
-  useSeo({ jsonLd });
+  // Own a dedicated JSON-LD node so the page-level useSeo() call cannot
+  // overwrite (or delete) the BreadcrumbList.
+  useSeo({ jsonLd, jsonLdId: 'breadcrumb-jsonld' });
 
   return (
     <nav aria-label="مسار التنقل" className="flex flex-wrap items-center gap-1 text-xs text-brand-600/70">

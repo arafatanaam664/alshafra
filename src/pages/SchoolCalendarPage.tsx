@@ -1,7 +1,9 @@
 import { BookOpen, GraduationCap, CalendarCheck } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
-import { eventsByCategory, daysUntilEvent } from '../lib/events';
+import { eventsByCategory, daysUntilEvent,
+  eventHijriText,
+} from '../lib/events';
 import Countdown from '../components/Countdown';
 
 export default function SchoolCalendarPage() {
@@ -70,7 +72,7 @@ export default function SchoolCalendarPage() {
               <div>
                 <h3 className="font-display text-xl font-bold text-brand-900">{next.title}</h3>
                 <p className="mt-1 text-sm text-brand-700/80">
-                  {formatGregorian(next.date)} — {next.hijriNote} — {weekdayName(next.date)}
+                  {formatGregorian(next.date)} — {eventHijriText(next)} — {weekdayName(next.date)}
                 </p>
               </div>
             </div>
