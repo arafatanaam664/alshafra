@@ -2,6 +2,23 @@
   command = "npm run build"
   publish = "dist"
 
+# Old irrelevant pages — 410 Gone so Google removes them from index
+[[redirects]]
+  from = "/category/*"
+  to = "/410.html"
+  status = 410
+
+[[redirects]]
+  from = "/languages/*"
+  to = "/410.html"
+  status = 410
+
+[[redirects]]
+  from = "/news/*"
+  to = "/410.html"
+  status = 410
+
+# SPA fallback for valid routes (must be last)
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -81,46 +81,22 @@ export function jdnToGregorian(jdn: number): GregorianDate {
 
 // Convert Julian Day Number to Hijri Y/M/D using the arithmetical (tabular) algorithm.
 export function jdnToHijri(jdn: number): HijriDate {
-  const l1 = jdn - 1948440;
-  const cycles = Math.floor(l1 / 10631);
-  const remaining = l1 - 10631 * cycles;
-  let year = 30 * cycles + 1;
-  let month = 1;
-  let day = 1;
+  const days = jdn - 1948440;
+  let year = Math.floor(days / 354.367) + 1;
 
-  if (remaining < 354) {
-    year += Math.floor(remaining / 355);
-    day = (remaining % 355) + 1;
-  } else {
-    year += 10;
-    const l2 = remaining - 354;
-    const extraCycles = Math.floor(l2 / 10631);
-    const extraRemaining = l2 - 10631 * extraCycles;
-    year += 30 * extraCycles;
-    if (extraRemaining < 354) {
-      year += Math.floor(extraRemaining / 355);
-      day = (extraRemaining % 355) + 1;
-    } else {
-      year += 10;
-      const l3 = extraRemaining - 354;
-      const c2 = Math.floor(l3 / 10631);
-      const r2 = l3 - 10631 * c2;
-      year += 30 * c2;
-      year += Math.floor(r2 / 355);
-      day = (r2 % 355) + 1;
-    }
-  }
+  while (hijriToJdn({ year, month: 1, day: 1 }) > jdn) year--;
+  while (hijriToJdn({ year: year + 1, month: 1, day: 1 }) <= jdn) year++;
 
-  // Determine month by accumulating month lengths.
+  const dayOfYear = jdn - hijriToJdn({ year, month: 1, day: 1 });
   const monthLengths = hijriMonthLengths(year);
-  let cumulative = 0;
+  let month = 1;
+  let day = dayOfYear + 1;
   for (let i = 0; i < 12; i++) {
-    if (cumulative + monthLengths[i] >= day) {
+    if (day <= monthLengths[i]) {
       month = i + 1;
-      day = day - cumulative;
       break;
     }
-    cumulative += monthLengths[i];
+    day -= monthLengths[i];
   }
 
   return { year, month, day };

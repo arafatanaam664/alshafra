@@ -1,1 +1,7 @@
-/*    /index.html   200
+# Old irrelevant pages — 410 Gone so Google removes them from index
+/category/*  /410.html  410
+/languages/*  /410.html  410
+/news/*  /410.html  410
+
+# SPA fallback for valid routes
+/*  /index.html  200
