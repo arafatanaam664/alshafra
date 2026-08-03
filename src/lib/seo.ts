@@ -8,6 +8,13 @@ interface SeoOptions {
   description?: string;
   canonical?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /**
+   * Id of the <script type="application/ld+json"> node this call owns.
+   * Different callers on the same page MUST use different ids, otherwise the
+   * last effect to run silently deletes the other one's structured data
+   * (this is what used to drop every BreadcrumbList on the site).
+   */
+  jsonLdId?: string;
   keywords?: string;
 }
 
@@ -43,6 +50,8 @@ function setJsonLd(id: string, data: Record<string, unknown> | Record<string, un
 }
 
 export function useSeo(opts: SeoOptions) {
+  const jsonLdKey = opts.jsonLd ? JSON.stringify(opts.jsonLd) : '';
+  const jsonLdId = opts.jsonLdId ?? 'page-jsonld';
   useEffect(() => {
     if (opts.title) {
       document.title = opts.title;
@@ -60,10 +69,12 @@ export function useSeo(opts: SeoOptions) {
       setMeta('og:url', opts.canonical, 'property');
     }
     if (opts.jsonLd) {
-      setJsonLd('page-jsonld', opts.jsonLd);
+      setJsonLd(jsonLdId, opts.jsonLd);
     } else {
-      const existing = document.getElementById('page-jsonld');
+      const existing = document.getElementById(jsonLdId);
       if (existing) existing.remove();
     }
-  }, [opts.title, opts.description, opts.canonical, opts.keywords, opts.jsonLd]);
+    // `jsonLdKey` is a stable string hash of the payload, so this effect no
+    // longer re-runs on every render (the home page re-renders every second).
+  }, [opts.title, opts.description, opts.canonical, opts.keywords, jsonLdKey, jsonLdId]);
 }

@@ -8,6 +8,7 @@ import {
   CATEGORY_LABELS,
   CATEGORY_STYLES,
   daysUntilEvent,
+  eventHijriText,
 } from '../lib/events';
 import Countdown from '../components/Countdown';
 
@@ -101,7 +102,7 @@ export default function HolidaysPage() {
                 <div>
                   <h3 className="font-display text-xl font-bold text-brand-900">{nextHoliday.title}</h3>
                   <p className="mt-1 text-sm text-brand-700/80">
-                    {formatGregorian(nextHoliday.date)} — {nextHoliday.hijriNote} — {weekdayName(nextHoliday.date)}
+                    {formatGregorian(nextHoliday.date)} — {eventHijriText(nextHoliday)} — {weekdayName(nextHoliday.date)}
                   </p>
                   {nextHoliday.holidayDays && (
                     <span className="chip mt-2 bg-gold-50 text-gold-700 ring-1 ring-gold-200">

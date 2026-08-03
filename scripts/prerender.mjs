@@ -206,10 +206,8 @@ const routes = [
         inLanguage: 'ar-SA',
       },
     ],
-    body: `<div id="root"></div>
-<noscript>
-  <div style="font-family:system-ui,sans-serif;max-width:900px;margin:0 auto;padding:2rem;line-height:1.8" dir="rtl" lang="ar">
-    <h1>تقويم السعودية — مواعيد الرواتب والتقويم الهجري والميلادي والإجازات الرسمية</h1>
+    body: bodyWithNoscript(`
+<h1>تقويم السعودية — مواعيد الرواتب والتقويم الهجري والميلادي والإجازات الرسمية</h1>
     <p>بوابة سعودية شاملة تجمع مواعيد صرف الرواتب الحكومية، حساب المواطن، الضمان الاجتماعي المطوّر، رواتب المتقاعدين، التقويم الهجري والميلادي، التقويم الدراسي، والإجازات الرسمية، مع أدوات تحويل التاريخ وحاسبة العمر وزخرفة الأسماء — وفق تقويم أم القرى الرسمي.</p>
     <h2>خدماتنا</h2>
     <ul>
@@ -231,8 +229,7 @@ const routes = [
       <li><a href="/articles/hijri-to-gregorian-conversion">كيف تحوّل التاريخ الهجري إلى ميلادي بدقة؟</a></li>
       <li><a href="/articles/developed-social-security">الضمان الاجتماعي المطور 2026-2027م</a></li>
     </ul>
-  </div>
-</noscript>`,
+    `),
   },
   {
     path: '/salaries',
@@ -258,10 +255,12 @@ const routes = [
       <ul>
         <li>رواتب الموظفين الحكوميين — تُصرف في اليوم 27 من كل شهر ميلادي.</li>
         <li>حساب المواطن — يُصرف في اليوم 10 من كل شهر ميلادي.</li>
-        <li>رواتب المتقاعدين — تُصرف في اليوم 1 من كل شهر ميلادي.</li>
-        <li>الضمان الاجتماعي المطور — يُصرف في اليوم 1 من كل شهر ميلادي.</li>
-        <li>الدعم السكني — يُصرف في اليوم 27 من كل شهر ميلادي.</li>
+        <li>رواتب المتقاعدين — تُصرف في اليوم 1 من كل شهر ميلادي (المؤسسة العامة للتأمينات الاجتماعية).</li>
+        <li>الضمان الاجتماعي المطوّر — يُصرف في اليوم 1 من كل شهر ميلادي.</li>
+        <li>الدعم السكني (سكني) — يُصرف في اليوم 24 من كل شهر ميلادي.</li>
       </ul>
+      <h2>قاعدة نهاية الأسبوع في مواعيد الصرف</h2>
+      <p>إذا صادف موعد الصرف يوم الجمعة يُقدَّم الإيداع إلى يوم الخميس الذي قبله، وإذا صادف يوم السبت يُؤجَّل إلى يوم الأحد الذي بعده. تطبّق هذه القاعدة وزارة المالية والمؤسسة العامة للتأمينات الاجتماعية وبرنامج حساب المواطن وبرنامج سكني.</p>
       <p>مواعيد الصرف المعروضة تقريبية بناءً على المواعيد الشهرية المعتادة لكل برنامج. قد تتغير المواعيد الفعلية بإعلان رسمي من الجهة المُصدرة (وزارة المالية، المؤسسة العامة للتقاعد، وزارة الموارد البشرية، برنامج سكني، إلخ). يُنصح بمتابعة الإعلانات الرسمية.</p>
     `),
   },
@@ -719,15 +718,49 @@ const routes = [
 
 // --- HTML helpers ------------------------------------------------------------
 
+// The static HTML that every crawler (Googlebot, Bingbot, social + AI bots)
+// and every first paint sees. It lives INSIDE #root — not inside <noscript> —
+// because content hidden in <noscript> is discounted by search engines and is
+// invisible to Bing/Yandex/LLM crawlers, which do not execute JavaScript.
+// React replaces this markup on hydration with the interactive version.
 function bodyWithNoscript(innerHtml) {
-  return `<div id="root"></div>
-<noscript>
-  <div style="font-family:system-ui,sans-serif;max-width:900px;margin:0 auto;padding:2rem;line-height:1.8" dir="rtl" lang="ar">
+  return `<div id="root"><div class="prerender-shell" dir="rtl" lang="ar">
+      <header class="prerender-nav">
+        <a href="/"><strong>تقويم السعودية</strong></a>
+        <nav>
+          <a href="/salaries">مواعيد الرواتب</a>
+          <a href="/hijri-calendar">التقويم الهجري</a>
+          <a href="/school-calendar">التقويم الدراسي</a>
+          <a href="/holidays">الإجازات الرسمية</a>
+          <a href="/date-converter">تحويل التاريخ</a>
+          <a href="/age-calculator">حاسبة العمر</a>
+          <a href="/name-decoration">زخرفة الأسماء</a>
+          <a href="/articles">مقالات</a>
+          <a href="/faq">الأسئلة الشائعة</a>
+        </nav>
+      </header>
+      <main>
 ${innerHtml}
-    <p><a href="/">العودة للرئيسية</a> | <a href="/articles">جميع المقالات</a></p>
-  </div>
-</noscript>`;
+      </main>
+      <footer class="prerender-footer">
+        <a href="/about">عن الموقع</a> ·
+        <a href="/contact">اتصل بنا</a> ·
+        <a href="/privacy">سياسة الخصوصية</a> ·
+        <a href="/terms">شروط الاستخدام</a>
+      </footer>
+    </div></div>`;
 }
+
+const PRERENDER_CSS = `<style>
+  .prerender-shell{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;max-width:960px;margin:0 auto;padding:1.25rem 1.25rem 3rem;line-height:1.9;color:#0f3d2e}
+  .prerender-shell a{color:#0b6e4f;text-decoration:none}
+  .prerender-nav{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;padding:.75rem 0;border-bottom:1px solid rgba(11,110,79,.12);font-size:.9rem}
+  .prerender-nav nav{display:flex;flex-wrap:wrap;gap:.75rem}
+  .prerender-shell h1{font-size:1.7rem;line-height:1.5;margin:1.25rem 0 .5rem}
+  .prerender-shell h2{font-size:1.2rem;margin:1.5rem 0 .5rem}
+  .prerender-shell ul{padding-inline-start:1.25rem}
+  .prerender-footer{margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(11,110,79,.12);font-size:.85rem;color:#4b6b5f}
+</style>`;
 
 function setMeta(html, name, content, attr = 'name') {
   const regex = new RegExp(`<meta ${attr}="${name}"[^>]*>`, 'i');
@@ -779,6 +812,7 @@ for (const route of routes) {
 
   if (route.body) {
     html = setBody(html, route.body);
+    html = html.replace('</head>', `    ${PRERENDER_CSS}\n  </head>`);
   }
 
   const outDir = route.path === '/' ? distDir : join(distDir, route.path);
@@ -790,3 +824,59 @@ for (const route of routes) {
 }
 
 console.log(`[prerender] Done. ${count} pages generated.`);
+
+// --- sitemap.xml -------------------------------------------------------------
+// Generated from the same route table that produced the HTML, so the sitemap
+// can never drift out of sync with the pages that actually exist.
+
+const today = new Date().toISOString().slice(0, 10);
+
+const CHANGEFREQ = {
+  '/': 'daily',
+  '/salaries': 'daily',
+  '/hijri-calendar': 'weekly',
+  '/school-calendar': 'weekly',
+  '/holidays': 'weekly',
+  '/articles': 'weekly',
+  '/name-decoration': 'weekly',
+};
+
+const PRIORITY = {
+  '/': '1.0',
+  '/salaries': '0.9',
+  '/hijri-calendar': '0.9',
+  '/name-decoration': '0.8',
+  '/school-calendar': '0.8',
+  '/holidays': '0.8',
+  '/date-converter': '0.7',
+  '/age-calculator': '0.7',
+  '/articles': '0.7',
+  '/faq': '0.6',
+  '/about': '0.4',
+  '/contact': '0.4',
+  '/privacy': '0.3',
+  '/terms': '0.3',
+};
+
+const sitemap = [
+  '<?xml version="1.0" encoding="UTF-8"?>',
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  ...routes.map((r) => {
+    const loc = r.path === '/' ? `${SITE_URL}/` : SITE_URL + r.path;
+    const changefreq = CHANGEFREQ[r.path] || 'monthly';
+    const priority = PRIORITY[r.path] || '0.6';
+    return [
+      '  <url>',
+      `    <loc>${loc}</loc>`,
+      `    <lastmod>${today}</lastmod>`,
+      `    <changefreq>${changefreq}</changefreq>`,
+      `    <priority>${priority}</priority>`,
+      '  </url>',
+    ].join('\n');
+  }),
+  '</urlset>',
+  '',
+].join('\n');
+
+writeFileSync(join(distDir, 'sitemap.xml'), sitemap, 'utf-8');
+console.log(`[prerender] sitemap.xml written with ${routes.length} URLs (lastmod ${today}).`);

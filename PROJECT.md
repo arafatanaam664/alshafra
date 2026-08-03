@@ -86,7 +86,9 @@ project/
 ## 4. القرارات المعمارية المهمة
 
 ### 4.1 الموجّه (Router)
-- **موجّه مخصص خفيف** يعتمد على `window.location.hash` — لا يستخدم `react-router`.
+- **موجّه مخصص خفيف** يعتمد على `window.location.pathname` + `history.pushState` — لا يستخدم `react-router`.
+- التنقّل يبثّ حدث `alshafra:routechange` على `window` حتى تتزامن كل نسخ `useRoute()` (بدونه كان الهيدر يغيّر الرابط دون تغيير الصفحة).
+- **كل رابط داخلي يجب أن يستخدم مكوّن `src/components/Link.tsx`** الذي يُخرج `<a href>` حقيقياً — لا تستخدم `<button onClick={navigate}>` لأن جوجل لا يتبع الأزرار.
 - السبب: بساطة المشروع وعدم الحاجة لـ SSR أو موجّه كامل.
 - الدوال الرئيسية: `useRoute()` و `parseRoute(path)`.
 - المسارات المتاحة: `/`, `/salaries`, `/hijri-calendar`, `/school-calendar`, `/holidays`, `/date-converter`, `/age-calculator`, `/faq`, `/articles`, `/articles/:slug`.
@@ -109,7 +111,9 @@ project/
 
 ### 4.4 حسابات التقويم الهجري
 - `src/lib/hijri.ts` يحتوي على دوال: `todayHijri`, `todayGregorian`, `formatHijri`, `formatGregorian`, `weekdayName`, `formatHijriShort`, `formatGregorianShort`.
-- يعتمد على `Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura')` (تقويم أم القرى الرسمي).
+- يعتمد على `Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn')` (جدول أم القرى الرسمي في ICU) مع خوارزمية جدولية كخطة بديلة فقط.
+- `todayGregorian()` يحسب اليوم بتوقيت **الرياض** لا بتوقيت جهاز الزائر.
+- **لا تكتب تواريخ هجرية يدوياً في البيانات** — استخدم `eventHijriText()` / `gregorianToHijri()` لاشتقاقها.
 - **لا تستخدم Date API العادية مباشرة** — استخدم دوال `hijri.ts` لضمان التوافق مع التقويم السعودي.
 
 ### 4.5 الأحداث والرواتب
@@ -125,7 +129,7 @@ project/
 - `src/lib/articles.ts` يحتوي على مصفوفة `ARTICLES` — كل مقال له: `slug`, `title`, `description`, `category`, `updatedAt`, `readMinutes`, `keywords`, `sections[]`, `faq[]`.
 - `ArticlePage.tsx` يعرض مقالاً واحداً + مقالات ذات صلة.
 - `ArticlesListPage` (مصدّرة من نفس الملف) تعرض قائمة كل المقالات.
-- **عند إضافة مقال:** أضفه إلى مصفوفة `ARTICLES` فقط — لا تحتاج لتعديل الـ router أو إنشاء ملف جديد. أضفه أيضاً إلى `public/sitemap.xml`.
+- **عند إضافة مقال:** أضفه إلى مصفوفة `ARTICLES` **وإلى جدول المسارات في `scripts/prerender.mjs`** (منه تُولَّد صفحة HTML ثابتة وخريطة الموقع تلقائياً). لم يعد هناك `public/sitemap.xml` يدوي.
 - **التصنيفات المتاحة:** `salaries`, `calendar`, `holidays`, `tools` (مع تسمياتها في `CATEGORY_LABELS_ARTICLE`).
 
 ### 4.7 التنسيق (Tailwind)

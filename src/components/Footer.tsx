@@ -1,4 +1,5 @@
 import { Calendar, Mail, Github, Shield } from 'lucide-react';
+import Link from './Link';
 
 const LINKS = [
   { to: '/', label: 'الرئيسية' },
@@ -13,7 +14,7 @@ const LINKS = [
   { to: '/faq', label: 'الأسئلة الشائعة' },
 ];
 
-export default function Footer({ navigate }: { navigate: (to: string) => void }) {
+export default function Footer() {
   return (
     <footer className="mt-20 border-t border-brand-900/10 bg-brand-900 text-brand-50">
       <div className="container-page py-12">
@@ -40,12 +41,9 @@ export default function Footer({ navigate }: { navigate: (to: string) => void })
             <ul className="mt-4 grid grid-cols-2 gap-2 text-sm">
               {LINKS.map((l) => (
                 <li key={l.to}>
-                  <button
-                    onClick={() => navigate(l.to)}
-                    className="text-brand-100/80 transition-colors hover:text-white"
-                  >
+                  <Link to={l.to} className="text-brand-100/80 transition-colors hover:text-white">
                     {l.label}
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -71,10 +69,10 @@ export default function Footer({ navigate }: { navigate: (to: string) => void })
               </li>
             </ul>
             <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-brand-200/70">
-              <li><button onClick={() => navigate('/about')} className="hover:text-white">عن الموقع</button></li>
-              <li><button onClick={() => navigate('/contact')} className="hover:text-white">اتصل بنا</button></li>
-              <li><button onClick={() => navigate('/privacy')} className="hover:text-white">سياسة الخصوصية</button></li>
-              <li><button onClick={() => navigate('/terms')} className="hover:text-white">شروط الاستخدام</button></li>
+              <li><Link to="/about" className="hover:text-white">عن الموقع</Link></li>
+              <li><Link to="/contact" className="hover:text-white">اتصل بنا</Link></li>
+              <li><Link to="/privacy" className="hover:text-white">سياسة الخصوصية</Link></li>
+              <li><Link to="/terms" className="hover:text-white">شروط الاستخدام</Link></li>
             </ul>
           </div>
         </div>

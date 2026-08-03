@@ -33,7 +33,7 @@ function PageLoader() {
 }
 
 export default function App() {
-  const [path, navigate] = useRoute();
+  const [path] = useRoute();
   const { name, param } = useMemo(() => parseRoute(path), [path]);
 
   return (
@@ -56,10 +56,10 @@ export default function App() {
           {name === 'terms' && <TermsPage />}
           {name === 'about' && <AboutPage />}
           {name === 'contact' && <ContactPage />}
-          {name === 'home' && <HomePage navigate={navigate} />}
+          {name === 'home' && <HomePage />}
         </Suspense>
       </main>
-      <Footer navigate={navigate} />
+      <Footer />
     </div>
   );
 }

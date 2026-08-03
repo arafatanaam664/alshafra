@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Sparkles, Copy, Check, Type, ArrowLeft, Wand2 } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
-import { DECORATION_TOOLS, decorationToolBySlug, type DecorationTool } from '../lib/decoration';
+import { DECORATION_TOOLS, decorationToolBySlug } from '../lib/decoration';
 
 // --- Hub page: /name-decoration ---------------------------------------------
 
@@ -155,6 +155,18 @@ export default function NameDecorationToolPage({ slug }: { slug: string }) {
       : undefined,
   });
 
+  // NOTE: this useMemo must run before any early return — React requires the
+  // same hook order on every render, otherwise the page crashes when a user
+  // navigates from a valid tool to an unknown slug.
+  const results = useMemo(() => {
+    if (!tool || !name.trim()) return [];
+    return tool.styles.map((style) => ({
+      id: style.id,
+      label: style.label,
+      value: style.transform(name.trim()),
+    }));
+  }, [name, tool]);
+
   if (!tool) {
     return (
       <div className="container-page py-20 text-center">
@@ -168,15 +180,6 @@ export default function NameDecorationToolPage({ slug }: { slug: string }) {
       </div>
     );
   }
-
-  const results = useMemo(() => {
-    if (!name.trim()) return [];
-    return tool.styles.map((style) => ({
-      id: style.id,
-      label: style.label,
-      value: style.transform(name.trim()),
-    }));
-  }, [name, tool]);
 
   const handleCopy = async (id: string, value: string) => {
     try {
