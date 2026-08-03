@@ -32,7 +32,7 @@ export default function AdSlot({
           ref={insRef}
           className="adsbygoogle"
           style={{ display: 'block', minHeight: 100 }}
-          data-ad-client="ca-pub-0000000000000000"
+          data-ad-client="ca-pub-9822552442964714"
           data-ad-slot={slot}
           data-ad-format={format}
           data-full-width-responsive="true"
