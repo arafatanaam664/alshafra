@@ -5,6 +5,8 @@ import Link from './Link';
 
 const NAV = [
   { to: '/', label: 'الرئيسية', icon: Calendar },
+  { to: '/today', label: 'تاريخ اليوم', icon: CalendarDays },
+  { to: '/countdown', label: 'كم باقي؟', icon: Clock },
   { to: '/salaries', label: 'مواعيد الرواتب', icon: Coins },
   { to: '/hijri-calendar', label: 'التقويم الهجري', icon: CalendarDays },
   { to: '/school-calendar', label: 'التقويم الدراسي', icon: BookOpen },
@@ -41,7 +43,7 @@ export default function Header() {
 
         <nav className="hidden items-center gap-1 lg:flex">
           {NAV.map((item) => {
-            const active = path === item.to;
+            const active = path === item.to || (item.to !== '/' && path.startsWith(`${item.to}/`));
             const Icon = item.icon;
             return (
               <Link
@@ -71,7 +73,7 @@ export default function Header() {
         <div className="border-t border-brand-900/5 bg-white lg:hidden">
           <nav className="container-page grid gap-1 py-3">
             {NAV.map((item) => {
-              const active = path === item.to;
+              const active = path === item.to || (item.to !== '/' && path.startsWith(`${item.to}/`));
               const Icon = item.icon;
               return (
                 <Link

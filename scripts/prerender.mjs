@@ -19,6 +19,145 @@ if (!existsSync(templatePath)) {
 }
 
 const template = readFileSync(templatePath, 'utf-8');
+const countdowns = JSON.parse(readFileSync(join(process.cwd(), 'src/data/countdowns.json'), 'utf-8'));
+
+// --- Shared date helpers for prerendered countdown pages ---------------------
+
+const HIJRI_MONTHS = ['محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'];
+const GREGORIAN_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+const WEEKDAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+const CATEGORY_LABELS_STATIC = { religious: 'دينية', national: 'وطنية', school: 'دراسية', salary: 'الرواتب', seasonal: 'موسمية' };
+const SALARY_DAY = { 'employee-salaries': 27, 'citizen-account': 10, 'retiree-salaries': 1, 'social-security': 1 };
+
+function gregorianToJdn(year, month, day) {
+  const a = Math.floor((14 - month) / 12);
+  const y = year + 4800 - a;
+  const m = month + 12 * a - 3;
+  return day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+}
+
+function jdnToGregorian(jdn) {
+  const a = jdn + 32044;
+  const b = Math.floor((4 * a + 3) / 146097);
+  const c = a - Math.floor((146097 * b) / 4);
+  const d = Math.floor((4 * c + 3) / 1461);
+  const e = c - Math.floor((1461 * d) / 4);
+  const m = Math.floor((5 * e + 2) / 153);
+  const day = e - Math.floor((153 * m + 2) / 5) + 1;
+  const month = m + 3 - 12 * Math.floor(m / 10);
+  const year = 100 * b + d - 4800 + Math.floor(m / 10);
+  return { year, month, day };
+}
+
+const umFormatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { year: 'numeric', month: 'numeric', day: 'numeric', timeZone: 'UTC' });
+function gregorianToHijri(g) {
+  const parts = umFormatter.formatToParts(new Date(Date.UTC(g.year, g.month - 1, g.day)));
+  const pick = (type) => Number((parts.find((p) => p.type === type)?.value || '').replace(/[^0-9]/g, ''));
+  return { year: pick('year'), month: pick('month'), day: pick('day') };
+}
+function tabularHijriToJdn(h) {
+  const isLeap = (h.year * 11 + 14) % 30 < 11;
+  const lengths = [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, isLeap ? 30 : 29];
+  let jdn = 1948440;
+  for (let y = 1; y < h.year; y++) jdn += ((y * 11 + 14) % 30 < 11) ? 355 : 354;
+  for (let m = 1; m < h.month; m++) jdn += lengths[m - 1];
+  return jdn + h.day - 1;
+}
+function hijriToGregorian(h) {
+  const seed = tabularHijriToJdn(h);
+  for (let delta = 0; delta <= 20; delta++) {
+    const candidates = delta === 0 ? [seed] : [seed - delta, seed + delta];
+    for (const jdn of candidates) {
+      const g = jdnToGregorian(jdn);
+      const back = gregorianToHijri(g);
+      if (back.year === h.year && back.month === h.month && back.day === h.day) return g;
+    }
+  }
+  return jdnToGregorian(seed);
+}
+function formatGregorian(g) { return `${g.day} ${GREGORIAN_MONTHS[g.month - 1]} ${g.year}م`; }
+function formatHijri(h) { return `${h.day} ${HIJRI_MONTHS[h.month - 1]} ${h.year}هـ`; }
+function weekdayName(g) { return WEEKDAYS[(gregorianToJdn(g.year, g.month, g.day) + 1) % 7]; }
+function parseDate(s) { const [year, month, day] = s.split('-').map(Number); return { year, month, day }; }
+function todayRiyadh() {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+  const pick = (type) => Number(parts.find((p) => p.type === type)?.value);
+  return { year: pick('year'), month: pick('month'), day: pick('day') };
+}
+function applyWeekendRule(g) {
+  const wd = (gregorianToJdn(g.year, g.month, g.day) + 1) % 7;
+  if (wd === 5) return jdnToGregorian(gregorianToJdn(g.year, g.month, g.day) - 1);
+  if (wd === 6) return jdnToGregorian(gregorianToJdn(g.year, g.month, g.day) + 1);
+  return g;
+}
+function nextSalaryDate(scheduleId, from) {
+  const day = SALARY_DAY[scheduleId];
+  const fromJdn = gregorianToJdn(from.year, from.month, from.day);
+  for (let offset = 0; offset < 3; offset++) {
+    const month = ((from.month - 1 + offset) % 12) + 1;
+    const year = from.year + Math.floor((from.month - 1 + offset) / 12);
+    const adjusted = applyWeekendRule({ year, month, day });
+    if (gregorianToJdn(adjusted.year, adjusted.month, adjusted.day) >= fromJdn) return adjusted;
+  }
+  return applyWeekendRule({ year: from.year, month: from.month, day });
+}
+function resolveCountdownStatic(def, from = todayRiyadh()) {
+  const target = def.target;
+  const date = target.type === 'fixed'
+    ? parseDate(target.date)
+    : target.type === 'hijri'
+      ? hijriToGregorian({ year: target.year, month: target.month, day: target.day })
+      : nextSalaryDate(target.scheduleId, from);
+  const hijri = gregorianToHijri(date);
+  return {
+    ...def,
+    date,
+    hijri,
+    daysRemaining: Math.max(0, gregorianToJdn(date.year, date.month, date.day) - gregorianToJdn(from.year, from.month, from.day)),
+    gregorianText: formatGregorian(date),
+    hijriText: formatHijri(hijri),
+    weekdayText: weekdayName(date),
+    categoryLabel: CATEGORY_LABELS_STATIC[def.category],
+  };
+}
+
+function countdownRoutes() {
+  const resolved = countdowns.map((c) => resolveCountdownStatic(c)).sort((a, b) => a.daysRemaining - b.daysRemaining);
+  const hubLinks = resolved.map((c) => `        <li><a href="/countdown/${c.slug}">${c.title}</a> — ${c.gregorianText} / ${c.hijriText}</li>`).join('\n');
+  return [
+    {
+      path: '/countdown',
+      title: 'كم باقي؟ 18 عدّادًا تنازليًا للسعودية | تقويم السعودية',
+      description: 'مركز العدّادات التنازلية في السعودية: كم باقي على رمضان، العيد، اليوم الوطني، يوم التأسيس، حساب المواطن، الرواتب، الدراسة، سهيل والمربعانية.',
+      keywords: 'كم باقي, عداد تنازلي, كم باقي على رمضان, كم باقي على الراتب, كم باقي على حساب المواطن',
+      jsonLd: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'العدّادات التنازلية السعودية', inLanguage: 'ar-SA' }],
+      body: bodyWithNoscript(`
+      <h1>العدّادات التنازلية السعودية — كم باقي؟</h1>
+      <p>18 عدّادًا مباشرًا لأهم مواعيد السعودية: المناسبات الوطنية والدينية، مواعيد الرواتب، الدراسة، والمواسم.</p>
+      <h2>قائمة العدّادات</h2>
+      <ul>
+${hubLinks}
+      </ul>
+    `),
+    },
+    ...resolved.map((c) => ({
+      path: `/countdown/${c.slug}`,
+      title: `${c.title} | تقويم السعودية`,
+      description: c.description,
+      keywords: c.keywords,
+      jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebPage', name: c.title, inLanguage: 'ar-SA', url: `${SITE_URL}/countdown/${c.slug}` }],
+      body: bodyWithNoscript(`
+      <h1>${c.title}</h1>
+      <p>${c.description}</p>
+      <h2>الموعد</h2>
+      <p>يتبقى ${c.daysRemaining} يوم على ${c.shortTitle}. الموعد هو ${c.weekdayText}، ${c.gregorianText}، الموافق ${c.hijriText}.</p>
+      <h2>مصدر التاريخ</h2>
+      <p>${c.source}</p>
+      <p><a href="/countdown">عودة إلى كل العدّادات التنازلية</a></p>
+    `),
+    })),
+  ];
+}
 
 // --- Article data (duplicated from src/lib/articles.ts for prerendering) -----
 
@@ -64,12 +203,12 @@ const ARTICLES = [
     keywords: 'التقويم الهجري 1448, تقويم أم القرى, المناسبات الدينية 1448, بداية شهر رمضان 1448, عيد الفطر 1448',
     sections: [
       { heading: 'ما هو تقويم أم القرى؟', body: 'تقويم أم القرى هو التقويم الهجري الرسمي المعتمد في المملكة العربية السعودية، سُمّي نسبة إلى مكة المكرمة. يُحسب فلكياً لتحديد بدايات الأشهر الهجرية ويُستخدم كمرجع رسمي لتحديد مواعيد الإجازات والمناسبات في المملكة. يختلف بيوم أحياناً عن التقاويم الفلكية الأخرى لأنه يعتمد على رؤية الهلال فعلياً.' },
-      { heading: 'متى يبدأ العام الهجري 1448هـ؟', body: 'يبدأ العام الهجري 1448هـ في 1 محرم 1448هـ الموافق 15 يونيو 2026م تقريباً وفق تقويم أم القرى. يستمر العام حتى 30 ذو الحجة 1448هـ الموافق يونيو 2027م. العام 1448هـ يشمل مناسبات رئيسية منها المولد النبوي، اليوم الوطني، يوم التأسيس، شهر رمضان، عيد الفطر، وقفة عرفة، وعيد الأضحى.' },
+      { heading: 'متى يبدأ العام الهجري 1448هـ؟', body: 'يبدأ العام الهجري 1448هـ في 1 محرم 1448هـ الموافق 16 يونيو 2026م تقريباً وفق تقويم أم القرى. يستمر العام حتى 30 ذو الحجة 1448هـ الموافق يونيو 2027م. العام 1448هـ يشمل مناسبات رئيسية منها المولد النبوي، اليوم الوطني، يوم التأسيس، شهر رمضان، عيد الفطر، وقفة عرفة، وعيد الأضحى.' },
       { heading: 'أبرز المناسبات الدينية في 1448هـ', body: 'تشمل المناسبات الدينية الرئيسية: رأس السنة الهجرية (1 محرم)، المولد النبوي الشريف (12 ربيع الأول)، بداية شهر رمضان (1 رمضان)، عيد الفطر المبارك (1 شوال)، وقفة عرفة (9 ذو الحجة)، وعيد الأضحى المبارك (10 ذو الحجة). كل هذه المناسبات إجازات رسمية في المملكة العربية السعودية.' },
-      { heading: 'أبرز المناسبات الوطنية في 1448هـ', body: 'تشمل المناسبات الوطنية: يوم التأسيس السعودي (22 شوال)، يوم العلم السعودي (11 مارس)، واليوم الوطني السعودي (23 سبتمبر). يوم التأسيس واليوم الوطني إجازات رسمية، بينما يوم العلم يُحتفل به دون إجازة رسمية.' },
+      { heading: 'أبرز المناسبات الوطنية في 1448هـ', body: 'تشمل المناسبات الوطنية: يوم التأسيس السعودي (22 فبراير/ 15 رمضان 1448هـ)، يوم العلم السعودي (11 مارس/ 3 شوال 1448هـ)، واليوم الوطني السعودي (23 سبتمبر/ 12 ربيع الآخر 1448هـ). يوم التأسيس واليوم الوطني إجازات رسمية، بينما يوم العلم يُحتفل به دون إجازة رسمية.' },
     ],
     faq: [
-      { q: 'متى يبدأ العام الهجري 1448؟', a: 'يبدأ العام الهجري 1448هـ في 1 محرم 1448هـ الموافق 15 يونيو 2026م تقريباً.' },
+      { q: 'متى يبدأ العام الهجري 1448؟', a: 'يبدأ العام الهجري 1448هـ في 1 محرم 1448هـ الموافق 16 يونيو 2026م تقريباً.' },
       { q: 'ما هو تقويم أم القرى؟', a: 'هو التقويم الهجري الرسمي المعتمد في المملكة العربية السعودية، يُحسب فلكياً لتحديد بدايات الأشهر الهجرية.' },
       { q: 'هل كل المناسبات الدينية إجازات رسمية؟', a: 'نعم، رأس السنة الهجرية، المولد النبوي، عيد الفطر، وقفة عرفة، وعيد الأضحى كلها إجازات رسمية في المملكة.' },
     ],
@@ -82,7 +221,7 @@ const ARTICLES = [
     sections: [
       { heading: 'متى تبدأ الدراسة في العام 1448-1449هـ؟', body: 'تبدأ الدراسة للعام الدراسي 1448-1449هـ يوم الأحد 23 أغسطس 2026م الموافق 10 ربيع الأول 1448هـ لجميع مراحل التعليم العام. يعود المعلمون والمعلمات قبل ذلك بيوم الأحد 16 أغسطس 2026م استعداداً لبدء العام الدراسي.' },
       { heading: 'كم عدد الفصول الدراسية في العام؟', body: 'ينقسم العام الدراسي في المملكة العربية السعودية إلى ثلاثة فصول دراسية، كل فصل مدته تقريباً 13 أسبوعاً. بين كل فصلين إجازة منتصف فصل مدتها أسبوع تقريباً، بالإضافة إلى إجازات رسمية دينية ووطنية موزعة على العام.' },
-      { heading: 'إجازات المدارس الرئيسية في 1448-1449هـ', body: 'تشمل الإجازات الرئيسية: إجازة منتصف الفصل الأول (أكتوبر 2026)، إجازة منتصف العام (يناير 2027)، إجازة منتصف الفصل الثاني (مارس 2027)، إجازة عيد الفطر (مارس-أبريل 2027)، إجازة عيد الأضحى (يوليو 2027)، وإجازة نهاية العام الدراسي (مايو 2027).' },
+      { heading: 'إجازات المدارس الرئيسية في 1448-1449هـ', body: 'تشمل الإجازات الرئيسية: إجازة منتصف الفصل الأول (أكتوبر 2026)، إجازة منتصف العام (يناير 2027)، إجازة منتصف الفصل الثاني (مارس 2027)، إجازة عيد الفطر (مارس-أبريل 2027)، إجازة عيد الأضحى (مايو 2027)، وإجازة نهاية العام الدراسي (مايو 2027).' },
       { heading: 'هل يختلف التقويم بين المناطق؟', body: 'يُوحّد تقويم وزارة التعليم لجميع المناطق الإدارية في المملكة، لكن قد تُعلن بعض التعديلات المحلية في حالات الطقس أو الظروف الاستثنائية. يُنصح بمتابعة إدارة التعليم في منطقتك للتأكد من أي تعديلات محلية.' },
     ],
     faq: [
@@ -98,13 +237,13 @@ const ARTICLES = [
     keywords: 'الإجازات الرسمية السعودية, عطلات السعودية 2026, إجازة عيد الفطر, إجازة عيد الأضحى, اليوم الوطني السعودي',
     sections: [
       { heading: 'الإجازات الدينية الرسمية', body: 'تشمل الإجازات الدينية الرسمية في المملكة: رأس السنة الهجرية (يوم واحد)، المولد النبوي الشريف (يوم واحد)، عيد الفطر المبارك (4 أيام تبدأ من 1 شوال)، وقفة عرفة (يوم واحد لعرفة)، وعيد الأضحى المبارك (4 أيام تبدأ من 10 ذو الحجة). تُعلن هذه الإجازات رسمياً من قبل الجهات المختصة.' },
-      { heading: 'الإجازات الوطنية الرسمية', body: 'تشمل الإجازات الوطنية: يوم التأسيس السعودي (22 شوال من كل عام هجري، يوم واحد)، واليوم الوطني السعودي (23 سبتمبر من كل عام ميلادي، يوم واحد). كلاهما إجازة رسمية في جميع قطاعات الحكومة والقطاع الخاص.' },
+      { heading: 'الإجازات الوطنية الرسمية', body: 'تشمل الإجازات الوطنية: يوم التأسيس السعودي (22 فبراير من كل عام ميلادي، يوم واحد)، واليوم الوطني السعودي (23 سبتمبر من كل عام ميلادي، يوم واحد). كلاهما إجازة رسمية في جميع قطاعات الحكومة والقطاع الخاص.' },
       { heading: 'إجازات أخرى ومناسبات وطنية', body: 'يوم العلم السعودي (11 مارس) ويوم القوات المسلحة (6 أكتوبر) هما مناسبتان وطنيتان يُحتفل بهما لكنهما ليستا إجازات رسمية. كما تُحتفل بعض المناسبات الموسمية مثل يوم الشباب ويوم المهندس دون أن تكون إجازات.' },
       { heading: 'كيف تُحتسب إجازات نهاية الأسبوع؟', body: 'إذا صادفت إجازة رسمية يوم جمعة أو سبت، قد تُمدد الإجازة لتشمل يوم الخميس أو الأحد حسب التقويم. تُعلن وزارة الموارد البشرية والتنمية الاجتماعية جدول الإجازات الرسمية في بداية كل عام ميلادي.' },
     ],
     faq: [
       { q: 'كم عدد الإجازات الرسمية في السعودية؟', a: 'الإجازات الرسمية الرئيسية هي 5: رأس السنة الهجرية، المولد النبوي، عيد الفطر، عرفة وعيد الأضحى، بالإضافة إلى يوم التأسيس واليوم الوطني.' },
-      { q: 'هل يوم التأسيس السعودي إجازة رسمية؟', a: 'نعم، يوم التأسيس السعودي (22 شوال) إجازة رسمية في المملكة.' },
+      { q: 'هل يوم التأسيس السعودي إجازة رسمية؟', a: 'نعم، يوم التأسيس السعودي (22 فبراير) إجازة رسمية في المملكة.' },
       { q: 'كم يوم إجازة عيد الفطر؟', a: 'إجازة عيد الفطر المبارك رسمياً 4 أيام تبدأ من 1 شوال.' },
     ],
   },
@@ -211,6 +350,8 @@ const routes = [
     <p>بوابة سعودية شاملة تجمع مواعيد صرف الرواتب الحكومية، حساب المواطن، الضمان الاجتماعي المطوّر، رواتب المتقاعدين، التقويم الهجري والميلادي، التقويم الدراسي، والإجازات الرسمية، مع أدوات تحويل التاريخ وحاسبة العمر وزخرفة الأسماء — وفق تقويم أم القرى الرسمي.</p>
     <h2>خدماتنا</h2>
     <ul>
+      <li><a href="/today">تاريخ اليوم</a> — التاريخ الهجري والميلادي الآن في السعودية.</li>
+      <li><a href="/countdown">كم باقي؟</a> — 18 عدّادًا تنازليًا لأهم مواعيد السعودية.</li>
       <li><a href="/salaries">مواعيد الرواتب</a> — رواتب الموظفين الحكوميين وحساب المواطن والمتقاعدين والضمان الاجتماعي والدعم السكني.</li>
       <li><a href="/hijri-calendar">التقويم الهجري</a> — تقويم أم القرى الرسمي لكل الشهور الهجرية مع المناسبات الدينية والوطنية.</li>
       <li><a href="/school-calendar">التقويم الدراسي</a> — موعد بداية الدراسة وإجازات المدارس وفق تقويم وزارة التعليم السعودية.</li>
@@ -231,6 +372,24 @@ const routes = [
     </ul>
     `),
   },
+  {
+    path: '/today',
+    title: 'تاريخ اليوم هجري وميلادي في السعودية | تقويم السعودية',
+    description: 'اعرف تاريخ اليوم في السعودية الآن بالتقويم الهجري والميلادي، مع اليوم من الأسبوع والوقت الحالي حسب توقيت المملكة العربية السعودية.',
+    keywords: 'تاريخ اليوم, تاريخ اليوم هجري, تاريخ اليوم ميلادي, التقويم الهجري اليوم, السعودية اليوم',
+    jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebPage', name: 'تاريخ اليوم', inLanguage: 'ar-SA' }],
+    body: bodyWithNoscript(`
+      <h1>تاريخ اليوم هجري وميلادي في السعودية</h1>
+      <p>يعرض تقويم السعودية تاريخ اليوم حسب توقيت المملكة العربية السعودية وتقويم أم القرى، مع التاريخ الهجري والميلادي واليوم من الأسبوع.</p>
+      <h2>أدوات مرتبطة</h2>
+      <ul>
+        <li><a href="/date-converter">تحويل التاريخ الهجري والميلادي</a></li>
+        <li><a href="/hijri-calendar">التقويم الهجري</a></li>
+        <li><a href="/countdown">العدّادات التنازلية</a></li>
+      </ul>
+    `),
+  },
+  ...countdownRoutes(),
   {
     path: '/salaries',
     title: 'مواعيد الرواتب في السعودية 2026-2027 | حساب المواطن والمتقاعدين | تقويم السعودية',
@@ -295,7 +454,7 @@ const routes = [
         <li>عيد الفطر المبارك — 1 شوال</li>
         <li>وقفة عرفة — 9 ذو الحجة</li>
         <li>عيد الأضحى المبارك — 10 ذو الحجة</li>
-        <li>يوم التأسيس السعودي — 22 شوال</li>
+        <li>يوم التأسيس السعودي — 22 فبراير</li>
       </ul>
     `),
   },
@@ -329,7 +488,7 @@ const routes = [
         <li>إجازة منتصف العام (يناير 2027)</li>
         <li>إجازة منتصف الفصل الثاني (مارس 2027)</li>
         <li>إجازة عيد الفطر (مارس-أبريل 2027)</li>
-        <li>إجازة عيد الأضحى (يوليو 2027)</li>
+        <li>إجازة عيد الأضحى (مايو 2027)</li>
         <li>إجازة نهاية العام الدراسي (مايو 2027)</li>
       </ul>
     `),
@@ -364,7 +523,7 @@ const routes = [
       </ul>
       <h2>الإجازات الوطنية الرسمية</h2>
       <ul>
-        <li>يوم التأسيس السعودي — 22 شوال من كل عام هجري، يوم واحد</li>
+        <li>يوم التأسيس السعودي — 22 فبراير من كل عام ميلادي، يوم واحد</li>
         <li>اليوم الوطني السعودي — 23 سبتمبر من كل عام ميلادي، يوم واحد</li>
       </ul>
       <p>تُحدد الإجازات الرسمية في المملكة العربية السعودية وفق تقويم أم القرى وتشمل الإجازات الدينية (رأس السنة الهجرية، المولد النبوي، عيد الفطر، عرفة، عيد الأضحى) والإجازات الوطنية (يوم التأسيس، يوم العلم، اليوم الوطني) والإجازات الدراسية وفق تقويم وزارة التعليم.</p>
@@ -728,6 +887,8 @@ function bodyWithNoscript(innerHtml) {
       <header class="prerender-nav">
         <a href="/"><strong>تقويم السعودية</strong></a>
         <nav>
+          <a href="/today">تاريخ اليوم</a>
+          <a href="/countdown">كم باقي؟</a>
           <a href="/salaries">مواعيد الرواتب</a>
           <a href="/hijri-calendar">التقويم الهجري</a>
           <a href="/school-calendar">التقويم الدراسي</a>
@@ -833,6 +994,8 @@ const today = new Date().toISOString().slice(0, 10);
 
 const CHANGEFREQ = {
   '/': 'daily',
+  '/today': 'daily',
+  '/countdown': 'daily',
   '/salaries': 'daily',
   '/hijri-calendar': 'weekly',
   '/school-calendar': 'weekly',
@@ -843,6 +1006,8 @@ const CHANGEFREQ = {
 
 const PRIORITY = {
   '/': '1.0',
+  '/today': '0.9',
+  '/countdown': '0.9',
   '/salaries': '0.9',
   '/hijri-calendar': '0.9',
   '/name-decoration': '0.8',

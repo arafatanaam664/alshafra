@@ -13,6 +13,11 @@ const HolidaysPage = lazy(() => import('./pages/HolidaysPage'));
 const FaqPage = lazy(() => import('./pages/FaqPage'));
 const ArticlePage = lazy(() => import('./pages/ArticlePage'));
 const NameDecorationPage = lazy(() => import('./pages/NameDecorationPage'));
+const TodayPage = lazy(() => import('./pages/TodayPage'));
+const CountdownPage = lazy(() => import('./pages/CountdownPage'));
+const CountdownHubPage = lazy(() =>
+  import('./pages/CountdownPage').then((m) => ({ default: m.CountdownHubPage }))
+);
 const ArticlesListPage = lazy(() =>
   import('./pages/ArticlePage').then((m) => ({ default: m.ArticlesListPage }))
 );
@@ -48,6 +53,9 @@ export default function App() {
           {name === 'school-calendar' && <SchoolCalendarPage />}
           {name === 'holidays' && <HolidaysPage />}
           {name === 'faq' && <FaqPage />}
+          {name === 'today' && <TodayPage />}
+          {name === 'countdown' && param && <CountdownPage slug={param} />}
+          {name === 'countdown' && !param && <CountdownHubPage />}
           {name === 'articles' && param && <ArticlePage slug={param} />}
           {name === 'articles' && !param && <ArticlesListPage />}
           {name === 'name-decoration' && param && <NameDecorationPage slug={param} />}

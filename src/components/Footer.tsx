@@ -3,6 +3,8 @@ import Link from './Link';
 
 const LINKS = [
   { to: '/', label: 'الرئيسية' },
+  { to: '/today', label: 'تاريخ اليوم' },
+  { to: '/countdown', label: 'كم باقي؟' },
   { to: '/salaries', label: 'مواعيد الرواتب' },
   { to: '/hijri-calendar', label: 'التقويم الهجري' },
   { to: '/school-calendar', label: 'التقويم الدراسي' },

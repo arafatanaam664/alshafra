@@ -7,6 +7,7 @@ import {
   weekdayIndex,
   gregorianToJdn,
   jdnToGregorian,
+  hijriToGregorian,
 } from './hijri';
 
 export type EventCategory =
@@ -27,12 +28,20 @@ export interface SaudiEvent {
   emoji?: string;
 }
 
+/**
+ * Religious occasions are defined by their Hijri date, then converted through
+ * the Umm Al-Qura calendar. This prevents stale, hand-written Gregorian dates.
+ */
+export function hijriEvent(year: number, month: number, day: number): GregorianDate {
+  return hijriToGregorian({ year, month, day });
+}
+
 export const SAUDI_EVENTS: SaudiEvent[] = [
   {
     id: 'hijri-new-year-1448',
     title: 'رأس السنة الهجرية 1448هـ',
     category: 'religious',
-    date: { year: 2026, month: 6, day: 15 },
+    date: hijriEvent(1448, 1, 1),
     description:
       'بداية العام الهجري الجديد 1448هـ. عطلة رسمية في المملكة تُحيي ذكرى هجرة النبي محمد ﷺ من مكة إلى المدينة المنورة.',
     isHoliday: true,
@@ -125,7 +134,7 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     category: 'national',
     date: { year: 2027, month: 2, day: 22 },
     description:
-      'يصادف 22 شوال من كل عام هجري ذكرى تأسيس الدولة السعودية الأولى عام 1139هـ على يد الإمام محمد بن سعود. يوم وطني يُحيي فيه السعوديون إرثهم التاريخي.',
+      'يصادف 22 فبراير من كل عام ميلادي ذكرى تأسيس الدولة السعودية الأولى عام 1139هـ على يد الإمام محمد بن سعود. وفي عام 2027م يوافق 15 رمضان 1448هـ — وهي مفارقة تاريخية نادرة.',
     isHoliday: true,
     holidayDays: 1,
     emoji: '🇸🇦',
@@ -134,7 +143,7 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     id: 'ramadan-start-1448',
     title: 'مطلع شهر رمضان المبارك 1448هـ',
     category: 'religious',
-    date: { year: 2027, month: 2, day: 18 },
+    date: hijriEvent(1448, 9, 1),
     description:
       'بداية شهر رمضان المبارك للعام الهجري 1448هـ، شهر الصيام والقيام وتلاوة القرآن. تُعلن رؤية الهلال رسمياً من قبل المحكمة العليا.',
     isHoliday: false,
@@ -144,7 +153,7 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     id: 'eid-fitr-1448',
     title: 'عيد الفطر المبارك 1448هـ',
     category: 'religious',
-    date: { year: 2027, month: 3, day: 19 },
+    date: hijriEvent(1448, 10, 1),
     description:
       'يبدأ عيد الفطر المبارك في 1 شوال 1448هـ بعد صيام شهر رمضان. تُقام صلاة العيد في المساجد والمصليات وتستمر الإجازة الرسمية عدة أيام.',
     isHoliday: true,
@@ -155,7 +164,7 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     id: 'arafat-1448',
     title: 'وقفة عرفة 1448هـ',
     category: 'religious',
-    date: { year: 2027, month: 7, day: 18 },
+    date: hijriEvent(1448, 12, 9),
     description:
       'يوم عرفة، أعظم أيام السنة عند المسلمين، يقف فيه حجاج بيت الله الحرام على عرفات. يُستحب صيامه لغير الحجاج.',
     isHoliday: true,
@@ -166,7 +175,7 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     id: 'eid-adha-1448',
     title: 'عيد الأضحى المبارك 1448هـ',
     category: 'religious',
-    date: { year: 2027, month: 7, day: 19 },
+    date: hijriEvent(1448, 12, 10),
     description:
       'يبدأ عيد الأضحى المبارك في 10 ذو الحجة 1448هـ، ويستمر أربعة أيام. تُقام صلاة العيد ويُضحى بالأضاحي تقرّباً إلى الله.',
     isHoliday: true,
