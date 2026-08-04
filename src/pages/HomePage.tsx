@@ -120,9 +120,13 @@ export default function HomePage() {
                   <Coins className="h-4 w-4" />
                   مواعيد الرواتب
                 </Link>
-                <Link to="/date-converter" className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
+                <Link to="/countdown" className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
                   <Clock className="h-4 w-4" />
-                  تحويل التاريخ
+                  كم باقي؟
+                </Link>
+                <Link to="/today" className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
+                  <CalendarDays className="h-4 w-4" />
+                  تاريخ اليوم
                 </Link>
                 <Link to="/hijri-calendar" className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
                   <CalendarDays className="h-4 w-4" />
@@ -232,6 +236,18 @@ export default function HomePage() {
           </div>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ServiceCard
+            icon={Clock}
+            title="كم باقي؟"
+            desc="18 عدّادًا تنازليًا لرمضان والعيد والرواتب والدراسة والمواسم السعودية."
+            to="/countdown"
+          />
+          <ServiceCard
+            icon={CalendarDays}
+            title="تاريخ اليوم"
+            desc="التاريخ الهجري والميلادي الآن في السعودية حسب تقويم أم القرى وتوقيت الرياض."
+            to="/today"
+          />
           <ServiceCard
             icon={Coins}
             title="مواعيد الرواتب"
