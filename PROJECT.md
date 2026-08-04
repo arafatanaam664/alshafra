@@ -62,15 +62,20 @@ project/
     │   ├── Footer.tsx      # التذييل + الروابط
     │   ├── Countdown.tsx   # عداد تنازلي للأحداث
     │   └── Breadcrumbs.tsx # مسار التنقل + JSON-LD
+    ├── data/
+    │   └── countdowns.json # مصدر العدّادات التنازلية (يقرأه التطبيق وسكربت التوليد معاً)
     ├── lib/
     │   ├── router.ts       # موجّه مخصص خفيف (hash-based)
     │   ├── seo.ts          # إدارة <title> وmeta وJSON-LD
     │   ├── hijri.ts        # حسابات التقويم الهجري
     │   ├── events.ts       # الأحداث والرواتب والمناسبات
+    │   ├── countdowns.ts   # محرّك العدّادات التنازلية (كم باقي على…)
     │   ├── articles.ts     # بيانات المقالات الـ SEO
     │   └── useNow.ts        # hook للوقت الحالي
     └── pages/
         ├── HomePage.tsx           # الصفحة الرئيسية
+        ├── CountdownPage.tsx      # مركز العدّادات + صفحة كل عدّاد
+        ├── TodayPage.tsx          # التاريخ الهجري والميلادي اليوم
         ├── SalariesPage.tsx       # مواعيد الرواتب
         ├── HijriCalendarPage.tsx  # التقويم الهجري
         ├── SchoolCalendarPage.tsx  # التقويم الدراسي
@@ -91,7 +96,7 @@ project/
 - **كل رابط داخلي يجب أن يستخدم مكوّن `src/components/Link.tsx`** الذي يُخرج `<a href>` حقيقياً — لا تستخدم `<button onClick={navigate}>` لأن جوجل لا يتبع الأزرار.
 - السبب: بساطة المشروع وعدم الحاجة لـ SSR أو موجّه كامل.
 - الدوال الرئيسية: `useRoute()` و `parseRoute(path)`.
-- المسارات المتاحة: `/`, `/salaries`, `/hijri-calendar`, `/school-calendar`, `/holidays`, `/date-converter`, `/age-calculator`, `/faq`, `/articles`, `/articles/:slug`.
+- المسارات المتاحة: `/`, `/countdown`, `/countdown/:slug`, `/today`, `/salaries`, `/hijri-calendar`, `/school-calendar`, `/holidays`, `/date-converter`, `/age-calculator`, `/name-decoration`, `/name-decoration/:slug`, `/faq`, `/articles`, `/articles/:slug`, `/about`, `/contact`, `/privacy`, `/terms`.
 - **عند إضافة صفحة جديدة:** أضف المسار في `parseRoute` داخل `src/lib/router.ts`، ثم عالجه في `App.tsx`.
 
 ### 4.2 إدارة SEO
@@ -123,7 +128,17 @@ project/
   - `upcomingEvents`: يرجع الأحداث القادمة مرتبة زمنياً.
   - `daysUntilEvent`: يحسب الأيام المتبقية لحدث.
   - `CATEGORY_LABELS` و `CATEGORY_STYLES`: لتصنيف الأحداث بصرياً.
+- **المناسبات الدينية تُشتق من تاريخها الهجري** عبر `hijriEvent(سنة, شهر, يوم)` الذي يحوّل بتقويم أم القرى — لا تكتب مقابلاً ميلادياً يدوياً (كانت هذه مصدر أخطاء تصل إلى شهرين، مثل عيد الأضحى 1448 الذي كان مكتوباً 19 يوليو 2027 والصحيح 16 مايو 2027).
 - **عند إضافة مناسبة جديدة:** أضفها إلى `SAUDI_EVENTS` مع الحقول المطلوبة (لا تكرر المناسبات الدينية الموجودة).
+
+### 4.5.1 العدّادات التنازلية (كم باقي على…)
+- **مصدر البيانات الوحيد:** `src/data/countdowns.json` — يقرأه تطبيق React (`src/lib/countdowns.ts`) وسكربت التوليد الثابت (`scripts/countdowns.mjs` + `scripts/prerender.mjs`) معاً، فلا تختلف الصفحة الثابتة عن الصفحة التفاعلية أبداً.
+- **أنواع الجدولة (`schedule.type`):**
+  - `hijri-annual` — يوم هجري ثابت (رمضان، العيدان، ليلة القدر، رأس السنة الهجرية) يُحوَّل بتقويم أم القرى.
+  - `gregorian-annual` — يوم ميلادي ثابت (اليوم الوطني، يوم التأسيس، رأس السنة، سهيل، المربعانية)، ويدعم `editionBase` لترقيم اليوم الوطني تلقائياً.
+  - `monthly` — يوم صرف شهري (الرواتب والدعم) مع قاعدة نهاية الأسبوع: الجمعة تُقدَّم للخميس والسبت يُؤجَّل للأحد.
+  - `fixed` — قائمة تواريخ معتمدة (المواعيد الدراسية).
+- **عند إضافة عدّاد:** أضف عنصراً واحداً في `countdowns.json` فقط — تُولَّد صفحته الثابتة ورابط الخريطة تلقائياً في البناء التالي.
 
 ### 4.6 المقالات
 - `src/lib/articles.ts` يحتوي على مصفوفة `ARTICLES` — كل مقال له: `slug`, `title`, `description`, `category`, `updatedAt`, `readMinutes`, `keywords`, `sections[]`, `faq[]`.
@@ -200,6 +215,9 @@ npm run lint        # فحص ESLint
 ## 7. حالة المشروع الحالية
 
 ### ما تم بناؤه
+- ✅ 47 صفحة ثابتة مُولَّدة (`npm run build`) مع خريطة موقع تُبنى من نفس جدول المسارات
+- ✅ نظام عدّادات تنازلية «كم باقي على…» (19 عدّاداً) + صفحة مركز `/countdown` وصفحة لكل عدّاد
+- ✅ صفحة `/today` للتاريخ الهجري والميلادي الآن بتوقيت الرياض
 - ✅ 7 صفحات وظيفية (الرئيسية + 6 أدوات)
 - ✅ صفحة أسئلة شائعة (FAQ) مع JSON-LD
 - ✅ 6 مقالات SEO طويلة لاستهداف long-tail keywords

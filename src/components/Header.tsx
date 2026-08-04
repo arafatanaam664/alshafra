@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText, Wand2 } from 'lucide-react';
+import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText, Wand2, Timer, Sun } from 'lucide-react';
 import { useRoute } from '../lib/router';
 import Link from './Link';
 
 const NAV = [
   { to: '/', label: 'الرئيسية', icon: Calendar },
+  { to: '/countdown', label: 'كم باقي على…', icon: Timer },
+  { to: '/today', label: 'التاريخ اليوم', icon: Sun },
   { to: '/salaries', label: 'مواعيد الرواتب', icon: Coins },
   { to: '/hijri-calendar', label: 'التقويم الهجري', icon: CalendarDays },
   { to: '/school-calendar', label: 'التقويم الدراسي', icon: BookOpen },

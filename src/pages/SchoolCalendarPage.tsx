@@ -1,7 +1,7 @@
 import { BookOpen, GraduationCap, CalendarCheck } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
-import { eventsByCategory, daysUntilEvent,
+import { eventsByCategory, daysUntilEvent, rawDaysUntilEvent,
   eventHijriText,
 } from '../lib/events';
 import Countdown from '../components/Countdown';
@@ -11,7 +11,9 @@ export default function SchoolCalendarPage() {
   const schoolEvents = [...eventsByCategory('school')].sort(
     (a, b) => a.date.year - b.date.year || a.date.month - b.date.month || a.date.day - b.date.day,
   );
-  const next = schoolEvents.find((e) => daysUntilEvent(e, today) >= 0);
+  // Signed difference — `daysUntilEvent` clamps to 0 and would happily return
+  // a school date that already passed.
+  const next = schoolEvents.find((e) => rawDaysUntilEvent(e, today) >= 0);
 
   useSeo({
     title: 'التقويم الدراسي 1448-1449هـ (2026-2027م) | تقويم السعودية',

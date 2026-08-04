@@ -1,6 +1,7 @@
 import type { GregorianDate } from './hijri';
 import {
   gregorianToHijri,
+  hijriToGregorian,
   formatHijri,
   formatGregorian,
   weekdayName,
@@ -8,6 +9,19 @@ import {
   gregorianToJdn,
   jdnToGregorian,
 } from './hijri';
+
+/**
+ * Gregorian date of a Hijri date, resolved through the Umm Al-Qura table.
+ *
+ * Religious dates used to be hand-typed Gregorian values here and several of
+ * them were wrong by weeks (Eid Al-Adha 1448 was listed as 19 July 2027 while
+ * 10 Dhul-Hijjah 1448 is 16 May 2027). Deriving them from the Hijri date makes
+ * that class of error impossible: the Hijri day is the fact, the Gregorian day
+ * is computed.
+ */
+export function hijriEvent(year: number, month: number, day: number): GregorianDate {
+  return hijriToGregorian({ year, month, day });
+}
 
 export type EventCategory =
   | 'religious'
@@ -32,7 +46,7 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     id: 'hijri-new-year-1448',
     title: 'رأس السنة الهجرية 1448هـ',
     category: 'religious',
-    date: { year: 2026, month: 6, day: 15 },
+    date: hijriEvent(1448, 1, 1),
     description:
       'بداية العام الهجري الجديد 1448هـ. عطلة رسمية في المملكة تُحيي ذكرى هجرة النبي محمد ﷺ من مكة إلى المدينة المنورة.',
     isHoliday: true,
@@ -125,7 +139,7 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     category: 'national',
     date: { year: 2027, month: 2, day: 22 },
     description:
-      'يصادف 22 شوال من كل عام هجري ذكرى تأسيس الدولة السعودية الأولى عام 1139هـ على يد الإمام محمد بن سعود. يوم وطني يُحيي فيه السعوديون إرثهم التاريخي.',
+      'يصادف 22 فبراير من كل عام ميلادي ذكرى تأسيس الدولة السعودية الأولى عام 1139هـ على يد الإمام محمد بن سعود. يوم وطني وإجازة رسمية يُحيي فيها السعوديون إرثهم التاريخي، ويوافق هذا العام 15 رمضان 1448هـ.',
     isHoliday: true,
     holidayDays: 1,
     emoji: '🇸🇦',
@@ -134,7 +148,7 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     id: 'ramadan-start-1448',
     title: 'مطلع شهر رمضان المبارك 1448هـ',
     category: 'religious',
-    date: { year: 2027, month: 2, day: 18 },
+    date: hijriEvent(1448, 9, 1),
     description:
       'بداية شهر رمضان المبارك للعام الهجري 1448هـ، شهر الصيام والقيام وتلاوة القرآن. تُعلن رؤية الهلال رسمياً من قبل المحكمة العليا.',
     isHoliday: false,
@@ -144,7 +158,7 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     id: 'eid-fitr-1448',
     title: 'عيد الفطر المبارك 1448هـ',
     category: 'religious',
-    date: { year: 2027, month: 3, day: 19 },
+    date: hijriEvent(1448, 10, 1),
     description:
       'يبدأ عيد الفطر المبارك في 1 شوال 1448هـ بعد صيام شهر رمضان. تُقام صلاة العيد في المساجد والمصليات وتستمر الإجازة الرسمية عدة أيام.',
     isHoliday: true,
@@ -155,7 +169,7 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     id: 'arafat-1448',
     title: 'وقفة عرفة 1448هـ',
     category: 'religious',
-    date: { year: 2027, month: 7, day: 18 },
+    date: hijriEvent(1448, 12, 9),
     description:
       'يوم عرفة، أعظم أيام السنة عند المسلمين، يقف فيه حجاج بيت الله الحرام على عرفات. يُستحب صيامه لغير الحجاج.',
     isHoliday: true,
@@ -166,12 +180,23 @@ export const SAUDI_EVENTS: SaudiEvent[] = [
     id: 'eid-adha-1448',
     title: 'عيد الأضحى المبارك 1448هـ',
     category: 'religious',
-    date: { year: 2027, month: 7, day: 19 },
+    date: hijriEvent(1448, 12, 10),
     description:
       'يبدأ عيد الأضحى المبارك في 10 ذو الحجة 1448هـ، ويستمر أربعة أيام. تُقام صلاة العيد ويُضحى بالأضاحي تقرّباً إلى الله.',
     isHoliday: true,
     holidayDays: 4,
     emoji: '🐏',
+  },
+  {
+    id: 'hijri-new-year-1449',
+    title: 'رأس السنة الهجرية 1449هـ',
+    category: 'religious',
+    date: hijriEvent(1449, 1, 1),
+    description:
+      'بداية العام الهجري الجديد 1449هـ وفق تقويم أم القرى. عطلة رسمية في المملكة تُحيي ذكرى هجرة النبي محمد ﷺ من مكة إلى المدينة المنورة.',
+    isHoliday: true,
+    holidayDays: 1,
+    emoji: '📅',
   },
   {
     id: 'school-end-1448',
@@ -351,6 +376,14 @@ export function nextHolidayAfter(from: GregorianDate): SaudiEvent | undefined {
 /** Hijri text for an event, derived from the Umm Al-Qura table (never hardcoded). */
 export function eventHijriText(event: SaudiEvent): string {
   return formatHijri(gregorianToHijri(event.date.year, event.date.month, event.date.day));
+}
+
+/** Arabic-correct duration label: «يوم واحد»، «يومان»، «4 أيام»، «12 يوماً». */
+export function holidayDurationText(days: number): string {
+  if (days === 1) return 'يوم واحد';
+  if (days === 2) return 'يومان';
+  if (days <= 10) return `${days} أيام`;
+  return `${days} يوماً`;
 }
 
 export const CATEGORY_LABELS: Record<EventCategory, string> = {
