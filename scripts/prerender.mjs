@@ -6,6 +6,18 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
+import {
+  formatGregorian,
+  formatHijri,
+  gregorianToHijri,
+  hijriMonthLength,
+  isoDate,
+  loadCountdowns,
+  resolveAll,
+  resolveCountdown,
+  todayInRiyadh,
+  weekdayName,
+} from './countdowns.mjs';
 
 const SITE_URL = 'https://alshafra.com';
 const SITE_NAME = 'تقويم السعودية';
@@ -187,6 +199,221 @@ ${a.faq && a.faq.length ? `      <h2>الأسئلة الشائعة</h2>\n${a.faq
   }));
 }
 
+// --- Countdown pages ("كم باقي على…") ----------------------------------------
+// Built from src/data/countdowns.json — the same file the React app imports —
+// with every date resolved at build time through the Umm Al-Qura table, so the
+// crawlable HTML already contains the real Gregorian + Hijri dates instead of
+// an empty shell that only fills in after JavaScript runs.
+
+const TODAY_SA = todayInRiyadh();
+const TODAY_HIJRI = gregorianToHijri(TODAY_SA.year, TODAY_SA.month, TODAY_SA.day);
+const COUNTDOWNS = loadCountdowns();
+
+const COUNTDOWN_CATEGORY_LABELS = {
+  national: 'وطنية',
+  religious: 'دينية',
+  salary: 'الرواتب والدعم',
+  school: 'دراسية',
+  seasonal: 'مواسم',
+};
+
+function countdownHubRoute() {
+  const resolved = resolveAll(TODAY_SA);
+  const groups = ['religious', 'national', 'salary', 'school', 'seasonal'];
+  const listHtml = groups
+    .map((g) => {
+      const items = resolved.filter((r) => r.def.category === g);
+      if (!items.length) return '';
+      return `      <h2>عدّادات ${COUNTDOWN_CATEGORY_LABELS[g]}</h2>\n      <ul>\n${items
+        .map(
+          (r) =>
+            `        <li><a href="/countdown/${r.def.slug}">${r.def.question}</a> — ${
+              r.date ? `${r.gregorianText} الموافق ${r.hijriText} (${r.weekdayText})، باقٍ ${r.daysRemaining} يوماً.` : r.def.summary
+            }</li>`,
+        )
+        .join('\n')}\n      </ul>`;
+    })
+    .filter(Boolean)
+    .join('\n');
+
+  return {
+    path: '/countdown',
+    title: 'كم باقي على…؟ عدّادات تنازلية للمناسبات والرواتب في السعودية | تقويم السعودية',
+    description:
+      'عدّادات تنازلية مباشرة: كم باقي على رمضان، عيد الفطر، عيد الأضحى، اليوم الوطني، يوم التأسيس، حساب المواطن، الرواتب، بداية الدراسة والإجازات — محسوبة وفق تقويم أم القرى بتوقيت الرياض.',
+    keywords:
+      'كم باقي على رمضان, كم باقي على العيد, كم باقي على الراتب, كم باقي على اليوم الوطني, عداد تنازلي, كم باقي على حساب المواطن, كم باقي على الدراسة',
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: 'العدّادات التنازلية في تقويم السعودية',
+        inLanguage: 'ar-SA',
+        itemListElement: resolved.map((r, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: r.def.question,
+          url: `${SITE_URL}/countdown/${r.def.slug}`,
+        })),
+      },
+    ],
+    body: bodyWithNoscript(`
+      <h1>كم باقي على…؟ عدّادات تنازلية سعودية</h1>
+      <p>عدّاد تنازلي مباشر لكل موعد يهم السعوديين: رمضان والعيدان والمناسبات الوطنية ومواعيد الرواتب وحساب المواطن والضمان والإجازات الدراسية والمواسم — محسوبة من تقويم أم القرى الرسمي وبتوقيت الرياض.</p>
+${listHtml}
+      <h2>كيف تُحسب هذه العدّادات؟</h2>
+      <p>المناسبات الدينية تُشتق من تاريخها الهجري عبر تقويم أم القرى (مثلاً عيد الأضحى = 10 ذو الحجة)، والمناسبات الوطنية من تاريخها الميلادي الثابت، ومواعيد الرواتب والدعم من يوم الصرف الشهري بعد تطبيق قاعدة نهاية الأسبوع (الجمعة تُقدَّم للخميس والسبت يُؤجَّل للأحد)، والمواعيد الدراسية من التقويم المعتمد لوزارة التعليم. جميع الأيام محسوبة بتوقيت الرياض.</p>
+    `),
+  };
+}
+
+function countdownRoutes() {
+  return COUNTDOWNS.map((def) => {
+    const r = resolveCountdown(def, TODAY_SA);
+    const description = r.date
+      ? `${def.question} ${r.daysRemaining} يوماً — ${r.displayTitle} يوم ${r.weekdayText} ${r.gregorianText} الموافق ${r.hijriText}. عدّاد تنازلي مباشر بالأيام والساعات والدقائق بتوقيت الرياض.`
+      : `${def.question} — ${def.summary}`;
+
+    const upcomingHtml =
+      r.upcoming.length > 1
+        ? `      <h2>المواعيد القادمة</h2>\n      <ul>\n${r.upcoming
+            .map((d) => `        <li>${formatGregorian(d)} — ${weekdayName(d)} — ${formatHijri(gregorianToHijri(d.year, d.month, d.day))}</li>`)
+            .join('\n')}\n      </ul>`
+        : '';
+
+    const relatedHtml = def.related && def.related.length
+      ? `      <h2>عدّادات ذات صلة</h2>\n      <ul>\n${def.related
+          .map((slug) => COUNTDOWNS.find((c) => c.slug === slug))
+          .filter(Boolean)
+          .map((c) => `        <li><a href="/countdown/${c.slug}">${c.question}</a></li>`)
+          .join('\n')}\n      </ul>`
+      : '';
+
+    return {
+      path: `/countdown/${def.slug}`,
+      title: `${def.question} العدّ التنازلي | تقويم السعودية`,
+      description,
+      keywords: def.keywords,
+      jsonLd: [
+        ...(r.date
+          ? [
+              {
+                '@context': 'https://schema.org',
+                '@type': 'Event',
+                name: r.displayTitle,
+                description: def.summary,
+                startDate: isoDate(r.date),
+                endDate: isoDate(r.date),
+                eventStatus: 'https://schema.org/EventScheduled',
+                eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+                location: {
+                  '@type': 'Place',
+                  name: 'المملكة العربية السعودية',
+                  address: { '@type': 'PostalAddress', addressCountry: 'SA' },
+                },
+                inLanguage: 'ar-SA',
+              },
+            ]
+          : []),
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: def.faq.map((f) => ({
+            '@type': 'Question',
+            name: f.q,
+            acceptedAnswer: { '@type': 'Answer', text: f.a },
+          })),
+        },
+      ],
+      body: bodyWithNoscript(`
+      <h1>${def.emoji} ${def.question}</h1>
+      <p>${description}</p>
+      <h2>${r.displayTitle}</h2>
+      <ul>
+        <li>التاريخ الميلادي: ${r.gregorianText}</li>
+        <li>التاريخ الهجري: ${r.hijriText}</li>
+        <li>اليوم: ${r.weekdayText}</li>
+        <li>المتبقي: ${r.date ? `${r.daysRemaining} يوماً` : 'يُحدَّث فور اعتماد الموعد رسمياً'}</li>
+      </ul>
+      <h2>التفاصيل</h2>
+${def.paragraphs.map((p) => `      <p>${p}</p>`).join('\n')}
+      <h2>معلومات سريعة</h2>
+      <ul>
+${def.notes.map((n) => `        <li>${n}</li>`).join('\n')}
+      </ul>
+${upcomingHtml}
+      <h2>الأسئلة الشائعة</h2>
+${def.faq.map((f) => `      <h3>${f.q}</h3>\n      <p>${f.a}</p>`).join('\n')}
+${relatedHtml}
+      <p><a href="/countdown">كل العدّادات التنازلية</a> · <a href="/today">التاريخ اليوم</a></p>
+    `),
+    };
+  });
+}
+
+function todayRoute() {
+  const hijriText = formatHijri(TODAY_HIJRI);
+  const gregorianText = formatGregorian(TODAY_SA);
+  const weekday = weekdayName(TODAY_SA);
+  const monthLength = hijriMonthLength(TODAY_HIJRI.year, TODAY_HIJRI.month);
+  const upcoming = resolveAll(TODAY_SA).filter((r) => r.date).slice(0, 6);
+
+  return {
+    path: '/today',
+    title: `التاريخ اليوم: ${hijriText} — ${gregorianText} | تقويم السعودية`,
+    description: `التاريخ الهجري والميلادي اليوم في السعودية: ${weekday} ${hijriText} الموافق ${gregorianText} بتوقيت الرياض، وفق تقويم أم القرى الرسمي، مع الوقت الحالي وأقرب المواعيد والمناسبات.`,
+    keywords:
+      'التاريخ اليوم, كم التاريخ اليوم, التاريخ الهجري اليوم, التاريخ الميلادي اليوم, تاريخ اليوم بالهجري, اليوم كم بالهجري, تقويم أم القرى',
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: `التاريخ اليوم في السعودية — ${hijriText}`,
+        description: `التاريخ الهجري والميلادي اليوم في المملكة العربية السعودية وفق تقويم أم القرى: ${hijriText} الموافق ${gregorianText}.`,
+        inLanguage: 'ar-SA',
+        url: `${SITE_URL}/today`,
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: 'كم التاريخ الهجري اليوم؟',
+            acceptedAnswer: { '@type': 'Answer', text: `التاريخ الهجري اليوم هو ${hijriText} وفق تقويم أم القرى الرسمي.` },
+          },
+          {
+            '@type': 'Question',
+            name: 'كم التاريخ الميلادي اليوم؟',
+            acceptedAnswer: { '@type': 'Answer', text: `التاريخ الميلادي اليوم هو ${gregorianText}، ويوافق يوم ${weekday}.` },
+          },
+        ],
+      },
+    ],
+    body: bodyWithNoscript(`
+      <h1>التاريخ اليوم في السعودية</h1>
+      <p>التاريخ الهجري اليوم هو ${hijriText}، الموافق ${gregorianText}، ويوم ${weekday} بتوقيت الرياض وفق تقويم أم القرى الرسمي.</p>
+      <h2>تفاصيل اليوم</h2>
+      <ul>
+        <li>التاريخ الهجري: ${hijriText}</li>
+        <li>التاريخ الميلادي: ${gregorianText}</li>
+        <li>اليوم: ${weekday}</li>
+        <li>عدد أيام الشهر الهجري الحالي: ${monthLength} يوماً</li>
+        <li>المتبقي من الشهر الهجري: ${Math.max(0, monthLength - TODAY_HIJRI.day)} يوماً</li>
+      </ul>
+      <h2>أقرب المواعيد القادمة</h2>
+      <ul>
+${upcoming
+  .map((r) => `        <li><a href="/countdown/${r.def.slug}">${r.displayTitle}</a> — ${r.gregorianText} (باقٍ ${r.daysRemaining} يوماً)</li>`)
+  .join('\n')}
+      </ul>
+      <h2>عن التاريخ الهجري في السعودية</h2>
+      <p>تعتمد المملكة العربية السعودية تقويم أم القرى مرجعاً رسمياً للتواريخ الهجرية في المعاملات الحكومية والعقود والإجازات. يُحسب هذا التقويم فلكياً لتحديد بدايات الأشهر، وقد يختلف بيوم واحد عن الرؤية الشرعية المُعلنة لأشهر رمضان وشوال وذي الحجة.</p>
+      <p>التاريخ المعروض محسوب بتوقيت الرياض (UTC+3) بغض النظر عن موقع الزائر. لتحويل أي تاريخ آخر استخدم <a href="/date-converter">أداة تحويل التاريخ</a>، ولمعرفة المواعيد القادمة تصفّح <a href="/countdown">العدّادات التنازلية</a>.</p>
+    `),
+  };
+}
+
 // --- Route metadata + body content -------------------------------------------
 
 const routes = [
@@ -211,6 +438,8 @@ const routes = [
     <p>بوابة سعودية شاملة تجمع مواعيد صرف الرواتب الحكومية، حساب المواطن، الضمان الاجتماعي المطوّر، رواتب المتقاعدين، التقويم الهجري والميلادي، التقويم الدراسي، والإجازات الرسمية، مع أدوات تحويل التاريخ وحاسبة العمر وزخرفة الأسماء — وفق تقويم أم القرى الرسمي.</p>
     <h2>خدماتنا</h2>
     <ul>
+      <li><a href="/countdown">كم باقي على…</a> — عدّادات تنازلية مباشرة لرمضان والعيدين واليوم الوطني والرواتب وبداية الدراسة والإجازات.</li>
+      <li><a href="/today">التاريخ اليوم</a> — التاريخ الهجري والميلادي الآن بتوقيت الرياض وفق تقويم أم القرى.</li>
       <li><a href="/salaries">مواعيد الرواتب</a> — رواتب الموظفين الحكوميين وحساب المواطن والمتقاعدين والضمان الاجتماعي والدعم السكني.</li>
       <li><a href="/hijri-calendar">التقويم الهجري</a> — تقويم أم القرى الرسمي لكل الشهور الهجرية مع المناسبات الدينية والوطنية.</li>
       <li><a href="/school-calendar">التقويم الدراسي</a> — موعد بداية الدراسة وإجازات المدارس وفق تقويم وزارة التعليم السعودية.</li>
@@ -613,6 +842,9 @@ const routes = [
     `),
   },
   ...articleRoutes(),
+  countdownHubRoute(),
+  ...countdownRoutes(),
+  todayRoute(),
   {
     path: '/faq',
     title: 'الأسئلة الشائعة عن المواعيد والتقويم في السعودية | تقويم السعودية',
@@ -728,6 +960,8 @@ function bodyWithNoscript(innerHtml) {
       <header class="prerender-nav">
         <a href="/"><strong>تقويم السعودية</strong></a>
         <nav>
+          <a href="/countdown">كم باقي على…</a>
+          <a href="/today">التاريخ اليوم</a>
           <a href="/salaries">مواعيد الرواتب</a>
           <a href="/hijri-calendar">التقويم الهجري</a>
           <a href="/school-calendar">التقويم الدراسي</a>
@@ -833,6 +1067,8 @@ const today = new Date().toISOString().slice(0, 10);
 
 const CHANGEFREQ = {
   '/': 'daily',
+  '/countdown': 'daily',
+  '/today': 'daily',
   '/salaries': 'daily',
   '/hijri-calendar': 'weekly',
   '/school-calendar': 'weekly',
@@ -843,6 +1079,8 @@ const CHANGEFREQ = {
 
 const PRIORITY = {
   '/': '1.0',
+  '/countdown': '0.9',
+  '/today': '0.9',
   '/salaries': '0.9',
   '/hijri-calendar': '0.9',
   '/name-decoration': '0.8',
@@ -863,8 +1101,9 @@ const sitemap = [
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
   ...routes.map((r) => {
     const loc = r.path === '/' ? `${SITE_URL}/` : SITE_URL + r.path;
-    const changefreq = CHANGEFREQ[r.path] || 'monthly';
-    const priority = PRIORITY[r.path] || '0.6';
+    const isCountdown = r.path.startsWith('/countdown/');
+    const changefreq = CHANGEFREQ[r.path] || (isCountdown ? 'daily' : 'monthly');
+    const priority = PRIORITY[r.path] || (isCountdown ? '0.8' : '0.6');
     return [
       '  <url>',
       `    <loc>${loc}</loc>`,

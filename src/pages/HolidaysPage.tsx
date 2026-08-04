@@ -9,6 +9,8 @@ import {
   CATEGORY_STYLES,
   daysUntilEvent,
   eventHijriText,
+  holidayDurationText,
+  nextHolidayAfter,
 } from '../lib/events';
 import Countdown from '../components/Countdown';
 
@@ -27,9 +29,10 @@ export default function HolidaysPage() {
       new Date(b.date.year, b.date.month - 1, b.date.day).getTime(),
   );
 
-  const nextHoliday = SAUDI_EVENTS.filter((e) => e.isHoliday && daysUntilEvent(e, today) >= 0).sort(
-    (a, b) => daysUntilEvent(a, today) - daysUntilEvent(b, today),
-  )[0];
+  // `daysUntilEvent` clamps to 0, so filtering on it used to keep events that
+  // already happened and show them as «أقرب إجازة» with a frozen 00:00:00
+  // countdown. `nextHolidayAfter` compares the real (signed) difference.
+  const nextHoliday = nextHolidayAfter(today);
 
   useSeo({
     title: 'الإجازات الرسمية في السعودية 2026-2027 | تقويم السعودية',
@@ -107,7 +110,7 @@ export default function HolidaysPage() {
                   {nextHoliday.holidayDays && (
                     <span className="chip mt-2 bg-gold-50 text-gold-700 ring-1 ring-gold-200">
                       <Star className="h-3 w-3" />
-                      مدة الإجازة: {nextHoliday.holidayDays} أيام
+                      مدة الإجازة: {holidayDurationText(nextHoliday.holidayDays)}
                     </span>
                   )}
                 </div>
@@ -163,7 +166,7 @@ export default function HolidaysPage() {
                 {e.isHoliday && e.holidayDays ? (
                   <span className="chip bg-gold-50 text-gold-700 ring-1 ring-gold-200">
                     <Flag className="h-3 w-3" />
-                    {e.holidayDays} أيام
+                    {holidayDurationText(e.holidayDays)}
                   </span>
                 ) : (
                   <span className="text-xs text-brand-600/60">مناسبة</span>

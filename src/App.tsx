@@ -13,6 +13,11 @@ const HolidaysPage = lazy(() => import('./pages/HolidaysPage'));
 const FaqPage = lazy(() => import('./pages/FaqPage'));
 const ArticlePage = lazy(() => import('./pages/ArticlePage'));
 const NameDecorationPage = lazy(() => import('./pages/NameDecorationPage'));
+const CountdownDetailPage = lazy(() => import('./pages/CountdownPage'));
+const CountdownHubPage = lazy(() =>
+  import('./pages/CountdownPage').then((m) => ({ default: m.CountdownHubPage }))
+);
+const TodayPage = lazy(() => import('./pages/TodayPage'));
 const ArticlesListPage = lazy(() =>
   import('./pages/ArticlePage').then((m) => ({ default: m.ArticlesListPage }))
 );
@@ -47,6 +52,9 @@ export default function App() {
           {name === 'hijri-calendar' && <HijriCalendarPage />}
           {name === 'school-calendar' && <SchoolCalendarPage />}
           {name === 'holidays' && <HolidaysPage />}
+          {name === 'countdown' && param && <CountdownDetailPage slug={param} />}
+          {name === 'countdown' && !param && <CountdownHubPage />}
+          {name === 'today' && <TodayPage />}
           {name === 'faq' && <FaqPage />}
           {name === 'articles' && param && <ArticlePage slug={param} />}
           {name === 'articles' && !param && <ArticlesListPage />}

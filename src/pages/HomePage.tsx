@@ -16,6 +16,8 @@ import {
   FileText,
   HelpCircle,
   Wand2,
+  Timer,
+  Sun,
 } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import { useNow } from '../lib/useNow';
@@ -232,6 +234,18 @@ export default function HomePage() {
           </div>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ServiceCard
+            icon={Timer}
+            title="كم باقي على…"
+            desc="عدّادات تنازلية مباشرة لرمضان والعيدين واليوم الوطني والرواتب وبداية الدراسة."
+            to="/countdown"
+          />
+          <ServiceCard
+            icon={Sun}
+            title="التاريخ اليوم"
+            desc="التاريخ الهجري والميلادي الآن بتوقيت الرياض وفق تقويم أم القرى الرسمي."
+            to="/today"
+          />
           <ServiceCard
             icon={Coins}
             title="مواعيد الرواتب"
