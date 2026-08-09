@@ -18,11 +18,13 @@ import {
   todayInRiyadh,
   weekdayName,
 } from './countdowns.mjs';
+import { mergeCatalog, PRERENDER_CSS as GLOBAL_CSS } from './catalog.mjs';
 
 const SITE_URL = 'https://alshafra.com';
 const SITE_NAME = 'تقويم السعودية';
 
 const distDir = join(process.cwd(), 'dist');
+const rootDir = process.cwd();
 const templatePath = join(distDir, 'index.html');
 
 if (!existsSync(templatePath)) {
@@ -948,6 +950,13 @@ const routes = [
   },
 ];
 
+// --- الكتالوج العالمي متعدد اللغات -------------------------------------------
+// يُدمج آلاف الصفحات العالمية (أدوات × 16 لغة، دول، حروف، أسماء، مقالات) مع
+// الصفحات الحالية، ويطبّق جدولة النشر التلقائي: كل صفحة تُنشر في تاريخها المحدد
+// (5 صفحات/يوم افتراضياً من schedule.json) وتظهر في sitemap فقط بعد تاريخ نشرها.
+const { published: routesFinal, total: catalogTotal, today: buildDate } = mergeCatalog(routes);
+console.log(`[prerender] catalog merged: ${catalogTotal} total pages, ${routesFinal.length} published (${buildDate}).`);
+
 // --- HTML helpers ------------------------------------------------------------
 
 // The static HTML that every crawler (Googlebot, Bingbot, social + AI bots)
@@ -1026,7 +1035,7 @@ function setBody(html, bodyContent) {
 // --- Generate pages ----------------------------------------------------------
 
 let count = 0;
-for (const route of routes) {
+for (const route of routesFinal) {
   let html = template;
   const canonical = SITE_URL + route.path;
 
@@ -1040,13 +1049,24 @@ for (const route of routes) {
   html = setMeta(html, 'twitter:title', route.title);
   html = setMeta(html, 'twitter:description', route.description);
 
+  // hreflang alternates for multilingual pages
+  if (route.hreflang && route.hreflang.length > 0) {
+    for (const alt of route.hreflang) {
+      html = setLink(html, `alternate hreflang="${alt.code}"`, SITE_URL + alt.path);
+    }
+    // x-default: الإصدار الإنجليزي إن وُجد
+    const xDefault = route.hreflang.find((a) => a.code === 'en');
+    if (xDefault) html = setLink(html, 'alternate hreflang="x-default"', SITE_URL + xDefault.path);
+  }
+
   if (route.jsonLd && route.jsonLd.length > 0) {
     html = setJsonLd(html, route.jsonLd);
   }
 
   if (route.body) {
     html = setBody(html, route.body);
-    html = html.replace('</head>', `    ${PRERENDER_CSS}\n  </head>`);
+    const css = route.lang && route.lang !== 'ar' ? GLOBAL_CSS : PRERENDER_CSS;
+    html = html.replace('</head>', `    ${css}\n  </head>`);
   }
 
   const outDir = route.path === '/' ? distDir : join(distDir, route.path);
@@ -1054,7 +1074,7 @@ for (const route of routes) {
   mkdirSync(outDir, { recursive: true });
   writeFileSync(outFile, html, 'utf-8');
   count++;
-  console.log(`[prerender] ${route.path} -> ${outFile.replace(distDir, 'dist')}`);
+  if (count <= 5 || count % 50 === 0) console.log(`[prerender] ${route.path}`);
 }
 
 console.log(`[prerender] Done. ${count} pages generated.`);
@@ -1065,49 +1085,22 @@ console.log(`[prerender] Done. ${count} pages generated.`);
 
 const today = new Date().toISOString().slice(0, 10);
 
-const CHANGEFREQ = {
-  '/': 'daily',
-  '/countdown': 'daily',
-  '/today': 'daily',
-  '/salaries': 'daily',
-  '/hijri-calendar': 'weekly',
-  '/school-calendar': 'weekly',
-  '/holidays': 'weekly',
-  '/articles': 'weekly',
-  '/name-decoration': 'weekly',
-};
-
-const PRIORITY = {
-  '/': '1.0',
-  '/countdown': '0.9',
-  '/today': '0.9',
-  '/salaries': '0.9',
-  '/hijri-calendar': '0.9',
-  '/name-decoration': '0.8',
-  '/school-calendar': '0.8',
-  '/holidays': '0.8',
-  '/date-converter': '0.7',
-  '/age-calculator': '0.7',
-  '/articles': '0.7',
-  '/faq': '0.6',
-  '/about': '0.4',
-  '/contact': '0.4',
-  '/privacy': '0.3',
-  '/terms': '0.3',
-};
+// قيم افتراضية للصفحات القائمة (الكتالوج يحدد قيمه بنفسه)
+const CHANGEFREQ = { '/': 'daily', '/countdown': 'daily', '/today': 'daily', '/salaries': 'daily', '/hijri-calendar': 'weekly', '/school-calendar': 'weekly', '/holidays': 'weekly', '/articles': 'weekly', '/name-decoration': 'weekly' };
+const PRIORITY = { '/': '1.0', '/countdown': '0.9', '/today': '0.9', '/salaries': '0.9', '/hijri-calendar': '0.9', '/name-decoration': '0.8', '/school-calendar': '0.8', '/holidays': '0.8', '/date-converter': '0.7', '/age-calculator': '0.7', '/articles': '0.7', '/faq': '0.6', '/about': '0.4', '/contact': '0.4', '/privacy': '0.3', '/terms': '0.3' };
 
 const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-  ...routes.map((r) => {
+  ...routesFinal.map((r) => {
     const loc = r.path === '/' ? `${SITE_URL}/` : SITE_URL + r.path;
     const isCountdown = r.path.startsWith('/countdown/');
-    const changefreq = CHANGEFREQ[r.path] || (isCountdown ? 'daily' : 'monthly');
-    const priority = PRIORITY[r.path] || (isCountdown ? '0.8' : '0.6');
+    const changefreq = r.changefreq || CHANGEFREQ[r.path] || (isCountdown ? 'daily' : 'monthly');
+    const priority = r.priority || PRIORITY[r.path] || (isCountdown ? '0.8' : '0.6');
     return [
       '  <url>',
       `    <loc>${loc}</loc>`,
-      `    <lastmod>${today}</lastmod>`,
+      `    <lastmod>${buildDate}</lastmod>`,
       `    <changefreq>${changefreq}</changefreq>`,
       `    <priority>${priority}</priority>`,
       '  </url>',
@@ -1118,4 +1111,20 @@ const sitemap = [
 ].join('\n');
 
 writeFileSync(join(distDir, 'sitemap.xml'), sitemap, 'utf-8');
-console.log(`[prerender] sitemap.xml written with ${routes.length} URLs (lastmod ${today}).`);
+console.log(`[prerender] sitemap.xml written with ${routesFinal.length} URLs (lastmod ${buildDate}).`);
+
+// --- published.json + indexnow-new.txt ----------------------------------------
+// published.json: قائمة الصفحات المنشورة (يقرأها تطبيق React لربط الصفحات المنشورة فقط)
+// indexnow-new.txt: الصفحات التي نُشرت اليوم (تُرسل لاحقاً إلى Bing IndexNow تلقائياً)
+const publishedData = {
+  generatedAt: buildDate,
+  published: routesFinal.map((r) => ({ path: r.path, title: r.title, lang: r.lang || 'ar', kind: r.kind || 'page' })),
+};
+writeFileSync(join(distDir, 'published.json'), JSON.stringify(publishedData), 'utf-8');
+writeFileSync(join(rootDir, 'public', 'published.json'), JSON.stringify(publishedData), 'utf-8');
+console.log(`[prerender] published.json written (${publishedData.published.length} pages).`);
+
+const publishedToday = routesFinal.filter((r) => r.publishDate && r.publishDate.toISOString().slice(0, 10) === buildDate);
+const indexnowList = (publishedToday.length ? publishedToday : routesFinal).map((r) => SITE_URL + r.path);
+writeFileSync(join(distDir, 'indexnow-new.txt'), indexnowList.join('\n'), 'utf-8');
+console.log(`[prerender] indexnow-new.txt written (${indexnowList.length} URLs for today).`);

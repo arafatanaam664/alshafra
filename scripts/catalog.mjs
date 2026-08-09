@@ -1,0 +1,493 @@
+// catalog.mjs — مولّد الكتالوج العالمي متعدد اللغات
+// يبني كل صفحات الموقع العالمية (أدوات × 16 لغة، دول، حروف، أسماء، قوائم، مقالات)
+// مع حساب تاريخ النشر لكل صفحة حسب schedule.json (نشر تلقائي بمعدل pages/day).
+// يُستخدم من scripts/prerender.mjs وقت البناء. البيانات مشتركة JSON مع تطبيق React.
+
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = join(__dirname, '..');
+const read = (p) => JSON.parse(readFileSync(join(root, p), 'utf-8'));
+
+export const LANGUAGES = read('src/data/languages.json').languages;
+export const COUNTRIES = read('src/data/countries.json').countries;
+export const NAMES = read('src/data/names.json').names;
+export const TRIVIA = read('src/data/trivia.json');
+export const SCHEDULE = read('src/data/schedule.json');
+export const PRICES = read('src/data/prices.json');
+
+const I18N = {};
+for (const l of LANGUAGES) I18N[l.code] = read(`src/i18n/${l.code}.json`);
+
+export const SITE_URL = 'https://alshafra.com';
+const LANG_BY_CODE = Object.fromEntries(LANGUAGES.map((l) => [l.code, l]));
+
+// ---------- أدوات مساعدة ----------
+function resolve(obj, parts) {
+  let v = obj;
+  for (const p of parts) {
+    if (v == null) return undefined;
+    v = v[p];
+  }
+  return v;
+}
+export function t(lang, key) {
+  const parts = key.split('.');
+  let v = resolve(I18N[lang], parts);
+  if (v !== undefined && v !== null && v !== '') return v;
+  v = resolve(I18N.en, parts);
+  if (v !== undefined && v !== null && v !== '') return v;
+  v = resolve(I18N.ar, parts);
+  return v !== undefined && v !== null && v !== '' ? v : key;
+}
+export function langDir(code) {
+  const l = LANG_BY_CODE[code];
+  return l ? l.dir : 'rtl';
+}
+export function langNative(code) {
+  const l = LANG_BY_CODE[code];
+  return l ? l.native : code;
+}
+export function countryName(lang, c) {
+  if (lang === 'ar') return c.ar || c.en;
+  if (lang === 'en') return c.en;
+  return c.local || c.en;
+}
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function fill(tpl, vars) {
+  return String(tpl).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
+}
+
+// ---------- مسارات الأدوات (Slugs موضعية حسب اللغة) ----------
+const TOOL_SLUGS = read('src/data/toolslugs.json').slugs;
+const TOOL_ORDER = read('src/data/toolslugs.json').order;
+const AR_EXISTING_TOOLS = read('src/data/toolslugs.json').arExisting;
+
+const ISLAMIC_LANGS = ['ar', 'tr', 'fa', 'ur', 'id', 'ms', 'hi', 'bn', 'sw', 'en'];
+
+// الحروف العربية
+const ARABIC_LETTERS = [
+  { char: 'أ', slug: 'alef', name: 'الألف' }, { char: 'ب', slug: 'ba', name: 'الباء' }, { char: 'ت', slug: 'ta', name: 'التاء' },
+  { char: 'ث', slug: 'tha', name: 'الثاء' }, { char: 'ج', slug: 'jeem', name: 'الجيم' }, { char: 'ح', slug: 'ha', name: 'الحاء' },
+  { char: 'خ', slug: 'kha', name: 'الخاء' }, { char: 'د', slug: 'dal', name: 'الدال' }, { char: 'ذ', slug: 'thal', name: 'الذال' },
+  { char: 'ر', slug: 'ra', name: 'الراء' }, { char: 'ز', slug: 'zain', name: 'الزاي' }, { char: 'س', slug: 'seen', name: 'السين' },
+  { char: 'ش', slug: 'sheen', name: 'الشين' }, { char: 'ص', slug: 'sad', name: 'الصاد' }, { char: 'ض', slug: 'dad', name: 'الضاد' },
+  { char: 'ط', slug: 'taa', name: 'الطاء' }, { char: 'ظ', slug: 'dha', name: 'الظاء' }, { char: 'ع', slug: 'ain', name: 'العين' },
+  { char: 'غ', slug: 'ghain', name: 'الغين' }, { char: 'ف', slug: 'fa', name: 'الفاء' }, { char: 'ق', slug: 'qaf', name: 'القاف' },
+  { char: 'ك', slug: 'kaf', name: 'الكاف' }, { char: 'ل', slug: 'lam', name: 'اللام' }, { char: 'م', slug: 'meem', name: 'الميم' },
+  { char: 'ن', slug: 'noon', name: 'النون' }, { char: 'ه', slug: 'haa', name: 'الهاء' }, { char: 'و', slug: 'waw', name: 'الواو' },
+  { char: 'ي', slug: 'ya', name: 'الياء' }
+];
+const PERSIAN_EXTRA = [
+  { char: 'پ', slug: 'pe', name: 'په' }, { char: 'چ', slug: 'che', name: 'چه' }, { char: 'ژ', slug: 'zhe', name: 'ژه' }, { char: 'گ', slug: 'gaf', name: 'گاف' }
+];
+
+// ---------- هيكل الصفحة (shell) ----------
+export const PRERENDER_CSS = `<style>
+  .prerender-shell{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;max-width:960px;margin:0 auto;padding:1.25rem 1.25rem 3rem;line-height:1.9;color:#0f3d2e}
+  .prerender-shell a{color:#0b6e4f;text-decoration:none}
+  .prerender-nav{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;padding:.75rem 0;border-bottom:1px solid rgba(11,110,79,.12);font-size:.9rem}
+  .prerender-nav nav{display:flex;flex-wrap:wrap;gap:.75rem}
+  .prerender-shell h1{font-size:1.7rem;line-height:1.5;margin:1.25rem 0 .5rem}
+  .prerender-shell h2{font-size:1.2rem;margin:1.5rem 0 .5rem}
+  .prerender-shell h3{font-size:1rem;margin:1rem 0 .25rem}
+  .prerender-shell ul,.prerender-shell ol{padding-inline-start:1.25rem}
+  .prerender-shell table{border-collapse:collapse;width:100%;margin:.75rem 0;font-size:.9rem}
+  .prerender-shell th,.prerender-shell td{border:1px solid rgba(11,110,79,.15);padding:.4rem .6rem;text-align:start}
+  .prerender-shell th{background:rgba(11,110,79,.07)}
+  .prerender-shell .updated{color:#6b7f76;font-size:.8rem}
+  .prerender-shell .disclaimer{background:#fdf6e3;border:1px solid #f0e0b0;border-radius:.5rem;padding:.6rem .9rem;font-size:.85rem;margin:1rem 0}
+  .prerender-shell .faq-block{margin:1rem 0}
+  .prerender-shell .tool-placeholder{background:rgba(11,110,79,.05);border:1px dashed rgba(11,110,79,.3);border-radius:.75rem;padding:1rem;text-align:center;color:#3f6b5a;margin:1rem 0}
+  .prerender-shell .lang-links{display:flex;flex-wrap:wrap;gap:.5rem;font-size:.8rem;margin:.75rem 0}
+  .prerender-shell .lang-links a{border:1px solid rgba(11,110,79,.2);border-radius:999px;padding:.15rem .6rem}
+  .prerender-shell .grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.6rem}
+  .prerender-shell .chip{display:inline-block;background:rgba(11,110,79,.08);border-radius:999px;padding:.1rem .7rem;font-size:.8rem;margin:.2rem .1rem}
+  .prerender-footer{margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(11,110,79,.12);font-size:.85rem;color:#4b6b5f}
+</style>`;
+
+function shell(lang, innerHtml) {
+  const s = I18N[lang] || I18N.en;
+  const nav = s.nav || {};
+  const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const navLinks = [
+    `<a href="${prefix || '/'}">${esc(nav.home || 'Home')}</a>`,
+    `<a href="${prefix}/tools">${esc(nav.tools || 'Tools')}</a>`,
+    `<a href="${prefix}/articles">${esc(nav.articles || 'Articles')}</a>`
+  ];
+  if (lang === 'ar') {
+    navLinks.push(`<a href="/today">${esc(nav.today || '')}</a>`);
+    navLinks.push(`<a href="/countdown">${esc(nav.countdown || '')}</a>`);
+    navLinks.push(`<a href="/name-decoration">زخرفة الأسماء</a>`);
+    navLinks.push(`<a href="/salaries">مواعيد الرواتب</a>`);
+    navLinks.push(`<a href="/hijri-calendar">التقويم الهجري</a>`);
+  }
+  const langSwitcher = `<div class="lang-links">${LANGUAGES.map((l) => {
+    const p = l.code === 'ar' ? '/' : `/${l.code}`;
+    return `<a href="${p}">${l.flag} ${esc(l.native)}</a>`;
+  }).join('')}</div>`;
+  const footer = `<footer class="prerender-footer">
+    ${lang === 'ar' ? `<a href="/about">عن الموقع</a> · <a href="/contact">اتصل بنا</a> · <a href="/privacy">سياسة الخصوصية</a> · <a href="/terms">شروط الاستخدام</a>` : `<span>${esc(s.siteName || 'Shafra Tools')}</span> · <a href="${prefix}/articles">${esc(nav.articles || 'Articles')}</a>`}
+  </footer>`;
+  return `<div id="root"><div class="prerender-shell" dir="${langDir(lang)}" lang="${lang}">
+    <header class="prerender-nav"><a href="${prefix || '/'}"><strong>${esc(s.siteName || '')}</strong></a><nav>${navLinks.join('')}</nav></header>
+    ${langSwitcher}
+    <main>${innerHtml}</main>
+    ${footer}
+  </div></div>`;
+}
+
+function faqBlock(faq) {
+  if (!faq || !faq.length) return '';
+  return `<div class="faq-block"><h2>${esc(faqTitle())}</h2>${faq.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')}</div>`;
+}
+function faqTitle() {
+  return 'FAQ';
+}
+
+function relatedBlock(links) {
+  if (!links || !links.length) return '';
+  return `<h2>${esc('🔗')}</h2><div class="grid2">${links.map((l) => `<a href="${l.href}">${esc(l.title)}</a>`).join('')}</div>`;
+}
+
+// ---------- بناة الصفحات ----------
+// ربط مفتاح الأداة (في المسارات) بمفتاحها في ملفات الترجمة
+const STRING_KEY = {
+  'fancy-text': 'fancy-text',
+  symbols: 'symbols',
+  'password-generator': 'password',
+  'word-counter': 'word-counter',
+  'percentage-calculator': 'percentage',
+  'case-converter': 'case-converter',
+  'number-converter': 'number-converter',
+  'age-calculator': 'age-calculator',
+  'date-converter': 'date-converter',
+  today: 'today',
+  countdown: 'countdown',
+  tools: 'hub'
+};
+
+function toolRoute(lang, toolKey) {
+  if (lang === 'ar' && AR_EXISTING_TOOLS.includes(toolKey)) return null;
+  const sk = STRING_KEY[toolKey] || toolKey;
+  const s = t(lang, `tools.${sk}`);
+  const st = t(lang, `tools.${sk}.title`) || s;
+  const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const slug = TOOL_SLUGS[toolKey][lang] || TOOL_SLUGS[toolKey].en;
+  const path = `${prefix}/${slug}`;
+  const intro = (s.intro || []).map((p) => `<p>${esc(p)}</p>`).join('');
+  const howto = (s.howto || []).map((p, i) => `<li>${esc(p)}</li>`).join('');
+  const faq = faqBlock(s.faq || []);
+  const body = `
+    <h1>${esc(st)}</h1>
+    <div class="tool-placeholder">⚙️ ${esc(st)}</div>
+    ${intro}
+    ${howto ? `<h2>${esc(t(lang, 'ui.generate'))}</h2><ol>${howto}</ol>` : ''}
+    ${faq}
+  `;
+  const keywords = st;
+  const title = `${st} | ${t(lang, 'siteName')}`;
+  const description = (s.intro && s.intro[0] ? s.intro[0] : st).slice(0, 155);
+  const hreflang = LANGUAGES.filter((l) => !(l.code === 'ar' && AR_EXISTING_TOOLS.includes(toolKey))).map((l) => ({
+    code: l.code,
+    path: `${l.code === 'ar' ? '' : `/${l.code}`}/${TOOL_SLUGS[toolKey][l.code] || TOOL_SLUGS[toolKey].en}`
+  }));
+  return {
+    path, lang, kind: 'tool', param: toolKey, title, description, keywords,
+    body: shell(lang, body), hreflang,
+    jsonLd: [
+      { '@context': 'https://schema.org', '@type': 'WebApplication', name: st, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web', inLanguage: lang, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }
+    ],
+    changefreq: 'weekly', priority: '0.8'
+  };
+}
+
+function countryRoute(lang, country, kind) {
+  const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const cname = countryName(lang, country);
+  const path = `${prefix}/${kind === 'gold' ? 'gold-price' : kind === 'usd' ? 'usd-rate' : 'date-today'}/${country.slug}`;
+  const tplKey = kind === 'gold' ? 'gold' : kind === 'usd' ? 'usd' : 'dateToday';
+  const s = t(lang, tplKey);
+  const titleTpl = s.title || '{country}';
+  const title = fill(titleTpl, { country: cname, currency: country.curName, capital: country.cap });
+  const intro = (s.intro || []).map((p) => `<p>${esc(fill(p, { country: cname, currency: country.curName, capital: country.cap }))}</p>`).join('');
+  const faq = faqBlock((s.faq || []).map((f) => ({
+    q: fill(f.q, { country: cname, currency: country.curName, capital: country.cap }),
+    a: fill(f.a, { country: cname, currency: country.curName, capital: country.cap })
+  })));
+  let extra = '';
+  const updated = `${t(lang, 'ui.lastUpdated')}: ${PRICES.updated}`;
+  if (kind === 'gold') {
+    const rate = PRICES.rates[country.cur] || 1;
+    const oz = PRICES.xauUsd;
+    const ozLocal = oz * rate;
+    const gLocal = (v) => (ozLocal * v).toFixed(country.cur === 'IRR' || country.cur === 'VND' || country.cur === 'IDR' ? 0 : 2);
+    extra = `<h2>${esc(fill(t(lang, 'gold.title'), { country: cname }))}</h2>
+      <p class="updated">🗓️ ${esc(updated)}</p>
+      <table><thead><tr><th>${esc('24K')}</th><th>${esc('22K')}</th><th>${esc('21K')}</th><th>${esc('18K')}</th></tr></thead>
+      <tbody><tr><td>${esc(gLocal(1))}</td><td>${esc(gLocal(0.9166))}</td><td>${esc(gLocal(0.875))}</td><td>${esc(gLocal(0.75))}</td></tr></tbody></table>
+      <p>${esc(fill(t(lang, 'gold.intro')[0] || '', { country: cname, currency: country.curName }))}</p>
+      <div class="disclaimer">${esc(t(lang, 'ui.disclaimer'))}</div>`;
+  } else if (kind === 'usd') {
+    const rate = PRICES.rates[country.cur] || 1;
+    extra = `<h2>${esc(fill(t(lang, 'usd.title'), { country: cname }))}</h2>
+      <p class="updated">🗓️ ${esc(updated)}</p>
+      <table><thead><tr><th>${esc('1 USD → ' + country.cur)}</th><th>${esc('1 ' + country.cur + ' → USD')}</th></tr></thead>
+      <tbody><tr><td>${esc(rate.toFixed(2))}</td><td>${esc((1 / rate).toFixed(4))}</td></tr></tbody></table>
+      <div class="disclaimer">${esc(t(lang, 'ui.disclaimer'))}</div>`;
+  } else {
+    extra = `<h2>${esc(fill(t(lang, 'dateToday.title'), { country: cname }))}</h2>
+      <p class="updated">🗓️ ${esc(updated)}</p>
+      <table><thead><tr><th>${esc(t(lang, 'ui.lastUpdated'))}</th><th>${esc(t(lang, 'names.gender'))}</th><th>${esc('💱')}</th></tr></thead>
+      <tbody><tr><td>${esc(cname)}</td><td>${esc(country.cap)}</td><td>${esc(country.cur + ' — ' + country.curName)}</td></tr></tbody></table>`;
+  }
+  const hreflang = (country.langs || [lang]).filter((l) => l !== lang).map((l) => ({ code: l, path: `${l === 'ar' ? '' : `/${l}`}/${kind === 'gold' ? 'gold-price' : kind === 'usd' ? 'usd-rate' : 'date-today'}/${country.slug}` }));
+  return {
+    path, lang, kind: kind === 'gold' ? 'gold' : kind === 'usd' ? 'usd' : 'date-today', param: country.slug,
+    title: `${title} | ${t(lang, 'siteName')}`,
+    description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
+    keywords: `${title}, ${cname}, ${country.cur}, ${t(lang, 'gold.title')}`,
+    body: shell(lang, `<h1>${esc(title)}</h1>${intro}${extra}${faq}`),
+    hreflang,
+    jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebApplication', name: title, applicationCategory: 'FinanceApplication', operatingSystem: 'Web', inLanguage: lang }],
+    changefreq: 'daily', priority: '0.7'
+  };
+}
+
+function letterRoute(lang, letter) {
+  const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const path = `${prefix}/fancy-letter/${letter.slug}`;
+  const s = t(lang, 'letters');
+  const display = lang === 'ar' || lang === 'fa' || lang === 'ur' ? letter.char : letter.char.toLowerCase();
+  const title = fill(s.title || '{letter}', { letter: display });
+  const intro = (s.intro || []).map((p) => `<p>${esc(fill(p, { letter: display }))}</p>`).join('');
+  const faq = faqBlock((s.faq || []).map((f) => ({ q: fill(f.q, { letter: display }), a: fill(f.a, { letter: display }) })));
+  const lettersForLang = lang === 'fa' ? [...ARABIC_LETTERS, ...PERSIAN_EXTRA] : ARABIC_LETTERS;
+  const latin = LANG_BY_CODE[lang].script === 'latin';
+  const list = latin
+    ? 'abcdefghijklmnopqrstuvwxyz'.split('').map((c) => ({ slug: c, char: c }))
+    : lettersForLang;
+  const related = list.slice(0, 26).map((l2) => ({ href: `${prefix}/fancy-letter/${l2.slug}`, title: `${l2.char}` }));
+  const relatedHtml = relatedBlock(related);
+  // hreflang فقط للغات التي تملك هذه الصفحة فعلاً (نفس الخط)
+  const hreflang = LANGUAGES.filter((l) => LANG_BY_CODE[l.code].script === LANG_BY_CODE[lang].script && l.code !== lang).filter((l) => {
+    if (LANG_BY_CODE[l.code].script === 'latin') return true;
+    const letters = l.code === 'fa' ? [...ARABIC_LETTERS, ...PERSIAN_EXTRA] : ARABIC_LETTERS;
+    return letters.some((x) => x.slug === letter.slug);
+  }).map((l) => ({
+    code: l.code,
+    path: `${l.code === 'ar' ? '' : `/${l.code}`}/fancy-letter/${letter.slug}`
+  }));
+  return {
+    path, lang, kind: 'letter', param: letter.slug, title: `${title} | ${t(lang, 'siteName')}`,
+    description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
+    keywords: title,
+    body: shell(lang, `<h1>${esc(title)}</h1>${intro}${faq}${relatedHtml}`),
+    hreflang,
+    jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebApplication', name: title, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web', inLanguage: lang }],
+    changefreq: 'monthly', priority: '0.6'
+  };
+}
+
+function nameRoute(lang, name) {
+  const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const path = `${prefix}/name/${name.slug}`;
+  const s = t(lang, 'names');
+  const display = (lang === 'ar' || lang === 'fa' || lang === 'ur') && name.ar ? name.ar : name.en;
+  const title = fill(s.title || '{name}', { name: display });
+  const intro = (s.intro || []).map((p) => `<p>${esc(fill(p, { name: display }))}</p>`).join('');
+  const meaning = lang === 'ar' || lang === 'fa' || lang === 'ur' ? name.meaningAr || name.meaningEn : name.meaningEn;
+  const faq = faqBlock((s.faq || []).map((f) => ({ q: fill(f.q, { name: display }), a: fill(f.a, { name: display }) })));
+  const gender = t(lang, name.gender === 'male' ? 'ui.male' : 'ui.female');
+  const related = NAMES.filter((n) => n.slug !== name.slug && n.origin === name.origin).slice(0, 24).map((n) => ({
+    href: `${prefix}/name/${n.slug}`,
+    title: (lang === 'ar' || lang === 'fa' || lang === 'ur') && n.ar ? n.ar : n.en
+  }));
+  const relatedHtml = relatedBlock(related);
+  // hreflang فقط للغات التي تملك صفحة هذا الاسم فعلاً
+  const nameExistsIn = (l, nm) => {
+    if (l === 'ar') return nm.origin === 'arabic';
+    if (l === 'fa') return nm.origin === 'arabic' || nm.origin === 'persian';
+    if (l === 'ur') return nm.origin === 'arabic';
+    if (l === 'tr') return nm.origin === 'turkish' || nm.origin === 'arabic';
+    if (l === 'en') return nm.origin === 'english' || nm.origin === 'arabic';
+    return nm.origin === 'english';
+  };
+  const hreflang = LANGUAGES.filter((l) => l.code !== lang && nameExistsIn(l.code, name)).map((l) => ({
+    code: l.code,
+    path: `${l.code === 'ar' ? '' : `/${l.code}`}/name/${name.slug}`
+  }));
+  return {
+    path, lang, kind: 'name', param: name.slug, title: `${title} | ${t(lang, 'siteName')}`,
+    description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
+    keywords: `${title}, ${t(lang, 'names.title')}`,
+    body: shell(lang, `<h1>${esc(title)}</h1>
+      <p><strong>${esc(t(lang, 'ui.meaning'))}:</strong> ${esc(meaning)} &nbsp;·&nbsp; <strong>${esc(t(lang, 'ui.gender'))}:</strong> ${esc(gender)}</p>
+      ${intro}${faq}${relatedHtml}`),
+    hreflang,
+    jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebPage', name: title, inLanguage: lang }],
+    changefreq: 'monthly', priority: '0.6'
+  };
+}
+
+function listRoute(lang, listKey) {
+  const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const path = `${prefix}/names/${listKey}`;
+  const s = t(lang, `lists.${listKey}`);
+  const title = s.title || listKey;
+  const intro = (s.intro || []).map((p) => `<p>${esc(p)}</p>`).join('');
+  let items;
+  if (listKey === 'cat') items = TRIVIA.catNames;
+  else if (listKey === 'dog') items = TRIVIA.dogNames;
+  else if (listKey === 'company') items = TRIVIA.companyNames;
+  else {
+    const g = listKey === 'boy' ? 'male' : 'female';
+    const origins = lang === 'ar' ? ['arabic'] : lang === 'fa' ? ['arabic', 'persian'] : lang === 'tr' ? ['turkish', 'arabic'] : ['english'];
+    items = NAMES.filter((n) => n.gender === g && origins.includes(n.origin)).slice(0, 120).map((n) => (lang === 'ar' || lang === 'fa' || lang === 'ur') && n.ar ? n.ar : n.en);
+  }
+  const chips = items.map((i) => `<span class="chip">${esc(i)}</span>`).join('');
+  const body = `<h1>${esc(title)}</h1>${intro}<p>${chips}</p>${faqBlock(s.faq || [])}`;
+  return {
+    path, lang, kind: 'list', param: listKey, title: `${title} | ${t(lang, 'siteName')}`,
+    description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
+    keywords: title,
+    body: shell(lang, body),
+    hreflang: LANGUAGES.filter((l) => l.code !== lang).map((l) => ({ code: l.code, path: `${l.code === 'ar' ? '' : `/${l.code}`}/names/${listKey}` })),
+    jsonLd: [{ '@context': 'https://schema.org', '@type': 'Article', headline: title, inLanguage: lang }],
+    changefreq: 'monthly', priority: '0.6'
+  };
+}
+
+const WORLD_ARTICLES = ['smallest-country', 'biggest-country', 'messi-vs-ronaldo', 'pele', 'argentina', 'fun-facts', 'riddles', 'jokes', 'love-quotes', 'sad-quotes', 'whatsapp-statuses', 'instagram-bios'];
+const DHIKR_ARTICLES = ['morning-dhikr', 'evening-dhikr', 'daily-dua'];
+
+function articleRoute(lang, slug) {
+  const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const basePath = lang === 'ar' ? '/world' : `${prefix}/articles`;
+  const path = `${basePath}/${slug}`;
+  const s = t(lang, `articles.${slug}`);
+  const title = s.title || slug;
+  const intro = (s.intro || []).map((p) => `<p>${esc(p)}</p>`).join('');
+  const faq = faqBlock(s.faq || []);
+  let itemsHtml = '';
+  if (slug === 'fun-facts' || slug === 'riddles' || slug === 'jokes' || slug === 'love-quotes' || slug === 'sad-quotes' || slug === 'whatsapp-statuses' || slug === 'instagram-bios') {
+    const key = slug === 'whatsapp-statuses' ? 'statuses' : slug === 'instagram-bios' ? 'bios' : slug;
+    const list = TRIVIA[key] && TRIVIA[key][lang === 'ar' ? 'ar' : 'en'] ? TRIVIA[key][lang === 'ar' ? 'ar' : 'en'] : [];
+    itemsHtml = `<ul>${list.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`;
+  }
+  if (slug === 'morning-dhikr' || slug === 'evening-dhikr' || slug === 'daily-dua') {
+    const key = slug === 'morning-dhikr' ? 'morning' : slug === 'evening-dhikr' ? 'evening' : 'dua';
+    itemsHtml = `<div class="grid2">${TRIVIA.dhikr[key].map((d) => `<div><strong>${esc(d.text)}</strong><br/><span>${esc(d.detail)}</span></div>`).join('')}</div>`;
+  }
+  if (slug === 'smallest-country' || slug === 'biggest-country') {
+    const sorted = [...COUNTRIES].sort((a, b) => (slug === 'smallest-country' ? a.popM - b.popM : b.popM - a.popM));
+    itemsHtml = `<table><thead><tr><th>#</th><th>${esc(t(lang, 'names.gender') === 'Gender' ? 'Country' : 'الدولة')}</th><th>${esc('👥')}</th></tr></thead><tbody>${sorted.slice(0, 10).map((c, i) => `<tr><td>${i + 1}</td><td>${esc(c.flag)} ${esc(countryName(lang, c))}</td><td>~${c.popM}M</td></tr>`).join('')}</tbody></table>`;
+  }
+  const related = WORLD_ARTICLES.filter((a) => a !== slug).slice(0, 6).map((a) => ({ href: `${basePath}/${a}`, title: t(lang, `articles.${a}.title`) }));
+  const relatedHtml = relatedBlock(related);
+  return {
+    path, lang, kind: 'article', param: slug, title: `${title} | ${t(lang, 'siteName')}`,
+    description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
+    keywords: title,
+    body: shell(lang, `<h1>${esc(title)}</h1>${intro}${itemsHtml}${faq}${relatedHtml}`),
+    hreflang: LANGUAGES.filter((l) => l.code !== lang && (WORLD_ARTICLES.includes(slug) ? true : ISLAMIC_LANGS.includes(l.code))).map((l) => ({
+      code: l.code, path: l.code === 'ar' ? `/world/${slug}` : `/${l.code}/articles/${slug}`
+    })),
+    jsonLd: [{ '@context': 'https://schema.org', '@type': 'Article', headline: title, inLanguage: lang, description: descriptionOf(intro) }],
+    changefreq: 'monthly', priority: '0.6'
+  };
+}
+function descriptionOf(introHtml) {
+  return introHtml.replace(/<[^>]+>/g, '').slice(0, 155);
+}
+
+function hubRoute(lang) {
+  const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const s = t(lang, 'home');
+  const title = s.title || '';
+  const intro = (s.intro || []).map((p) => `<p>${esc(p)}</p>`).join('');
+  const toolLinks = TOOL_ORDER.filter((tk) => !(lang === 'ar' && AR_EXISTING_TOOLS.includes(tk))).map((tk) => {
+    const slug = TOOL_SLUGS[tk][lang] || TOOL_SLUGS[tk].en;
+    const sk = STRING_KEY[tk] || tk;
+    return `<a href="${prefix}/${slug}" class="chip">${esc(t(lang, `tools.${sk}.title`))}</a>`;
+  }).join('');
+  const faq = faqBlock(s.faq || []);
+  const body = `<h1>${esc(title)}</h1>${intro}<p>${toolLinks}</p>${faq}`;
+  const path = prefix || '/';
+  return {
+    path, lang, kind: 'home', title: `${title} | ${t(lang, 'siteName')}`,
+    description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
+    keywords: title,
+    body: shell(lang, body),
+    hreflang: LANGUAGES.filter((l) => l.code !== lang).map((l) => ({ code: l.code, path: l.code === 'ar' ? '/' : `/${l.code}` })),
+    jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebSite', name: t(lang, 'siteName'), url: SITE_URL + path, inLanguage: lang }],
+    changefreq: 'daily', priority: '0.9'
+  };
+}
+
+// ---------- بناء الكتالوج بالترتيب ----------
+export function buildCatalog() {
+  const routes = [];
+  const push = (r) => { if (r) routes.push(r); };
+
+  for (const lang of LANGUAGES.map((l) => l.code)) {
+    // 1) الصفحة الرئيسية + الأدوات (العربية الرئيسية = الصفحة السعودية القائمة، لا نكررها)
+    if (lang !== 'ar') push(hubRoute(lang));
+    for (const tk of TOOL_ORDER) push(toolRoute(lang, tk));
+    // 3) صفحات الدول (الذهب + الدولار + تاريخ اليوم)
+    const countries = COUNTRIES.filter((c) => (c.langs || []).includes(lang));
+    countries.sort((a, b) => b.popM - a.popM);
+    for (const c of countries) {
+      push(countryRoute(lang, c, 'gold'));
+      push(countryRoute(lang, c, 'usd'));
+      push(countryRoute(lang, c, 'date-today'));
+    }
+    // 4) الحروف
+    if (LANG_BY_CODE[lang].script === 'latin') {
+      for (const ch of 'abcdefghijklmnopqrstuvwxyz'.split('')) push(letterRoute(lang, { slug: ch, char: ch }));
+    } else {
+      const letters = lang === 'fa' ? [...ARABIC_LETTERS, ...PERSIAN_EXTRA] : ARABIC_LETTERS;
+      for (const ltr of letters) push(letterRoute(lang, ltr));
+    }
+    // 5) الأسماء
+    let names;
+    if (lang === 'ar') names = NAMES.filter((n) => n.origin === 'arabic');
+    else if (lang === 'fa') names = NAMES.filter((n) => n.origin === 'arabic' || n.origin === 'persian');
+    else if (lang === 'ur') names = NAMES.filter((n) => n.origin === 'arabic');
+    else if (lang === 'tr') names = NAMES.filter((n) => n.origin === 'turkish' || n.origin === 'arabic');
+    else if (lang === 'en') names = NAMES.filter((n) => n.origin === 'english' || n.origin === 'arabic');
+    else names = NAMES.filter((n) => n.origin === 'english');
+    for (const n of names) push(nameRoute(lang, n));
+    // 6) قوائم الأسماء
+    for (const lk of ['boy', 'girl', 'cat', 'dog', 'company']) push(listRoute(lang, lk));
+    // 7) المقالات
+    for (const a of WORLD_ARTICLES) push(articleRoute(lang, a));
+    if (ISLAMIC_LANGS.includes(lang)) for (const a of DHIKR_ARTICLES) push(articleRoute(lang, a));
+  }
+  return routes;
+}
+
+// ---------- الجدولة ----------
+export function mergeCatalog(existingRoutes) {
+  const catalog = buildCatalog();
+  const start = new Date(`${SCHEDULE.startDate}T00:00:00Z`);
+  const rate = SCHEDULE.ratePerDay || 5;
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const all = existingRoutes.map((r) => ({ ...r, publishDate: start, fromExisting: true }));
+  // إزالة أي تكرار: الصفحات القائمة لها الأولوية (لا نكتب فوق الرئيسية السعودية أبداً)
+  const seen = new Set(existingRoutes.map((r) => r.path));
+  catalog.forEach((r, i) => {
+    if (seen.has(r.path)) return;
+    seen.add(r.path);
+    const d = new Date(start);
+    d.setUTCDate(d.getUTCDate() + Math.floor(i / rate));
+    all.push({ ...r, publishDate: d });
+  });
+  const published = all.filter((r) => r.publishDate <= today);
+  return { all, published, today: today.toISOString().slice(0, 10), total: all.length };
+}
