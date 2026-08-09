@@ -1,0 +1,60 @@
+# Daily auto-publish: ينفّذ 3 مرات يومياً (04:30 / 12:30 / 20:30 UTC)
+# 1) يجلب أسعار الذهب والعملات تلقائياً (scripts/fetch-prices.mjs)
+# 2) يبني الموقع (vite build + prerender) فيُنشر تلقائياً عدد الصفحات المقرر لهذا اليوم
+#    من كتالوج النشر (schedule.json → ratePerDay = 5 صفحات/يوم)
+# 3) يحدّث public/published.json (قائمة الصفحات المنشورة) ويُحدِث commit → Vercel يعيد النشر
+# 4) يرسل الصفحات الجديدة إلى Bing IndexNow للفهرسة الفورية
+# ملاحظة: يعمل تلقائياً بعد دمج هذا الملف في الفرع الرئيسي (main) للمستودع.
+
+name: Daily auto-publish
+
+on:
+  schedule:
+    - cron: '30 4 * * *'
+    - cron: '30 12 * * *'
+    - cron: '30 20 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch live gold & FX prices
+        run: node scripts/fetch-prices.mjs
+
+      - name: Build site (publishes today's pages)
+        run: npm run build
+
+      - name: Commit auto-updates (prices + published list)
+        run: |
+          git config user.name "shafra-bot"
+          git config user.email "bot@alshafra.com"
+          git add src/data/prices.json public/published.json public/4f9c2a7e1b8d3f6a9c0e5b7d2a8f4c1e.txt
+          if git diff --cached --quiet; then
+            echo "No changes to commit (prices unchanged today)."
+          else
+            git commit -m "chore: daily auto-publish $(date -u +%F) — prices + published pages"
+            git push
+            echo "Committed and pushed. Vercel will rebuild."
+          fi
+
+      - name: Submit new pages to IndexNow (Bing/Yandex)
+        run: node scripts/indexnow.mjs
