@@ -277,7 +277,6 @@
     { "slug": "pınar", "en": "Pinar", "meaningEn": "Spring, fountain", "gender": "female", "origin": "turkish" },
     { "slug": "sevgi", "en": "Sevgi", "meaningEn": "Love", "gender": "female", "origin": "turkish" },
     { "slug": "şebnem", "en": "Sebnem", "meaningEn": "Dew", "gender": "female", "origin": "turkish" },
-    { "slug": "yasemin", "en": "Yasemin", "meaningEn": "Jasmine", "gender": "female", "origin": "turkish" },
-    { "slug": "zeynep", "en": "Zeynep", "meaningEn": "Precious gem", "gender": "female", "origin": "turkish" }
+    { "slug": "yasemin", "en": "Yasemin", "meaningEn": "Jasmine", "gender": "female", "origin": "turkish" }
   ]
 }

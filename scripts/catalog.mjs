@@ -114,9 +114,10 @@ function shell(lang, innerHtml) {
   const s = I18N[lang] || I18N.en;
   const nav = s.nav || {};
   const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const toolsSlug = (TOOL_SLUGS.tools && TOOL_SLUGS.tools[lang]) || 'tools';
   const navLinks = [
     `<a href="${prefix || '/'}">${esc(nav.home || 'Home')}</a>`,
-    `<a href="${prefix}/tools">${esc(nav.tools || 'Tools')}</a>`,
+    `<a href="${prefix}/${toolsSlug}">${esc(nav.tools || 'Tools')}</a>`,
     `<a href="${prefix}/articles">${esc(nav.articles || 'Articles')}</a>`
   ];
   if (lang === 'ar') {
@@ -182,13 +183,24 @@ function toolRoute(lang, toolKey) {
   const intro = (s.intro || []).map((p) => `<p>${esc(p)}</p>`).join('');
   const howto = (s.howto || []).map((p, i) => `<li>${esc(p)}</li>`).join('');
   const faq = faqBlock(s.faq || []);
-  const body = `
+  // صفحة "كل الأدوات": تسرد كل الأدوات بروابط بدل قالب الأداة
+  let body;
+  if (toolKey === 'tools') {
+    const links = TOOL_ORDER.filter((tk) => !(lang === 'ar' && AR_EXISTING_TOOLS.includes(tk))).map((tk) => {
+      const k = STRING_KEY[tk] || tk;
+      const sl = TOOL_SLUGS[tk][lang] || TOOL_SLUGS[tk].en;
+      return `<li><a href="${prefix}/${sl}">${esc(t(lang, `tools.${k}.title`))}</a></li>`;
+    }).join('');
+    body = `<h1>${esc(st)}</h1>${intro}<ul>${links}</ul>${faq}`;
+  } else {
+    body = `
     <h1>${esc(st)}</h1>
     <div class="tool-placeholder">⚙️ ${esc(st)}</div>
     ${intro}
     ${howto ? `<h2>${esc(t(lang, 'ui.generate'))}</h2><ol>${howto}</ol>` : ''}
     ${faq}
   `;
+  }
   const keywords = st;
   const title = `${st} | ${t(lang, 'siteName')}`;
   const description = (s.intro && s.intro[0] ? s.intro[0] : st).slice(0, 155);
@@ -202,7 +214,8 @@ function toolRoute(lang, toolKey) {
     jsonLd: [
       { '@context': 'https://schema.org', '@type': 'WebApplication', name: st, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web', inLanguage: lang, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }
     ],
-    changefreq: 'weekly', priority: '0.8'
+    changefreq: 'weekly', priority: '0.8',
+    immediate: true
   };
 }
 
@@ -365,8 +378,28 @@ function listRoute(lang, listKey) {
 const WORLD_ARTICLES = ['smallest-country', 'biggest-country', 'messi-vs-ronaldo', 'pele', 'argentina', 'fun-facts', 'riddles', 'jokes', 'love-quotes', 'sad-quotes', 'whatsapp-statuses', 'instagram-bios'];
 const DHIKR_ARTICLES = ['morning-dhikr', 'evening-dhikr', 'daily-dua'];
 
-function articleRoute(lang, slug) {
+// فهرس المقالات لكل لغة (/{lang}/articles) — يضمن أن رابط التنقل لا يقع في 404
+function articlesHubRoute(lang) {
   const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const path = `${prefix}/articles`;
+  const base = lang === 'ar' ? '/world' : path;
+  const slugs = [...WORLD_ARTICLES, ...(ISLAMIC_LANGS.includes(lang) ? DHIKR_ARTICLES : [])];
+  const links = slugs.map((a) => `<li><a href="${base}/${a}">${esc(t(lang, `articles.${a}.title`))}</a></li>`).join('');
+  const navTitle = t(lang, 'nav.articles') || 'Articles';
+  const body = `<h1>${esc(navTitle)}</h1><ul>${links}</ul>`;
+  return {
+    path, lang, kind: 'articles-list', title: `${navTitle} | ${t(lang, 'siteName')}`,
+    description: navTitle,
+    keywords: navTitle,
+    body: shell(lang, body),
+    hreflang: LANGUAGES.filter((l) => l.code !== lang).map((l) => ({ code: l.code, path: `${l.code === 'ar' ? '' : `/${l.code}`}/articles` })),
+    jsonLd: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: navTitle, inLanguage: lang }],
+    changefreq: 'weekly', priority: '0.7',
+    immediate: true,
+  };
+}
+
+function articleRoute(lang, slug) {  const prefix = lang === 'ar' ? '' : `/${lang}`;
   const basePath = lang === 'ar' ? '/world' : `${prefix}/articles`;
   const path = `${basePath}/${slug}`;
   const s = t(lang, `articles.${slug}`);
@@ -425,20 +458,31 @@ function hubRoute(lang) {
     body: shell(lang, body),
     hreflang: LANGUAGES.filter((l) => l.code !== lang).map((l) => ({ code: l.code, path: l.code === 'ar' ? '/' : `/${l.code}` })),
     jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebSite', name: t(lang, 'siteName'), url: SITE_URL + path, inLanguage: lang }],
-    changefreq: 'daily', priority: '0.9'
+    changefreq: 'daily', priority: '0.9',
+    immediate: true
   };
 }
 
-// ---------- بناء الكتالوج بالترتيب ----------
+// ---------- بناء الكتالوج بالمراحل ----------
+// المرحلة 0-2: المحاور + الأدوات + فهارس المقالات لكل اللغات (تُنشر فوراً — لا 404)
+// المرحلة 3+: المحتوى العميق (دول، حروف، أسماء، قوائم، مقالات) حسب جدولة ratePerDay
 export function buildCatalog() {
   const routes = [];
   const push = (r) => { if (r) routes.push(r); };
+  const langs = LANGUAGES.map((l) => l.code);
 
-  for (const lang of LANGUAGES.map((l) => l.code)) {
-    // 1) الصفحة الرئيسية + الأدوات (العربية الرئيسية = الصفحة السعودية القائمة، لا نكررها)
-    if (lang !== 'ar') push(hubRoute(lang));
-    for (const tk of TOOL_ORDER) push(toolRoute(lang, tk));
-    // 3) صفحات الدول (الذهب + الدولار + تاريخ اليوم)
+  // المرحلة 0: محاور اللغات (العربية الرئيسية = الصفحة السعودية القائمة)
+  for (const lang of langs) if (lang !== 'ar') push(hubRoute(lang));
+
+  // المرحلة 1: كل الأدوات لكل اللغات
+  for (const lang of langs) for (const tk of TOOL_ORDER) push(toolRoute(lang, tk));
+
+  // المرحلة 2: فهرس المقالات لكل لغة
+  for (const lang of langs) if (lang !== 'ar') push(articlesHubRoute(lang));
+
+  // المرحلة 3: المحتوى العميق لكل لغة
+  for (const lang of langs) {
+    // 3.1) صفحات الدول (الذهب + الدولار + تاريخ اليوم) — الأكبر سكاناً أولاً
     const countries = COUNTRIES.filter((c) => (c.langs || []).includes(lang));
     countries.sort((a, b) => b.popM - a.popM);
     for (const c of countries) {
@@ -446,14 +490,14 @@ export function buildCatalog() {
       push(countryRoute(lang, c, 'usd'));
       push(countryRoute(lang, c, 'date-today'));
     }
-    // 4) الحروف
+    // 3.2) الحروف
     if (LANG_BY_CODE[lang].script === 'latin') {
       for (const ch of 'abcdefghijklmnopqrstuvwxyz'.split('')) push(letterRoute(lang, { slug: ch, char: ch }));
     } else {
       const letters = lang === 'fa' ? [...ARABIC_LETTERS, ...PERSIAN_EXTRA] : ARABIC_LETTERS;
       for (const ltr of letters) push(letterRoute(lang, ltr));
     }
-    // 5) الأسماء
+    // 3.3) الأسماء (مع إزالة أي تكرار slug داخل نفس اللغة)
     let names;
     if (lang === 'ar') names = NAMES.filter((n) => n.origin === 'arabic');
     else if (lang === 'fa') names = NAMES.filter((n) => n.origin === 'arabic' || n.origin === 'persian');
@@ -461,10 +505,15 @@ export function buildCatalog() {
     else if (lang === 'tr') names = NAMES.filter((n) => n.origin === 'turkish' || n.origin === 'arabic');
     else if (lang === 'en') names = NAMES.filter((n) => n.origin === 'english' || n.origin === 'arabic');
     else names = NAMES.filter((n) => n.origin === 'english');
-    for (const n of names) push(nameRoute(lang, n));
-    // 6) قوائم الأسماء
+    const seenNames = new Set();
+    for (const n of names) {
+      if (seenNames.has(n.slug)) continue;
+      seenNames.add(n.slug);
+      push(nameRoute(lang, n));
+    }
+    // 3.4) قوائم الأسماء
     for (const lk of ['boy', 'girl', 'cat', 'dog', 'company']) push(listRoute(lang, lk));
-    // 7) المقالات
+    // 3.5) المقالات
     for (const a of WORLD_ARTICLES) push(articleRoute(lang, a));
     if (ISLAMIC_LANGS.includes(lang)) for (const a of DHIKR_ARTICLES) push(articleRoute(lang, a));
   }
@@ -472,22 +521,35 @@ export function buildCatalog() {
 }
 
 // ---------- الجدولة ----------
+// الملفات: تُولَّد كلها (حتى لا يقع أي رابط في 404 عند تبديل اللغة أو التنقل).
+// sitemap + published.json + IndexNow: مقيدة بالجدولة — كل يوم تظهر 5 صفحات جديدة
+// (ratePerDay) في sitemap فقط، بينما الصفحات الفورية (immediate) تظهر من اليوم الأول.
 export function mergeCatalog(existingRoutes) {
   const catalog = buildCatalog();
   const start = new Date(`${SCHEDULE.startDate}T00:00:00Z`);
   const rate = SCHEDULE.ratePerDay || 5;
   const now = new Date();
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const todayIso = today.toISOString().slice(0, 10);
   const all = existingRoutes.map((r) => ({ ...r, publishDate: start, fromExisting: true }));
   // إزالة أي تكرار: الصفحات القائمة لها الأولوية (لا نكتب فوق الرئيسية السعودية أبداً)
   const seen = new Set(existingRoutes.map((r) => r.path));
-  catalog.forEach((r, i) => {
+  // الفورية (محاور + أدوات + فهارس) تُنشر فوراً، والعميقة تُحسب أيامها من فهرسها الخاص
+  // (وليس من الفهرس العام) حتى تبدأ 10 صفحات يومياً من اليوم الأول.
+  let deepIndex = 0;
+  catalog.forEach((r) => {
     if (seen.has(r.path)) return;
     seen.add(r.path);
-    const d = new Date(start);
-    d.setUTCDate(d.getUTCDate() + Math.floor(i / rate));
-    all.push({ ...r, publishDate: d });
+    if (r.immediate) {
+      all.push({ ...r, publishDate: start });
+    } else {
+      const d = new Date(start);
+      d.setUTCDate(d.getUTCDate() + Math.floor(deepIndex / rate));
+      deepIndex++;
+      all.push({ ...r, publishDate: d });
+    }
   });
+  // المنشور (يظهر في sitemap): الصفحات القائمة + الفورية + ما حلّ أجله
   const published = all.filter((r) => r.publishDate <= today);
-  return { all, published, today: today.toISOString().slice(0, 10), total: all.length };
+  return { all, published, today: todayIso, total: all.length };
 }

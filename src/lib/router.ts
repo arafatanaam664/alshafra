@@ -89,7 +89,8 @@ export function parseRoute(path: RoutePath): RouteInfo {
     if (first === 'name' && second) return { lang, kind: 'name', param: second };
     if (first === 'names' && second) return { lang, kind: 'list', param: second };
     if (first === 'articles' && second) return { lang, kind: 'article', param: second };
-    if (first === 'articles' || first === 'adawat' || first === 'araclar' || first === 'abzarha' || first === 'outils' || first === 'herramientas' || first === 'ferramentas' || first === 'alat' || first === 'alatan' || first === 'toolz' || first === 'tools' || first === 'instrumenty' || first === 'strumenti' || first === 'zana') return { lang, kind: 'hub' };
+    if (first === 'articles') return { lang, kind: 'articles-list' };
+    if (first === 'adawat' || first === 'araclar' || first === 'abzarha' || first === 'outils' || first === 'herramientas' || first === 'ferramentas' || first === 'alat' || first === 'alatan' || first === 'toolz' || first === 'tools' || first === 'instrumenty' || first === 'strumenti' || first === 'zana') return { lang, kind: 'hub' };
     return { lang, kind: 'hub' };
   }
 
