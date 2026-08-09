@@ -1,0 +1,167 @@
+{
+  "code": "de",
+  "siteName": "Shafra Tools",
+  "siteTagline": "Kostenlose Tools für alle — schöne Schriftarten, Goldpreise, Daten, Namen und mehr",
+  "nav": { "home": "Startseite", "tools": "Tools", "gold": "Goldpreis", "names": "Namen", "articles": "Artikel", "today": "Heutiges Datum", "countdown": "Countdown", "contact": "Kontakt", "about": "Über uns" },
+  "ui": {
+    "copy": "Kopieren", "copied": "Kopiert!", "generate": "Generieren", "typeHere": "Text hier eingeben oder einfügen...",
+    "characters": "Zeichen", "words": "Wörter", "sentences": "Sätze", "readingTime": "Lesezeit", "minutes": "Min.",
+    "length": "Länge", "uppercase": "Großbuchstaben", "lowercase": "Kleinbuchstaben", "numbers": "Zahlen", "symbols": "Symbole",
+    "strength": "Stärke", "weak": "Schwach", "medium": "Mittel", "strong": "Stark", "result": "Ergebnis", "related": "Ähnliche Seiten",
+    "lastUpdated": "Zuletzt aktualisiert", "disclaimer": "Die angezeigten Preise sind Richtwerte und können variieren.",
+    "backHome": "Zurück zur Startseite", "meaning": "Bedeutung", "gender": "Geschlecht", "male": "Männlich", "female": "Weiblich",
+    "copyAll": "Alle kopieren", "clear": "Löschen", "whatsapp": "WhatsApp", "instagram": "Instagram", "tiktok": "TikTok",
+    "freefire": "Free Fire", "pubg": "PUBG", "checkMore": "Mehr ansehen"
+  },
+  "home": {
+    "title": "Kostenlose Tools für alle",
+    "intro": ["Willkommen bei Shafra Tools — schöne Schriftarten, Gold- und Währungspreise, Datumsumrechner, Altersrechner, Countdowns und Artikel. Alle Tools sind kostenlos und ohne Anmeldung."],
+    "faq": [
+      { "q": "Sind die Tools kostenlos?", "a": "Ja, alle Tools sind völlig kostenlos." },
+      { "q": "Welche Sprachen?", "a": "16 Sprachen, darunter Deutsch, Englisch, Arabisch und Türkisch." },
+      { "q": "Werden Preise aktualisiert?", "a": "Ja, Gold und Währungen werden täglich automatisch aktualisiert." }
+    ]
+  },
+  "tools": {
+    "hub": { "title": "Alle Tools", "intro": ["Sammlung kostenloser Tools, die im Browser funktionieren."], "faq": [] },
+    "fancy-text": {
+      "title": "Schöne Schriftarten — Text-Generator",
+      "intro": ["Dekoriere deinen Text oder Namen mit 30+ Stilen: fett, kursiv, handgeschrieben, eingekreist, quadratisch, gotisch, Herzen, Sterne... Kopiere den Stil und verwende ihn auf Instagram, TikTok, WhatsApp, Free Fire oder PUBG."],
+      "howto": ["Gib deinen Namen oben ein.", "Wähle einen Stil aus der Liste.", "Kopiere und füge ihn ein, wo du willst."],
+      "faq": [
+        { "q": "Funktioniert es auf Instagram?", "a": "Ja, die Stile sind echte Unicode-Zeichen." },
+        { "q": "Ist es kostenlos?", "a": "Ja, völlig kostenlos." },
+        { "q": "Unterstützt es Umlaute?", "a": "Ja, ä, ö, ü, ß und alle lateinischen Buchstaben." }
+      ]
+    },
+    "symbols": { "title": "Symbole zum Kopieren", "intro": ["Hunderte Symbole: Herzen, Sterne, Pfeile, geometrische Formen, Musik, Wetter und Währungen."], "faq": [
+      { "q": "Wie kopiere ich ein Symbol?", "a": "Klicke darauf, es wird automatisch kopiert." },
+      { "q": "Funktioniert es in Spielen?", "a": "Ja, die meisten." },
+      { "q": "Wie viele?", "a": "Über 300." } ] },
+    "password": { "title": "Passwort-Generator", "intro": ["Erstelle starke Zufallspasswörter. Wähle Länge und Zeichentypen. Die Passwörter werden nur in deinem Browser erzeugt."], "faq": [
+      { "q": "Sind sie sicher?", "a": "Ja, werden in deinem Browser erzeugt." },
+      { "q": "Empfohlene Länge?", "a": "Mindestens 12 Zeichen." },
+      { "q": "Kann ich Zeichen wählen?", "a": "Ja." } ] },
+    "word-counter": { "title": "Wort- und Zeichenzähler", "intro": ["Zähle Wörter, Zeichen, Sätze und Zeilen sofort, mit geschätzter Lesezeit."], "faq": [
+      { "q": "Wie funktioniert es?", "a": "Text eingeben, Zähler aktualisieren sich sofort." },
+      { "q": "Deutsch?", "a": "Ja, alle Sprachen." },
+      { "q": "Was zählt es?", "a": "Wörter, Zeichen, Sätze, Zeilen, Lesezeit." } ] },
+    "percentage": { "title": "Prozentrechner", "intro": ["Drei Rechner in einem: X% von Y, X ist wie viel % von Y, und prozentuale Änderung."], "faq": [
+      { "q": "Rabatt berechnen?", "a": "«X% von Y»: 20% von 200 = 40." },
+      { "q": "Prozentuale Änderung?", "a": "Beide Zahlen eingeben." },
+      { "q": "Kostenlos?", "a": "Ja." } ] },
+    "case-converter": { "title": "Groß-/Kleinschreibung", "intro": ["Wandle deinen Text um: GROSS, klein, Titel, Satz oder abwechselnd."], "faq": [
+      { "q": "Was ist Titel?", "a": "Macht den ersten Buchstaben jedes Wortes groß." },
+      { "q": "Deutsch?", "a": "Ja." },
+      { "q": "Kostenlos?", "a": "Ja." } ] },
+    "number-converter": { "title": "Zahlenumrechner", "intro": ["Zahlen zwischen Systemen umrechnen: arabisch (٠١٢٣), westlich (0123), römisch (XII), binär und hexadezimal."], "faq": [
+      { "q": "Römische Zahlen?", "a": "Altes System mit I, V, X, L, C, D, M." },
+      { "q": "Große Zahlen?", "a": "Ja." },
+      { "q": "Kostenlos?", "a": "Ja." } ] },
+    "age-calculator": { "title": "Altersrechner", "intro": ["Berechne dein genaues Alter in Jahren, Monaten und Tagen."], "faq": [
+      { "q": "Wie?", "a": "Geburtsdatum eingeben." },
+      { "q": "Anmeldung?", "a": "Nein." },
+      { "q": "Hidschri?", "a": "Ja, optional." } ] },
+    "date-converter": { "title": "Hidschri-Gregorianisch-Umrechner", "intro": ["Daten zwischen dem islamischen (Hidschri) und gregorianischen Kalender umrechnen."], "faq": [
+      { "q": "Was ist Umm al-Qura?", "a": "Der offizielle Hidschri-Kalender Saudi-Arabiens." },
+      { "q": "Genau?", "a": "Ja." },
+      { "q": "Beide Richtungen?", "a": "Ja." } ] },
+    "today": { "title": "Heutiges Datum", "intro": ["Sieh das heutige Datum im gregorianischen und hidschrischen Kalender."], "faq": [
+      { "q": "Heutiges Datum?", "a": "Oben automatisch angezeigt." },
+      { "q": "Lokale Zeit?", "a": "Ja." },
+      { "q": "Automatisch?", "a": "Ja, täglich." } ] },
+    "countdown": { "title": "Countdown", "intro": ["Wie lange bis Neujahr, Weihnachten, Ramadan oder Eid? Live-Countdowns."], "faq": [
+      { "q": "Genau?", "a": "Ja, jede Sekunde." },
+      { "q": "Welche Anlässe?", "a": "Neujahr, Weihnachten, Ramadan, Eid." },
+      { "q": "Kostenlos?", "a": "Ja." } ] }
+  },
+  "gold": { "title": "Goldpreis heute — {country}", "intro": ["Goldpreis heute in {country} in Dollar und lokaler Währung ({currency}): Karat 24, 22, 21 und 18, Unzen- und Grammpreis. Preise werden täglich automatisch aktualisiert."], "faq": [
+    { "q": "Unzenpreis heute?", "a": "In der Tabelle in Dollar." },
+    { "q": "Grammpreis 18 Karat?", "a": "In der Tabelle in lokaler Währung." },
+    { "q": "Warum anders als beim Juwelier?", "a": "Juweliere rechnen Arbeitskosten ein." } ] },
+  "usd": { "title": "Dollarkurs heute — {country}", "intro": ["Dollarkurs gegenüber der lokalen Währung in {country} ({currency})."], "faq": [
+    { "q": "Dollarkurs heute?", "a": "In der Tabelle." },
+    { "q": "Kauf/Verkauf?", "a": "Kauf ist, was die Bank für deine Dollar zahlt." },
+    { "q": "Offiziell?", "a": "Richtwerte." } ] },
+  "dateToday": { "title": "Heutiges Datum in {country}", "intro": ["Heutiges Datum in {country}, Ortszeit in der Hauptstadt {capital} und Länderinfos."], "faq": [
+    { "q": "Heutiges Datum?", "a": "Oben angezeigt." },
+    { "q": "Ortszeit?", "a": "Zeit in {capital} live." },
+    { "q": "Währung?", "a": "{currency}." } ] },
+  "letters": { "title": "Schöner Buchstabe {letter}", "intro": ["Alle Deko-Stile für den Buchstaben {letter}: fett, kursiv, handgeschrieben, eingekreist, gotisch, Herzen..."], "faq": [
+    { "q": "Wie?", "a": "Stil wählen, kopieren, einfügen." },
+    { "q": "Andere Buchstaben?", "a": "Ja, eine Seite pro Buchstabe." },
+    { "q": "Kostenlos?", "a": "Ja." } ] },
+  "names": { "title": "Name {name} — Bedeutung und Stile", "intro": ["Alles über den Namen {name}: Bedeutung, Geschlecht und alle Deko-Stile."], "faq": [
+    { "q": "Bedeutung von {name}?", "a": "In der Karte oben." },
+    { "q": "Wie schreibe ich {name} dekoriert?", "a": "Stil wählen, kopieren, einfügen." },
+    { "q": "Ähnliche Namen?", "a": "Ja, unten." } ] },
+  "lists": {
+    "boy": { "title": "Beliebte Jungennamen", "intro": ["Große Liste schöner Jungennamen mit Bedeutung."], "faq": [] },
+    "girl": { "title": "Beliebte Mädchennamen", "intro": ["Große Liste schöner Mädchennamen mit Bedeutung."], "faq": [] },
+    "cat": { "title": "Katzennamen", "intro": ["Die besten Katzennamen: Luna, Simba, Milo, Bella..."], "faq": [] },
+    "dog": { "title": "Hundenamen", "intro": ["Starke und süße Hundenamen: Max, Rocky, Luna..."], "faq": [] },
+    "company": { "title": "Firmennamen", "intro": ["Ideen für Firmen- und Startup-Namen."], "faq": [] }
+  },
+  "articles": {
+    "smallest-country": { "title": "Das kleinste Land der Welt", "intro": ["Was ist das kleinste Land der Welt? Die 10 kleinsten Länder nach Fläche und Bevölkerung. Der Vatikan ist mit 0,44 km² Erster."], "faq": [
+      { "q": "Kleinstes Land?", "a": "Vatikan, 0,44 km²." },
+      { "q": "Zweitkleinstes?", "a": "Monaco, ca. 2 km²." },
+      { "q": "Bevölkerung?", "a": "Ca. 800." } ] },
+    "biggest-country": { "title": "Das größte Land der Welt", "intro": ["Was ist das größte Land der Welt? Die 10 größten Länder. Russland ist mit 17,1 Mio. km² Erster."], "faq": [
+      { "q": "Größtes Land?", "a": "Russland, 17,1 Mio. km²." },
+      { "q": "Zweitgrößtes?", "a": "Kanada, 9,98 Mio. km²." },
+      { "q": "Fläche Russlands?", "a": "Ca. 17,1 Mio. km²." } ] },
+    "messi-vs-ronaldo": { "title": "Messi oder Ronaldo — Vergleich", "intro": ["Die größte Debatte der Fußballgeschichte: Messi oder Ronaldo? Zahlenbasierter Vergleich."], "faq": [
+      { "q": "Mehr Tore?", "a": "Ronaldo führt bei offiziellen Toren." },
+      { "q": "Mehr Ballon d'Or?", "a": "Messi 8, Ronaldo 5." },
+      { "q": "WM?", "a": "Messi 2022 mit Argentinien." } ] },
+    "pele": { "title": "Pelé — Der König des Fußballs", "intro": ["Pelé (1940-2022), der größte Fußballer: drei Weltmeisterschaften und über 1200 Tore."], "faq": [
+      { "q": "Wie viele WM?", "a": "Drei (1958, 1962, 1970)." },
+      { "q": "Tore?", "a": "Über 1200." },
+      { "q": "Gestorben?", "a": "29. Dezember 2022." } ] },
+    "argentina": { "title": "Argentinien — Geschichte und Titel", "intro": ["Weltmeister 2022: von Maradona bis Messi."], "faq": [
+      { "q": "Wie viele WM?", "a": "Drei: 1978, 1986, 2022." },
+      { "q": "Größte Stars?", "a": "Maradona und Messi." },
+      { "q": "Copa América?", "a": "16." } ] },
+    "fun-facts": { "title": "Erstaunliche Fakten", "intro": ["Die erstaunlichsten Fakten über Tiere, Weltraum, Geografie und den menschlichen Körper."], "faq": [
+      { "q": "Längstes Tier?", "a": "Der Schnürsenkelwurm bis 40 m." },
+      { "q": "Sterne in der Galaxie?", "a": "100-400 Milliarden." },
+      { "q": "Wird Honig schlecht?", "a": "Praktisch nicht." } ] },
+    "riddles": { "title": "Schwere Rätsel mit Lösungen", "intro": ["Die schwersten Rätsel mit Lösungen: Teste deine Intelligenz."], "faq": [
+      { "q": "Tipp?", "a": "Zweimal lesen, out of the box denken." },
+      { "q": "Gut fürs Gehirn?", "a": "Ja." },
+      { "q": "Wie viele?", "a": "15." } ] },
+    "jokes": { "title": "Lustige Witze", "intro": ["Die lustigsten kurzen Witze, sauber und familienfreundlich."], "faq": [
+      { "q": "Familientauglich?", "a": "Ja." },
+      { "q": "Teilen?", "a": "Klar." },
+      { "q": "Wie viele?", "a": "Über 20." } ] },
+    "love-quotes": { "title": "Liebeszitate", "intro": ["Die schönsten Liebeszitate und romantischen Sprüche."], "faq": [
+      { "q": "Kurz?", "a": "Ja, meistens." },
+      { "q": "Original?", "a": "Gemischt." },
+      { "q": "Frei nutzbar?", "a": "Ja." } ] },
+    "sad-quotes": { "title": "Traurige Sprüche", "intro": ["Traurige und bewegende Sprüche: Sehnsucht, Einsamkeit, Abschied."], "faq": [
+      { "q": "Sehr traurig?", "a": "Bewegend und ehrlich." },
+      { "q": "Wie viele?", "a": "Über 20." },
+      { "q": "Teilen?", "a": "Ja." } ] },
+    "whatsapp-statuses": { "title": "Beste WhatsApp-Status", "intro": ["Die besten WhatsApp-Status: religiös, weise, Liebe, traurig, lustig."], "faq": [
+      { "q": "Wie viele?", "a": "Über 30." },
+      { "q": "Für alle?", "a": "Ja." },
+      { "q": "Kopieren?", "a": "Ja, ein Klick." } ] },
+    "instagram-bios": { "title": "Instagram-Bios", "intro": ["Fertige Instagram-Bio-Ideen mit Symbolen."], "faq": [
+      { "q": "Dekoriert?", "a": "Ja." },
+      { "q": "Wie viele?", "a": "Über 25." },
+      { "q": "Kostenlos?", "a": "Ja." } ] },
+    "morning-dhikr": { "title": "Morgen-Adhkar", "intro": ["Vollständige Morgen-Adhkar aus Koran und Sunna."], "faq": [
+      { "q": "Wann?", "a": "Nach dem Fajr bis Sonnenaufgang." },
+      { "q": "Wie oft?", "a": "Die drei Quls dreimal." },
+      { "q": "Pflicht?", "a": "Sehr empfohlen." } ] },
+    "evening-dhikr": { "title": "Abend-Adhkar", "intro": ["Vollständige Abend-Adhkar aus Koran und Sunna."], "faq": [
+      { "q": "Wann?", "a": "Nach Asr bis Sonnenuntergang." },
+      { "q": "Anders?", "a": "Fast gleich." },
+      { "q": "Belohnung?", "a": "Schutz bis zum Morgen." } ] },
+    "daily-dua": { "title": "Tägliche Duas", "intro": ["Duas aus Koran und Sunna: Versorgung, Sorgen, Schulden."], "faq": [
+      { "q": "Beste Dua für Versorgung?", "a": "«O Allah, genüge mir mit dem Erlaubten...»" },
+      { "q": "Dua bei Sorgen?", "a": "«O Allah, ich suche Zuflucht bei Dir vor Kummer...»" },
+      { "q": "Wann erhört?", "a": "Im letzten Drittel der Nacht, in der Niederwerfung." } ] }
+  }
+}

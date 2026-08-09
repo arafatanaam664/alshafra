@@ -1,0 +1,242 @@
+{
+  "code": "fr",
+  "siteName": "Shafra Outils",
+  "siteTagline": "Outils gratuits pour tous — texte stylé, prix de l'or, dates, prénoms et plus",
+  "nav": { "home": "Accueil", "tools": "Outils", "gold": "Prix de l'or", "names": "Prénoms", "articles": "Articles", "today": "Date du jour", "countdown": "Compte à rebours", "contact": "Contact", "about": "À propos" },
+  "ui": {
+    "copy": "Copier", "copied": "Copié !", "generate": "Générer", "typeHere": "Tapez ou collez votre texte ici...",
+    "characters": "Caractères", "words": "Mots", "sentences": "Phrases", "readingTime": "Temps de lecture", "minutes": "min",
+    "length": "Longueur", "uppercase": "Majuscules", "lowercase": "Minuscules", "numbers": "Chiffres", "symbols": "Symboles",
+    "strength": "Force", "weak": "Faible", "medium": "Moyen", "strong": "Fort", "result": "Résultat", "related": "Pages similaires",
+    "lastUpdated": "Dernière mise à jour", "disclaimer": "Les prix affichés sont indicatifs et peuvent varier selon les marchés.",
+    "backHome": "Retour à l'accueil", "meaning": "Signification", "gender": "Genre", "male": "Masculin", "female": "Féminin",
+    "copyAll": "Tout copier", "clear": "Effacer", "whatsapp": "WhatsApp", "instagram": "Instagram", "tiktok": "TikTok",
+    "freefire": "Free Fire", "pubg": "PUBG", "checkMore": "Voir plus"
+  },
+  "home": {
+    "title": "Outils gratuits pour tout le monde",
+    "intro": ["Bienvenue sur Shafra Outils — une plateforme d'outils gratuits : texte stylé, prix de l'or et des devises, convertisseur de dates, calcul d'âge, comptes à rebours et articles culturels. Tous les outils sont gratuits et sans inscription."],
+    "faq": [
+      { "q": "Les outils sont-ils gratuits ?", "a": "Oui, tous les outils sont entièrement gratuits." },
+      { "q": "Quelles langues sont supportées ?", "a": "16 langues dont le français, l'arabe, l'anglais, le turc et le persan." },
+      { "q": "Les prix sont-ils mis à jour ?", "a": "Oui, les prix de l'or et des devises sont actualisés automatiquement chaque jour." }
+    ]
+  },
+  "tools": {
+    "hub": { "title": "Tous les outils", "intro": ["Une collection d'outils gratuits et rapides qui fonctionnent dans le navigateur."], "faq": [] },
+    "fancy-text": {
+      "title": "Texte stylé — Générateur de texte original",
+      "intro": ["Décorez votre texte ou prénom avec plus de 30 styles : gras, italique, manuscrit, cerclé, carré, gothique, cœurs, étoiles... Copiez le style choisi et collez-le sur Instagram, TikTok, WhatsApp, Free Fire ou PUBG."],
+      "howto": ["Écrivez votre prénom dans la case ci-dessus.", "Choisissez un style dans la liste.", "Cliquez sur copier et collez où vous voulez."],
+      "faq": [
+        { "q": "Ça fonctionne sur Instagram ?", "a": "Oui, les styles sont de vrais caractères Unicode compatibles partout." },
+        { "q": "C'est gratuit ?", "a": "Oui, entièrement gratuit et sans inscription." },
+        { "q": "Ça supporte les accents français ?", "a": "Oui, é, è, ê, à, ç et tous les caractères latins." }
+      ]
+    },
+    "symbols": {
+      "title": "Symboles à copier-coller",
+      "intro": ["Des centaines de symboles prêts à copier : cœurs, étoiles, flèches, formes géométriques, musique, météo, signes du zodiaque et devises."],
+      "faq": [
+        { "q": "Comment copier un symbole ?", "a": "Cliquez dessus, il est copié automatiquement." },
+        { "q": "Ça marche dans les jeux ?", "a": "Oui, la plupart des symboles fonctionnent dans Free Fire et PUBG." },
+        { "q": "Combien de symboles ?", "a": "Plus de 300 symboles classés par catégories." }
+      ]
+    },
+    "password": {
+      "title": "Générateur de mots de passe forts",
+      "intro": ["Générez des mots de passe forts et aléatoires. Choisissez la longueur et les types de caractères. Les mots de passe sont créés dans votre navigateur et ne sont jamais envoyés à un serveur."],
+      "faq": [
+        { "q": "Les mots de passe sont-ils sûrs ?", "a": "Oui, générés aléatoirement dans votre navigateur." },
+        { "q": "Quelle longueur recommandez-vous ?", "a": "Au moins 12 caractères avec chiffres et symboles." },
+        { "q": "Puis-je choisir les caractères ?", "a": "Oui, activez/désactivez majuscules, minuscules, chiffres et symboles." }
+      ]
+    },
+    "word-counter": {
+      "title": "Compteur de mots et de caractères",
+      "intro": ["Comptez instantanément les mots, caractères, phrases et lignes d'un texte, avec le temps de lecture estimé."],
+      "faq": [
+        { "q": "Comment ça marche ?", "a": "Tapez ou collez votre texte, les compteurs se mettent à jour instantanément." },
+        { "q": "Ça supporte le français ?", "a": "Oui, toutes les langues." },
+        { "q": "Que compte-t-il ?", "a": "Mots, caractères, phrases, lignes et temps de lecture." }
+      ]
+    },
+    "percentage": {
+      "title": "Calculatrice de pourcentage",
+      "intro": ["Trois calculatrices en une : X% de Y, X est quel pourcentage de Y, et le changement en pourcentage entre deux nombres."],
+      "faq": [
+        { "q": "Comment calculer une remise ?", "a": "Utilisez « X% de Y » : par exemple 20% de 200 = 40." },
+        { "q": "Comment calculer le changement en % ?", "a": "Entrez les deux nombres, ancien et nouveau." },
+        { "q": "C'est gratuit ?", "a": "Oui." }
+      ]
+    },
+    "case-converter": {
+      "title": "Convertisseur de casse",
+      "intro": ["Convertissez votre texte : MAJUSCULES, minuscules, casse de titre, casse de phrase ou alternée."],
+      "faq": [
+        { "q": "C'est quoi la casse de titre ?", "a": "Elle met une majuscule à la première lettre de chaque mot." },
+        { "q": "Ça supporte le français ?", "a": "Oui, les lettres latines avec accents." },
+        { "q": "C'est gratuit ?", "a": "Oui." }
+      ]
+    },
+    "number-converter": {
+      "title": "Convertisseur de nombres",
+      "intro": ["Convertissez les nombres entre systèmes : arabe (٠١٢٣), occidental (0123), romain (XII), binaire et hexadécimal."],
+      "faq": [
+        { "q": "Les chiffres romains ?", "a": "Un système ancien avec I, V, X, L, C, D, M." },
+        { "q": "Grands nombres ?", "a": "Oui, supportés." },
+        { "q": "Gratuit ?", "a": "Oui." }
+      ]
+    },
+    "age-calculator": {
+      "title": "Calcul d'âge",
+      "intro": ["Calculez votre âge exact en années, mois et jours depuis votre date de naissance."],
+      "faq": [
+        { "q": "Comment calculer mon âge ?", "a": "Entrez votre date de naissance, l'âge s'affiche instantanément." },
+        { "q": "Faut-il s'inscrire ?", "a": "Non." },
+        { "q": "Calcule en hégire ?", "a": "Oui, choix grégorien ou hégirien." }
+      ]
+    },
+    "date-converter": {
+      "title": "Convertisseur de date hégirien ↔ grégorien",
+      "intro": ["Convertissez les dates entre les calendriers hégirien (islamique) et grégorien selon le calendrier officiel d'Oumm al-Qura."],
+      "faq": [
+        { "q": "C'est quoi Oumm al-Qura ?", "a": "Le calendrier hégirien officiel utilisé en Arabie saoudite et dans le monde musulman." },
+        { "q": "La conversion est-elle précise ?", "a": "Oui, basée sur le calendrier astronomique officiel." },
+        { "q": "Dans les deux sens ?", "a": "Oui." }
+      ]
+    },
+    "today": {
+      "title": "Date du jour",
+      "intro": ["Voyez la date du jour en grégorien et en hégirien avec le jour de la semaine."],
+      "faq": [
+        { "q": "Quelle est la date d'aujourd'hui ?", "a": "Affichée en haut de page automatiquement." },
+        { "q": "L'heure est locale ?", "a": "Oui, selon votre fuseau horaire." },
+        { "q": "La date se met à jour ?", "a": "Oui, chaque jour." }
+      ]
+    },
+    "countdown": {
+      "title": "Compte à rebours",
+      "intro": ["Combien de temps avant le Nouvel An, Noël, le Ramadan ou l'Aïd ? Des comptes à rebours en direct."],
+      "faq": [
+        { "q": "Le compte est précis ?", "a": "Oui, mis à jour chaque seconde." },
+        { "q": "Quelles occasions ?", "a": "Nouvel An, Noël, Ramadan, Aïd el-Fitr, Aïd el-Adha." },
+        { "q": "Gratuit ?", "a": "Oui." }
+      ]
+    }
+  },
+  "gold": {
+    "title": "Prix de l'or aujourd'hui — {country}",
+    "intro": ["Découvrez le prix de l'or aujourd'hui en {country} en dollars et en monnaie locale ({currency}) : carats 24, 22, 21 et 18, prix de l'once et du gramme. Prix actualisés automatiquement chaque jour."],
+    "faq": [
+      { "q": "Quel est le prix de l'once d'or ?", "a": "Le prix de l'once en dollars est affiché dans le tableau ci-dessus." },
+      { "q": "Le prix du gramme 18 carats ?", "a": "Le prix du gramme pour chaque carat est affiché en monnaie locale." },
+      { "q": "Pourquoi les prix diffèrent des bijouteries ?", "a": "Les bijouteries incluent la main-d'œuvre et la marge." }
+    ]
+  },
+  "usd": {
+    "title": "Taux du dollar aujourd'hui — {country}",
+    "intro": ["Découvrez le taux de change du dollar américain contre la monnaie locale en {country} ({currency}), avec les taux d'achat et de vente approximatifs."],
+    "faq": [
+      { "q": "Quel est le taux du dollar ?", "a": "Le taux est affiché dans le tableau et mis à jour chaque jour." },
+      { "q": "Différence achat/vente ?", "a": "L'achat est le prix que la banque paie pour vos dollars." },
+      { "q": "Les taux sont-ils officiels ?", "a": "Indicatifs, basés sur le marché mondial." }
+    ]
+  },
+  "dateToday": {
+    "title": "Date du jour en {country}",
+    "intro": ["Quelle est la date d'aujourd'hui en {country} ? Date grégorienne et hégirienne, heure locale dans la capitale {capital} et infos sur le pays."],
+    "faq": [
+      { "q": "Quelle est la date aujourd'hui ?", "a": "Affichée en haut de la page." },
+      { "q": "L'heure locale ?", "a": "L'heure de la capitale {capital} est affichée en direct." },
+      { "q": "Quelle monnaie ?", "a": "La monnaie officielle est {currency}." }
+    ]
+  },
+  "letters": {
+    "title": "Lettre stylée {letter}",
+    "intro": ["Tous les styles décoratifs de la lettre {letter} : gras, italique, manuscrit, cerclé, carré, gothique, cœurs, étoiles... Prêts à copier."],
+    "faq": [
+      { "q": "Comment décorer la lettre ?", "a": "Choisissez un style, copiez et collez." },
+      { "q": "Il y a d'autres lettres ?", "a": "Oui, une page pour chaque lettre." },
+      { "q": "Gratuit ?", "a": "Oui." }
+    ]
+  },
+  "names": {
+    "title": "Prénom {name} — Signification et styles",
+    "intro": ["Tout sur le prénom {name} : sa signification, son genre et tous les styles décoratifs prêts à copier."],
+    "faq": [
+      { "q": "Que signifie {name} ?", "a": "La signification est affichée dans la carte ci-dessus." },
+      { "q": "Comment écrire {name} en style décoré ?", "a": "Choisissez un style, copiez et collez." },
+      { "q": "Des prénoms similaires ?", "a": "Oui, en bas de page." }
+    ]
+  },
+  "lists": {
+    "boy": { "title": "Prénoms de garçons populaires", "intro": ["Une grande liste de prénoms de garçons avec significations. Cliquez sur un prénom pour ouvrir sa page."], "faq": [] },
+    "girl": { "title": "Prénoms de filles populaires", "intro": ["Une grande liste de prénoms de filles avec significations. Cliquez sur un prénom pour ouvrir sa page."], "faq": [] },
+    "cat": { "title": "Noms de chats", "intro": ["Les meilleurs noms pour chats : Minou, Nala, Simba, Bella et plus."], "faq": [] },
+    "dog": { "title": "Noms de chiens", "intro": ["Des noms forts et mignons pour chiens : Rex, Max, Luna, Rocky et plus."], "faq": [] },
+    "company": { "title": "Noms d'entreprise", "intro": ["Des idées de noms d'entreprise et de startup avec des conseils."], "faq": [] }
+  },
+  "articles": {
+    "smallest-country": { "title": "Le plus petit pays du monde", "intro": ["Quel est le plus petit pays du monde ? Voici les 10 plus petits pays avec leur superficie et population. Le Vatican est premier avec 0,44 km²."], "faq": [
+      { "q": "Le plus petit pays ?", "a": "Le Vatican, 0,44 km²." },
+      { "q": "Le deuxième ?", "a": "Monaco, environ 2 km²." },
+      { "q": "Population du Vatican ?", "a": "Environ 800 habitants." } ] },
+    "biggest-country": { "title": "Le plus grand pays du monde", "intro": ["Quel est le plus grand pays du monde ? Voici les 10 plus grands pays. La Russie est première avec 17,1 millions de km²."], "faq": [
+      { "q": "Le plus grand pays ?", "a": "La Russie, 17,1 millions de km²." },
+      { "q": "Le deuxième ?", "a": "Le Canada, 9,98 millions de km²." },
+      { "q": "La taille de la Russie ?", "a": "Environ 17,1 millions de km²." } ] },
+    "messi-vs-ronaldo": { "title": "Messi ou Ronaldo — Comparaison complète", "intro": ["Le plus grand débat du football : Messi ou Ronaldo ? Comparaison chiffrée : buts, trophées, Ballon d'Or et palmarès international."], "faq": [
+      { "q": "Qui a marqué plus de buts ?", "a": "Cristiano Ronaldo mène au total des buts officiels." },
+      { "q": "Qui a plus de Ballons d'Or ?", "a": "Messi 8, Ronaldo 5." },
+      { "q": "Qui a gagné la Coupe du monde ?", "a": "Messi en 2022 avec l'Argentine." } ] },
+    "pele": { "title": "Pelé — Le roi du football", "intro": ["Pelé (1940-2022), considéré par des millions de personnes comme le plus grand footballeur : trois Coupes du monde et plus de 1200 buts."], "faq": [
+      { "q": "Combien de Coupes du monde ?", "a": "Trois (1958, 1962, 1970)." },
+      { "q": "Combien de buts ?", "a": "Plus de 1200." },
+      { "q": "Quand est-il décédé ?", "a": "Le 29 décembre 2022, à 82 ans." } ] },
+    "argentina": { "title": "Équipe d'Argentine — Histoire et titres", "intro": ["Championne du monde 2022 : de Maradona à Messi, une histoire riche et des records."], "faq": [
+      { "q": "Combien de Coupes du monde ?", "a": "Trois : 1978, 1986, 2022." },
+      { "q": "Les plus grandes stars ?", "a": "Maradona et Messi." },
+      { "q": "Combien de Copa América ?", "a": "16." } ] },
+    "fun-facts": { "title": "Faits étonnants — Le saviez-vous ?", "intro": ["Les faits généraux les plus étonnants : animaux, espace, géographie et corps humain."], "faq": [
+      { "q": "Le plus long animal ?", "a": "Le ver lacet peut atteindre 40 mètres." },
+      { "q": "Combien d'étoiles dans la galaxie ?", "a": "100 à 400 milliards dans la Voie lactée." },
+      { "q": "Le miel se périme-t-il ?", "a": "Pratiquement non — du miel comestible de 3000 ans a été trouvé." } ] },
+    "riddles": { "title": "Énigmes difficiles avec réponses", "intro": ["Les énigmes les plus difficiles avec réponses : testez votre intelligence."], "faq": [
+      { "q": "Comment résoudre les énigmes ?", "a": "Lisez deux fois et pensez hors des sentiers battus." },
+      { "q": "Les énigmes sont-elles utiles ?", "a": "Oui, elles stimulent la mémoire." },
+      { "q": "Combien d'énigmes ?", "a": "15." } ] },
+    "jokes": { "title": "Blagues drôles", "intro": ["Les blagues courtes les plus drôles, propres et familiales."], "faq": [
+      { "q": "Les blagues sont-elles convenables ?", "a": "Oui, toutes sont propres." },
+      { "q": "Puis-je les partager ?", "a": "Bien sûr." },
+      { "q": "Combien de blagues ?", "a": "Plus de 20." } ] },
+    "love-quotes": { "title": "Citations d'amour et messages romantiques", "intro": ["Les plus belles citations d'amour et messages romantiques courts."], "faq": [
+      { "q": "Les citations sont courtes ?", "a": "Oui, la plupart." },
+      { "q": "Originales ?", "a": "Un mélange de citations célèbres et originales." },
+      { "q": "Usage libre ?", "a": "Oui." } ] },
+    "sad-quotes": { "title": "Citations tristes", "intro": ["Des citations tristes et touchantes : manque, solitude, séparation."], "faq": [
+      { "q": "Très tristes ?", "a": "Touchantes et sincères." },
+      { "q": "Combien ?", "a": "Plus de 20." },
+      { "q": "Partage possible ?", "a": "Oui." } ] },
+    "whatsapp-statuses": { "title": "Meilleurs statuts WhatsApp", "intro": ["Les meilleurs statuts WhatsApp : religieux, sages, amoureux, tristes et drôles — prêts à copier."], "faq": [
+      { "q": "Combien de statuts ?", "a": "Plus de 30." },
+      { "q": "Pour tous ?", "a": "Oui, variés." },
+      { "q": "Copie facile ?", "a": "Oui, en un clic." } ] },
+    "instagram-bios": { "title": "Bios Instagram prêtes à copier", "intro": ["Des idées de bio Instagram prêtes, décorées de symboles."], "faq": [
+      { "q": "Les bios sont décorées ?", "a": "Oui." },
+      { "q": "Combien d'idées ?", "a": "Plus de 25." },
+      { "q": "Gratuit ?", "a": "Oui." } ] },
+    "morning-dhikr": { "title": "Adhkar du matin", "intro": ["Les adhkar complets du matin du Coran et de la Sunna : Ayat al-Kursi, les trois Qul, Sayyid al-Istighfar."], "faq": [
+      { "q": "Quand les réciter ?", "a": "Après la prière du Fajr jusqu'au lever du soleil." },
+      { "q": "Combien de fois ?", "a": "Les trois Qul trois fois." },
+      { "q": "Obligatoires ?", "a": "Recommandées, grande protection." } ] },
+    "evening-dhikr": { "title": "Adhkar du soir", "intro": ["Les adhkar complets du soir du Coran et de la Sunna."], "faq": [
+      { "q": "Quand ?", "a": "Après Asr jusqu'au coucher du soleil." },
+      { "q": "Différents du matin ?", "a": "Surtout les mêmes." },
+      { "q": "Récompense ?", "a": "Protection jusqu'au matin." } ] },
+    "daily-dua": { "title": "Douas quotidiennes", "intro": ["Une collection de douas du Coran et de la Sunna : subsistance, soucis, dettes."], "faq": [
+      { "q": "La meilleure doua pour la subsistance ?", "a": "« Ô Allah, suffis-moi avec le licite... »" },
+      { "q": "Une doua pour les soucis ?", "a": "« Ô Allah, je cherche refuge auprès de Toi contre le souci et la tristesse... »" },
+      { "q": "Quand la doua est exaucée ?", "a": "Le dernier tiers de la nuit, entre adhan et iqama, en prosternation." } ] }
+  }
+}

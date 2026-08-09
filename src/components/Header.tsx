@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText, Wand2, Timer, Sun } from 'lucide-react';
-import { useRoute } from '../lib/router';
+import { useRoute, parseRoute } from '../lib/router';
+import { useLang } from '../lib/i18n';
 import Link from './Link';
+import LangSwitcher from './LangSwitcher';
 
 const NAV = [
   { to: '/', label: 'الرئيسية', icon: Calendar },
@@ -20,59 +22,75 @@ const NAV = [
 
 export default function Header() {
   const [path] = useRoute();
+  const { lang, t } = useLang();
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
+  const info = parseRoute(path);
+  const isGlobal = lang !== 'ar' || ['hub', 'tool', 'gold', 'usd', 'date-today', 'letter', 'name', 'list', 'article'].includes(info.kind);
+  const brand = isGlobal ? t('siteName') : 'تقويم السعودية';
+  const tagline = isGlobal ? t('siteTagline') : 'بوابة المواعيد الرسمية';
+  const prefix = lang === 'ar' ? '' : `/${lang}`;
+
+  const globalNav = [
+    { to: `${prefix || '/'}`, label: t('nav.home'), icon: Calendar },
+    { to: `${prefix}/tools`, label: t('nav.tools'), icon: Wand2 },
+    { to: `${prefix}/articles`, label: t('nav.articles'), icon: FileText },
+  ];
+
+  const navItems = isGlobal ? globalNav : NAV;
 
   return (
     <header className="sticky top-0 z-40 border-b border-brand-900/5 bg-white/85 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between gap-4">
         <Link
-          to="/"
+          to={prefix || '/'}
           onClick={close}
           className="group flex items-center gap-2.5"
-          aria-label="تقويم السعودية - الصفحة الرئيسية"
+          aria-label={brand}
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-xl gradient-brand text-white shadow-soft transition-transform group-hover:scale-105">
             <Calendar className="h-5 w-5" />
           </span>
           <span className="text-right leading-tight">
-            <span className="block font-display text-base font-bold text-brand-900">تقويم السعودية</span>
-            <span className="block text-[11px] text-brand-600/70">بوابة المواعيد الرسمية</span>
+            <span className="block font-display text-base font-bold text-brand-900">{brand}</span>
+            <span className="block max-w-[160px] truncate text-[11px] text-brand-600/70">{tagline}</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
-          {NAV.map((item) => {
-            const active = path === item.to;
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={close}
-                aria-current={active ? 'page' : undefined}
-                className={`nav-link flex items-center gap-1.5 ${active ? 'nav-link-active' : ''}`}
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-700 ring-1 ring-brand-200 lg:hidden"
-          aria-label="القائمة"
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-1">
+          <nav className="hidden items-center gap-1 lg:flex">
+            {navItems.map((item) => {
+              const active = path === item.to;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={close}
+                  aria-current={active ? 'page' : undefined}
+                  className={`nav-link flex items-center gap-1.5 ${active ? 'nav-link-active' : ''}`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+          <LangSwitcher />
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-700 ring-1 ring-brand-200 lg:hidden"
+            aria-label="القائمة"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {open && (
         <div className="border-t border-brand-900/5 bg-white lg:hidden">
           <nav className="container-page grid gap-1 py-3">
-            {NAV.map((item) => {
+            {navItems.map((item) => {
               const active = path === item.to;
               const Icon = item.icon;
               return (

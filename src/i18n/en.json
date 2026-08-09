@@ -1,0 +1,478 @@
+{
+  "code": "en",
+  "siteName": "Shafra Tools",
+  "siteTagline": "Free tools for everyone — fancy text, gold prices, dates, names and more",
+  "nav": {
+    "home": "Home",
+    "tools": "Tools",
+    "gold": "Gold Price",
+    "names": "Names",
+    "articles": "Articles",
+    "today": "Today's Date",
+    "countdown": "Countdown",
+    "contact": "Contact",
+    "about": "About"
+  },
+  "ui": {
+    "copy": "Copy",
+    "copied": "Copied!",
+    "generate": "Generate",
+    "typeHere": "Type or paste your text here...",
+    "characters": "Characters",
+    "words": "Words",
+    "sentences": "Sentences",
+    "readingTime": "Reading time",
+    "minutes": "min",
+    "length": "Length",
+    "uppercase": "Uppercase",
+    "lowercase": "Lowercase",
+    "numbers": "Numbers",
+    "symbols": "Symbols",
+    "strength": "Strength",
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong",
+    "result": "Result",
+    "related": "Related pages",
+    "lastUpdated": "Last updated",
+    "disclaimer": "Prices shown are indicative and may vary between markets. Always verify with official sources.",
+    "backHome": "Back to home",
+    "meaning": "Meaning",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "copyAll": "Copy all",
+    "clear": "Clear",
+    "whatsapp": "WhatsApp",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "freefire": "Free Fire",
+    "pubg": "PUBG",
+    "checkMore": "Browse more"
+  },
+  "home": {
+    "title": "Free tools for everyone, in every language",
+    "intro": [
+      "Welcome to Shafra Tools — a free tools platform serving users in every country and language: fancy text and name decoration, gold and currency prices, date converters, age calculator, countdowns, name meanings and general knowledge articles.",
+      "All tools are 100% free, require no sign-up, and work instantly in your browser on mobile and desktop."
+    ],
+    "faq": [
+      { "q": "Are the tools free?", "a": "Yes, all tools are completely free and require no registration." },
+      { "q": "Which languages are supported?", "a": "16 languages: Arabic, English, Turkish, Persian, French, Spanish, Portuguese, Indonesian, Malay, Urdu, German, Russian, Italian, Hindi, Bengali and Swahili." },
+      { "q": "Are prices updated automatically?", "a": "Gold and currency prices are refreshed automatically every day from open data sources." }
+    ]
+  },
+  "tools": {
+    "hub": {
+      "title": "All tools",
+      "intro": ["A collection of fast, free browser tools available in every language."],
+      "faq": []
+    },
+    "fancy-text": {
+      "title": "Fancy Text Generator",
+      "intro": [
+        "Decorate any text or name with 30+ beautiful styles: bold, italic, script, circled, squared, small caps, gothic, hearts, stars and more. Copy the style you like and paste it into Instagram, TikTok, WhatsApp, Telegram, Free Fire, PUBG or any app that supports Unicode.",
+        "Fancy text works for Latin and Arabic scripts alike, is completely free and requires no sign-up."
+      ],
+      "howto": [
+        "Type your name or text in the box above.",
+        "Pick a style you like from the list.",
+        "Hit copy and paste the fancy text anywhere you want."
+      ],
+      "faq": [
+        { "q": "Does it work on Instagram?", "a": "Yes — fancy styles are real Unicode characters that work on Instagram, TikTok, WhatsApp and all apps." },
+        { "q": "Is it free?", "a": "Yes, completely free with no sign-up and no limits." },
+        { "q": "Does it support Arabic names?", "a": "Yes, it supports Arabic, Persian and Urdu scripts as well as Latin languages." }
+      ]
+    },
+    "symbols": {
+      "title": "Text Symbols Copy & Paste",
+      "intro": [
+        "Hundreds of special symbols ready to copy: hearts, stars, arrows, geometric shapes, music, weather, zodiac and currency symbols. Click any symbol to copy it instantly.",
+        "Perfect for decorating Instagram bios, game nicknames, WhatsApp statuses and text messages."
+      ],
+      "faq": [
+        { "q": "How do I copy a symbol?", "a": "Just click it — it is copied to your clipboard instantly, then paste it anywhere." },
+        { "q": "Do symbols work in games?", "a": "Yes, most symbols work in Free Fire, PUBG and other games for nicknames." },
+        { "q": "How many symbols are available?", "a": "More than 300 symbols organized into categories." }
+      ]
+    },
+    "password": {
+      "title": "Strong Password Generator",
+      "intro": [
+        "Generate strong random passwords to protect your accounts. Choose the length and character types (uppercase, lowercase, numbers, symbols) and hit generate.",
+        "Passwords are created entirely in your browser and never sent to any server — your privacy is guaranteed."
+      ],
+      "faq": [
+        { "q": "Are the passwords secure?", "a": "Yes — they are generated randomly in your browser and never stored or transmitted." },
+        { "q": "What length is recommended?", "a": "At least 12 characters with numbers and symbols for a strong password." },
+        { "q": "Can I choose the characters?", "a": "Yes, toggle uppercase, lowercase, numbers and symbols on or off." }
+      ]
+    },
+    "word-counter": {
+      "title": "Word Counter & Character Counter",
+      "intro": [
+        "Count words, characters, sentences and lines in any text instantly, with an estimated reading time. Great for students, writers and content creators.",
+        "The counter updates live as you type or paste, and supports every language."
+      ],
+      "faq": [
+        { "q": "How does it work?", "a": "Type or paste your text and the counts update instantly." },
+        { "q": "Does it support Arabic?", "a": "Yes, it supports all languages including Arabic and Persian." },
+        { "q": "What does it count?", "a": "Words, characters, sentences, lines and estimated reading time." }
+      ]
+    },
+    "percentage": {
+      "title": "Percentage Calculator",
+      "intro": [
+        "Three calculators in one: what is X% of Y? X is what percent of Y? And the percentage change between two numbers.",
+        "A fast tool for accounting, study, shopping and discounts."
+      ],
+      "faq": [
+        { "q": "How do I calculate a discount?", "a": "Use \"what is X% of Y\": e.g. 20% of 200 = 40." },
+        { "q": "How do I calculate percentage change?", "a": "Enter the old and new numbers and get the increase or decrease percentage." },
+        { "q": "Is the calculator free?", "a": "Yes, completely free." }
+      ]
+    },
+    "case-converter": {
+      "title": "Case Converter",
+      "intro": [
+        "Convert your text between cases: UPPERCASE, lowercase, Title Case, Sentence case, or alternating. Perfect for headings and copy.",
+        "Works instantly as you type and supports Latin-script languages."
+      ],
+      "faq": [
+        { "q": "What is Title Case?", "a": "It capitalizes the first letter of every word — ideal for headings." },
+        { "q": "Does it support Arabic?", "a": "Upper/lowercase conversion applies to Latin letters only." },
+        { "q": "Is the converter free?", "a": "Yes, free with no limits." }
+      ]
+    },
+    "number-converter": {
+      "title": "Number Converter",
+      "intro": [
+        "Convert numbers between systems: Arabic-Indic (٠١٢٣), Western (0123), Roman numerals (XII), binary and hexadecimal.",
+        "A handy tool for students, programmers and anyone writing numbers in different systems."
+      ],
+      "faq": [
+        { "q": "What are Roman numerals?", "a": "An ancient system using letters such as I, V, X, L, C, D and M." },
+        { "q": "How do I convert Arabic to English digits?", "a": "Type ١٢٣ and the Western equivalent 123 appears instantly." },
+        { "q": "Does it handle large numbers?", "a": "Yes, with instant conversion." }
+      ]
+    },
+    "age-calculator": {
+      "title": "Age Calculator",
+      "intro": [
+        "Calculate your exact age in years, months and days from your birth date, in both Gregorian and Hijri calendars.",
+        "A free, fast tool that works directly in your browser."
+      ],
+      "faq": [
+        { "q": "How do I calculate my age?", "a": "Enter your birth date and get your age in years, months and days instantly." },
+        { "q": "Do I need to register?", "a": "No, everything works in your browser." },
+        { "q": "Does it calculate in Hijri?", "a": "Yes, you can choose Gregorian or Hijri calendar." }
+      ]
+    },
+    "date-converter": {
+      "title": "Hijri to Gregorian Date Converter",
+      "intro": [
+        "Convert dates between the Islamic (Hijri) and Gregorian calendars accurately according to the official Umm al-Qura calendar.",
+        "An essential tool for anyone dealing with Islamic dates in Saudi Arabia, the Gulf and the Islamic world."
+      ],
+      "faq": [
+        { "q": "What is the Umm al-Qura calendar?", "a": "The official Hijri calendar used in Saudi Arabia and widely used across the Muslim world." },
+        { "q": "Is the conversion accurate?", "a": "Yes, it is based on the official Umm al-Qura astronomical calendar." },
+        { "q": "Can I convert both ways?", "a": "Yes — Hijri to Gregorian and Gregorian to Hijri." }
+      ]
+    },
+    "today": {
+      "title": "Today's Date",
+      "intro": [
+        "See today's date in Gregorian and Hijri with the full weekday, plus countdowns to upcoming occasions.",
+        "The page updates automatically every day when you visit."
+      ],
+      "faq": [
+        { "q": "What is today's Hijri date?", "a": "It is shown at the top of the page automatically according to the Umm al-Qura calendar." },
+        { "q": "Is the time local?", "a": "Yes, shown in your device timezone." },
+        { "q": "Does the date update automatically?", "a": "Yes, it updates daily." }
+      ]
+    },
+    "countdown": {
+      "title": "Countdown Timer",
+      "intro": [
+        "How long until New Year, Christmas, Ramadan, Eid or any occasion? Live countdowns that tick every second.",
+        "Pick an occasion and watch the days, hours, minutes and seconds count down."
+      ],
+      "faq": [
+        { "q": "Is the countdown accurate?", "a": "Yes, it updates every second in your device timezone." },
+        { "q": "Which occasions are available?", "a": "New Year, Christmas, Ramadan, Eid al-Fitr, Eid al-Adha and more." },
+        { "q": "Are the countdowns free?", "a": "Yes, completely free." }
+      ]
+    }
+  },
+  "gold": {
+    "title": "Gold Price Today in {country}",
+    "intro": [
+      "Find today's gold price in {country} in US dollars and in the local currency ({currency}), for the main carats — 24, 22, 21 and 18 — and for the ounce and the gram.",
+      "Prices are refreshed automatically every day from global market prices (XAU gold ounce) plus exchange rates. They are indicative and may differ from actual buy/sell prices at local gold shops."
+    ],
+    "faq": [
+      { "q": "What is the gold ounce price today?", "a": "The ounce price in USD is shown in the table above and updates automatically every day." },
+      { "q": "What is the gram price for 21 carat?", "a": "The gram price for all carats (24, 22, 21, 18) is shown in the local currency in the table." },
+      { "q": "Why do prices differ from shops?", "a": "Shop prices include workmanship, profit and taxes, while we show the base global price." }
+    ]
+  },
+  "usd": {
+    "title": "US Dollar Rate Today in {country}",
+    "intro": [
+      "Find today's US dollar exchange rate against the local currency in {country} ({currency}), with approximate buy and sell rates.",
+      "Rates are refreshed automatically every day from global exchange data and are indicative — they may differ from official bank or parallel market rates."
+    ],
+    "faq": [
+      { "q": "What is the dollar rate today?", "a": "The dollar rate against the local currency is shown in the table and updates daily." },
+      { "q": "What is the difference between buy and sell?", "a": "The buy rate is what the bank pays when buying dollars from you; the sell rate is what you pay to buy dollars." },
+      { "q": "Are the rates official?", "a": "They are indicative rates based on the global market and may differ from official rates in your country." }
+    ]
+  },
+  "dateToday": {
+    "title": "Today's Date in {country}",
+    "intro": [
+      "What is today's date in {country}? See the Gregorian and Hijri date, local time in the capital {capital}, and quick facts about the country.",
+      "This page updates automatically every day."
+    ],
+    "faq": [
+      { "q": "What is today's date in {country}?", "a": "The full date is shown at the top of the page and updates daily." },
+      { "q": "What is the local time?", "a": "The current time in the capital {capital} is displayed live." },
+      { "q": "What currency does {country} use?", "a": "The official currency is {currency}, shown in the info card." }
+    ]
+  },
+  "letters": {
+    "title": "Fancy Letter {letter}",
+    "intro": [
+      "Every fancy style for the letter {letter} in one place: bold, italic, script, circled, squared, gothic, hearts, stars and 30+ more, ready to copy.",
+      "Copy the decorated letter and use it in your name on Instagram, Free Fire, PUBG, TikTok or any game or app."
+    ],
+    "faq": [
+      { "q": "How do I decorate the letter {letter}?", "a": "Pick a style from the list and hit copy, then paste it anywhere." },
+      { "q": "Are there pages for other letters?", "a": "Yes — a decoration page exists for every letter. Browse the letter links at the bottom of the page." },
+      { "q": "Is letter decoration free?", "a": "Yes, completely free." }
+    ]
+  },
+  "names": {
+    "title": "Name {name} — Meaning and Fancy Styles",
+    "intro": [
+      "Everything about the name {name}: its meaning in English and Arabic, its gender, and every fancy style ready to copy for Instagram and games.",
+      "{name} is a beloved and popular name around the world."
+    ],
+    "faq": [
+      { "q": "What does the name {name} mean?", "a": "The meaning is shown in the meaning card above." },
+      { "q": "How do I write {name} in fancy text?", "a": "Pick any style from the list, hit copy and paste it into any app." },
+      { "q": "Can I see similar names?", "a": "Yes — browse the related names at the bottom of the page." }
+    ]
+  },
+  "lists": {
+    "boy": {
+      "title": "Popular Boy Names",
+      "intro": ["A large list of beautiful boy names with meanings, all available for decoration and copying. Click any name to open its page."],
+      "faq": []
+    },
+    "girl": {
+      "title": "Popular Girl Names",
+      "intro": ["A large list of beautiful girl names with meanings, all available for decoration and copying. Click any name to open its page."],
+      "faq": []
+    },
+    "cat": {
+      "title": "Cat Names",
+      "intro": ["The best cat names for males and females: Luna, Simba, Milo, Bella and many more. Pick the perfect name for your cat."],
+      "faq": []
+    },
+    "dog": {
+      "title": "Dog Names",
+      "intro": ["Strong and cute dog names: Max, Bella, Rocky, Luna and many more. Pick a name that fits your dog's personality."],
+      "faq": []
+    },
+    "company": {
+      "title": "Company Names",
+      "intro": ["Great company and startup name ideas with tips for choosing a memorable brand name."],
+      "faq": []
+    }
+  },
+  "articles": {
+    "smallest-country": {
+      "title": "Smallest Country in the World",
+      "intro": [
+        "What is the smallest country in the world by area and population? In this article we list the 10 smallest countries with their area, population and fascinating facts.",
+        "Despite their size, small countries have unique cultures and economies — some are among the richest in the world!"
+      ],
+      "faq": [
+        { "q": "What is the smallest country in the world?", "a": "Vatican City is the smallest country, with an area of only 0.44 square kilometers." },
+        { "q": "What is the second smallest country?", "a": "Monaco, with about 2 square kilometers." },
+        { "q": "What is the population of Vatican City?", "a": "About 800 people." }
+      ]
+    },
+    "biggest-country": {
+      "title": "Biggest Country in the World",
+      "intro": [
+        "What is the largest country in the world by area? In this article we list the 10 biggest countries with their area and facts.",
+        "Russia alone covers about 11% of the world's land area!"
+      ],
+      "faq": [
+        { "q": "What is the biggest country in the world?", "a": "Russia is the largest country, with 17.1 million square kilometers." },
+        { "q": "What is the second biggest country?", "a": "Canada, with 9.98 million square kilometers." },
+        { "q": "How big is Russia?", "a": "About 17.1 million square kilometers." }
+      ]
+    },
+    "messi-vs-ronaldo": {
+      "title": "Messi vs Ronaldo — Full Comparison",
+      "intro": [
+        "The greatest debate in football history: Lionel Messi or Cristiano Ronaldo? This article gives an objective, numbers-based comparison: goals, trophies, Ballon d'Or awards and international achievements.",
+        "Both players are legends by any standard — the numbers speak for themselves."
+      ],
+      "faq": [
+        { "q": "Who scored more goals?", "a": "Cristiano Ronaldo leads in total official career goals." },
+        { "q": "Who won more Ballon d'Or awards?", "a": "Lionel Messi has won the Ballon d'Or 8 times vs 5 for Ronaldo." },
+        { "q": "Who won the World Cup?", "a": "Messi won the 2022 World Cup with Argentina." }
+      ]
+    },
+    "pele": {
+      "title": "Pelé — The King of Football",
+      "intro": [
+        "Pelé (1940–2022) is regarded by millions as the greatest footballer of all time: three World Cups, more than 1,200 career goals and an unmatched legacy.",
+        "In this article we look at the career, records and titles of King Pelé."
+      ],
+      "faq": [
+        { "q": "How many World Cups did Pelé win?", "a": "Three (1958, 1962, 1970) — a record that has never been repeated." },
+        { "q": "How many goals did Pelé score?", "a": "More than 1,200 in his official career." },
+        { "q": "When did Pelé pass away?", "a": "He passed away on 29 December 2022 at the age of 82." }
+      ]
+    },
+    "argentina": {
+      "title": "Argentina National Football Team — History & Titles",
+      "intro": [
+        "Argentina, world champions in 2022: a rich history, legendary stars from Maradona to Messi, and world records.",
+        "In this article we explore the achievements of La Albiceleste."
+      ],
+      "faq": [
+        { "q": "How many World Cups has Argentina won?", "a": "Three: 1978, 1986 and 2022." },
+        { "q": "Who are Argentina's greatest stars?", "a": "Diego Maradona and Lionel Messi are the greatest icons of La Albiceleste." },
+        { "q": "How many Copa América titles?", "a": "Argentina has won the Copa América 16 times." }
+      ]
+    },
+    "fun-facts": {
+      "title": "Amazing Fun Facts — Did You Know?",
+      "intro": [
+        "A collection of the strangest and most entertaining general facts: about animals, space, geography and the human body.",
+        "Perfect for general knowledge, quizzes and competitions."
+      ],
+      "faq": [
+        { "q": "What is the longest animal in the world?", "a": "The bootlace worm can reach up to 40 meters in length." },
+        { "q": "How many stars are in the galaxy?", "a": "An estimated 100 to 400 billion stars in the Milky Way." },
+        { "q": "Does honey go bad?", "a": "Practically no — edible honey has been found that is 3,000 years old." }
+      ]
+    },
+    "riddles": {
+      "title": "Hard Riddles with Answers",
+      "intro": [
+        "The hardest riddles and brain teasers with answers: test your intelligence and challenge your friends.",
+        "Each riddle comes with its answer — try to solve it yourself first!"
+      ],
+      "faq": [
+        { "q": "What is the best way to solve riddles?", "a": "Read the riddle twice and think outside the box — most riddles rely on lateral thinking." },
+        { "q": "Are riddles good for the brain?", "a": "Yes, they boost memory and logical thinking." },
+        { "q": "How many riddles are in the article?", "a": "15 hard riddles with answers." }
+      ]
+    },
+    "jokes": {
+      "title": "Funny Jokes",
+      "intro": [
+        "The funniest short jokes that make everyone laugh — clean and family friendly.",
+        "Laugh and share the jokes with your friends!"
+      ],
+      "faq": [
+        { "q": "Are the jokes family friendly?", "a": "Yes, all jokes are clean and suitable for all ages." },
+        { "q": "Can I share the jokes?", "a": "Of course — copy and share freely." },
+        { "q": "How many jokes are there?", "a": "More than 20 funny jokes." }
+      ]
+    },
+    "love-quotes": {
+      "title": "Love Quotes & Romantic Captions",
+      "intro": [
+        "The most beautiful love quotes and short romantic captions that say what's in your heart — for your partner, spouse and friends.",
+        "Copy the quote and share it with someone you love."
+      ],
+      "faq": [
+        { "q": "Are the quotes short?", "a": "Yes, most are short and perfect for WhatsApp and social media statuses." },
+        { "q": "Are the quotes original?", "a": "A mix of famous quotes and original captions." },
+        { "q": "Can I use them freely?", "a": "Yes, copy and share as you wish." }
+      ]
+    },
+    "sad-quotes": {
+      "title": "Sad Quotes & Deep Feelings",
+      "intro": [
+        "Sad and touching quotes that express real feelings: loss, longing, loneliness and honest thoughts.",
+        "Pick the quote that speaks for you and share it with those who understand."
+      ],
+      "faq": [
+        { "q": "Are the quotes very sad?", "a": "They are touching and honest, but not harsh." },
+        { "q": "How many quotes are there?", "a": "More than 20 quotes and thoughts." },
+        { "q": "Can I share them?", "a": "Yes, freely." }
+      ]
+    },
+    "whatsapp-statuses": {
+      "title": "Best WhatsApp Statuses",
+      "intro": [
+        "The best WhatsApp statuses: religious, wise, love, sad and funny — ready to copy and paste.",
+        "Refresh your status daily with a new quote that fits your mood."
+      ],
+      "faq": [
+        { "q": "How many statuses are there?", "a": "More than 30 unique statuses." },
+        { "q": "Are they suitable for everyone?", "a": "Yes, varied and suitable for all tastes." },
+        { "q": "Can I copy them directly?", "a": "Yes, with one click." }
+      ]
+    },
+    "instagram-bios": {
+      "title": "Instagram Bios Ready to Copy",
+      "intro": [
+        "Ready-made Instagram bio ideas, decorated with symbols and fancy styles — funny and serious, in English and Arabic.",
+        "Copy the bio you like and put it on your profile instantly."
+      ],
+      "faq": [
+        { "q": "Are the bios decorated?", "a": "Yes, they include symbols and fancy text styles." },
+        { "q": "Are there bios in English and Arabic?", "a": "Yes, in both languages." },
+        { "q": "How many bio ideas are there?", "a": "More than 25 ideas." }
+      ]
+    },
+    "morning-dhikr": {
+      "title": "Morning Adhkar (Remembrances)",
+      "intro": [
+        "Complete morning adhkar from the Quran and Sunnah: Ayat al-Kursi, the three Quls, Sayyid al-Istighfar and prayers of protection.",
+        "Keep your morning adhkar daily — they are the believer's fortress against every harm."
+      ],
+      "faq": [
+        { "q": "When are morning adhkar recited?", "a": "From after Fajr prayer until sunrise, and it is permissible until noon." },
+        { "q": "How many times are the Quls recited?", "a": "Three times in the morning and evening." },
+        { "q": "Are morning adhkar obligatory?", "a": "They are highly recommended — a great protection." }
+      ]
+    },
+    "evening-dhikr": {
+      "title": "Evening Adhkar (Remembrances)",
+      "intro": [
+        "Complete evening adhkar from the Quran and Sunnah: Ayat al-Kursi, the three Quls, Sayyid al-Istighfar and prayers of protection.",
+        "Never skip your evening adhkar — they protect you and your family until morning."
+      ],
+      "faq": [
+        { "q": "When are evening adhkar recited?", "a": "From after Asr prayer until sunset, and it is permissible until midnight." },
+        { "q": "Are they different from morning adhkar?", "a": "Mostly the same with small differences." },
+        { "q": "What is the reward?", "a": "Great reward: protection from harm and remembrance of Allah day and night." }
+      ]
+    },
+    "daily-dua": {
+      "title": "Daily Duas (Supplications)",
+      "intro": [
+        "A collection of comprehensive duas from the Quran and Sunnah: for provision, relief from worry, repaying debt, and morning and evening supplications.",
+        "Ask Allah for whatever is in your heart — He is the best to ask."
+      ],
+      "faq": [
+        { "q": "What is the best dua for provision?", "a": "\"O Allah, suffice me with what is lawful against what is forbidden, and enrich me by Your grace from all others.\"" },
+        { "q": "Is there a dua for worry and sadness?", "a": "Yes — \"O Allah, I seek refuge in You from worry and sadness...\" is among the Prophet's duas." },
+        { "q": "When is dua most answered?", "a": "In the last third of the night, between the adhan and iqamah, and during prostration." }
+      ]
+    }
+  }
+}

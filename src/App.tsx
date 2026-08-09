@@ -3,6 +3,7 @@ import { useRoute, parseRoute } from './lib/router';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
+import GlobalPage from './pages/GlobalPage';
 
 const DateConverterPage = lazy(() => import('./pages/DateConverterPage'));
 const AgeCalculatorPage = lazy(() => import('./pages/AgeCalculatorPage'));
@@ -37,34 +38,41 @@ function PageLoader() {
   );
 }
 
+// الصفحات العالمية (غير العربية) تُعرض عبر GlobalPage
+const GLOBAL_KINDS = new Set(['hub', 'tool', 'gold', 'usd', 'date-today', 'letter', 'name', 'list', 'article']);
+
 export default function App() {
   const [path] = useRoute();
-  const { name, param } = useMemo(() => parseRoute(path), [path]);
+  const info = useMemo(() => parseRoute(path), [path]);
+  const { lang, kind, param } = info;
+
+  const isGlobal = lang !== 'ar' || GLOBAL_KINDS.has(kind);
 
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
-          {name === 'salaries' && <SalariesPage />}
-          {name === 'date-converter' && <DateConverterPage />}
-          {name === 'age-calculator' && <AgeCalculatorPage />}
-          {name === 'hijri-calendar' && <HijriCalendarPage />}
-          {name === 'school-calendar' && <SchoolCalendarPage />}
-          {name === 'holidays' && <HolidaysPage />}
-          {name === 'countdown' && param && <CountdownDetailPage slug={param} />}
-          {name === 'countdown' && !param && <CountdownHubPage />}
-          {name === 'today' && <TodayPage />}
-          {name === 'faq' && <FaqPage />}
-          {name === 'articles' && param && <ArticlePage slug={param} />}
-          {name === 'articles' && !param && <ArticlesListPage />}
-          {name === 'name-decoration' && param && <NameDecorationPage slug={param} />}
-          {name === 'name-decoration' && !param && <NameDecorationHubPage />}
-          {name === 'privacy' && <PrivacyPage />}
-          {name === 'terms' && <TermsPage />}
-          {name === 'about' && <AboutPage />}
-          {name === 'contact' && <ContactPage />}
-          {name === 'home' && <HomePage />}
+          {isGlobal && <GlobalPage info={info} />}
+          {!isGlobal && lang === 'ar' && kind === 'salaries' && <SalariesPage />}
+          {!isGlobal && kind === 'date-converter' && <DateConverterPage />}
+          {!isGlobal && kind === 'age-calculator' && <AgeCalculatorPage />}
+          {!isGlobal && kind === 'hijri-calendar' && <HijriCalendarPage />}
+          {!isGlobal && kind === 'school-calendar' && <SchoolCalendarPage />}
+          {!isGlobal && kind === 'holidays' && <HolidaysPage />}
+          {!isGlobal && kind === 'countdown' && param && <CountdownDetailPage slug={param} />}
+          {!isGlobal && kind === 'countdown' && !param && <CountdownHubPage />}
+          {!isGlobal && kind === 'today' && <TodayPage />}
+          {!isGlobal && kind === 'faq' && <FaqPage />}
+          {!isGlobal && kind === 'article' && param && <ArticlePage slug={param} />}
+          {!isGlobal && kind === 'article' && !param && <ArticlesListPage />}
+          {!isGlobal && kind === 'name-decoration' && param && <NameDecorationPage slug={param} />}
+          {!isGlobal && kind === 'name-decoration' && !param && <NameDecorationHubPage />}
+          {!isGlobal && kind === 'privacy' && <PrivacyPage />}
+          {!isGlobal && kind === 'terms' && <TermsPage />}
+          {!isGlobal && kind === 'about' && <AboutPage />}
+          {!isGlobal && kind === 'contact' && <ContactPage />}
+          {!isGlobal && kind === 'home' && <HomePage />}
         </Suspense>
       </main>
       <Footer />
