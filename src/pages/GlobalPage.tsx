@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSeo } from '../lib/seo';
 import { useLang, fillTemplate } from '../lib/i18n';
 import { allStyles, FancyStyle } from '../lib/fancy';
-import { COUNTRIES, NAMES, TRIVIA, PRICES, countryBySlug, nameBySlug, countryName, rateFor, fmtNum, articleData, WORLD_ARTICLES } from '../lib/globalData';
+import { COUNTRIES, NAMES, TRIVIA, PRICES, countryBySlug, nameBySlug, countryName, rateFor, fmtNum, articleData, WORLD_ARTICLES, DHIKR_ARTICLES, ISLAMIC_LANGS } from '../lib/globalData';
 import { langPrefix } from '../lib/router';
 import type { RouteInfo } from '../lib/router';
 import { gregorianToHijri } from '../lib/hijri';
@@ -607,6 +607,26 @@ function ArticlePage({ slug }: { slug: string }) {
   );
 }
 
+// ---------- فهرس المقالات لكل لغة (/{lang}/articles) ----------
+function ArticlesListPage() {
+  const { t, lang } = useLang();
+  const prefix = langPrefix(lang);
+  useSeo({ title: `${t('nav.articles')} | ${t('siteName')}`, canonical: `${SITE}${prefix}/articles` });
+  const slugs = [...WORLD_ARTICLES, ...(ISLAMIC_LANGS.includes(lang) ? DHIKR_ARTICLES : [])];
+  return (
+    <div className="container-page py-10">
+      <h1 className="section-title">{t('nav.articles')}</h1>
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        {slugs.map((a) => (
+          <Link key={a} to={`${prefix}/articles/${a}`} className="card p-4 transition-all hover:-translate-y-0.5 hover:shadow-soft">
+            <div className="font-bold text-brand-800">{t(`articles.${a}.title`)}</div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ---------- المحور (الصفحة الرئيسية لكل لغة) ----------
 function HubPage() {
   const { t, lang } = useLang();
@@ -668,6 +688,7 @@ export default function GlobalPage({ info }: { info: RouteInfo }) {
     case 'name': return <NamePage slug={info.param || ''} />;
     case 'list': return <ListPage slug={info.param || 'boy'} />;
     case 'article': return <ArticlePage slug={info.param || ''} />;
+    case 'articles-list': return <ArticlesListPage />;
     case 'hub':
     case 'home':
     default:

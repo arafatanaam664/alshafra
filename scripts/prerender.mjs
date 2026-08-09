@@ -954,8 +954,8 @@ const routes = [
 // يُدمج آلاف الصفحات العالمية (أدوات × 16 لغة، دول، حروف، أسماء، مقالات) مع
 // الصفحات الحالية، ويطبّق جدولة النشر التلقائي: كل صفحة تُنشر في تاريخها المحدد
 // (5 صفحات/يوم افتراضياً من schedule.json) وتظهر في sitemap فقط بعد تاريخ نشرها.
-const { published: routesFinal, total: catalogTotal, today: buildDate } = mergeCatalog(routes);
-console.log(`[prerender] catalog merged: ${catalogTotal} total pages, ${routesFinal.length} published (${buildDate}).`);
+const { all: routesAll, published: routesFinal, total: catalogTotal, today: buildDate } = mergeCatalog(routes);
+console.log(`[prerender] catalog merged: ${catalogTotal} total files, ${routesFinal.length} in sitemap (${buildDate}).`);
 
 // --- HTML helpers ------------------------------------------------------------
 
@@ -1035,7 +1035,7 @@ function setBody(html, bodyContent) {
 // --- Generate pages ----------------------------------------------------------
 
 let count = 0;
-for (const route of routesFinal) {
+for (const route of routesAll) {
   let html = template;
   const canonical = SITE_URL + route.path;
 

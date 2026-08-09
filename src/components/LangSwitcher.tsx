@@ -1,11 +1,52 @@
 // LangSwitcher.tsx — مبدّل اللغة (16 لغة) مع حفظ الاختيار
+// يتنقل فقط للصفحات الموجودة فعلاً في اللغة الهدف (كل الملفات مولّدة)،
+// ويسقط إلى محور اللغة إذا لم تكن الصفحة موجودة فيها.
 import { useState } from 'react';
 import { Globe } from 'lucide-react';
-import { LANGS, useLang } from '../lib/i18n';
+import { LANGS, LANG_BY_CODE, useLang } from '../lib/i18n';
 import { parseRoute, useRoute } from '../lib/router';
-import { countryBySlug } from '../lib/globalData';
+import { countryBySlug, nameBySlug, DHIKR_ARTICLES, ISLAMIC_LANGS } from '../lib/globalData';
+import toolSlugsData from '../data/toolslugs.json';
 
-const SAME_SLUG_TOOLS = ['fancy-text', 'symbols', 'word-counter', 'percentage-calculator', 'case-converter', 'number-converter', 'age-calculator', 'date-converter', 'today', 'countdown'];
+const TOOL_SLUGS = (toolSlugsData as { slugs: Record<string, Record<string, string>> }).slugs;
+const AR_EXISTING = (toolSlugsData as { arExisting: string[] }).arExisting;
+
+function toolSlugFor(code: string, key: string): string | null {
+  return TOOL_SLUGS[key] && TOOL_SLUGS[key][code] ? TOOL_SLUGS[key][code] : null;
+}
+
+/** هل توجد هذه الصفحة (نوع + معامل) في اللغة الهدف؟ */
+function targetExists(code: string, kind: string, param?: string): boolean {
+  if (kind === 'hub' || kind === 'home' || kind === 'articles-list') return true;
+  if (kind === 'tool') {
+    if (!param) return false;
+    if (code === 'ar' && AR_EXISTING.includes(param)) return true; // الصفحات العربية القائمة
+    return !!toolSlugFor(code, param);
+  }
+  if (kind === 'gold' || kind === 'usd' || kind === 'date-today') {
+    const c = param ? countryBySlug(param) : undefined;
+    return !!c && (c.langs || []).includes(code);
+  }
+  if (kind === 'letter') {
+    const isLatin = !!param && /^[a-z]$/.test(param);
+    return isLatin ? LANG_BY_CODE[code].script === 'latin' : LANG_BY_CODE[code].script !== 'latin';
+  }
+  if (kind === 'name') {
+    const n = param ? nameBySlug(param) : undefined;
+    if (!n) return false;
+    if (code === 'ar' || code === 'ur') return n.origin === 'arabic';
+    if (code === 'fa') return n.origin === 'arabic' || n.origin === 'persian';
+    if (code === 'tr') return n.origin === 'turkish' || n.origin === 'arabic';
+    if (code === 'en') return n.origin === 'english' || n.origin === 'arabic';
+    return n.origin === 'english';
+  }
+  if (kind === 'list') return true;
+  if (kind === 'article') {
+    if (param && DHIKR_ARTICLES.includes(param)) return ISLAMIC_LANGS.includes(code);
+    return true;
+  }
+  return false;
+}
 
 export default function LangSwitcher() {
   const { lang, setLang } = useLang();
@@ -19,23 +60,25 @@ export default function LangSwitcher() {
     const info = parseRoute(window.location.pathname);
     const prefix = code === 'ar' ? '' : `/${code}`;
     let target = prefix || '/';
-    if (info.kind === 'tool' && info.param && SAME_SLUG_TOOLS.includes(info.param)) {
-      target = `${prefix}/fancy-text-generator`; // slugs تختلف بين اللغات — نستخدم الصفحة الرئيسية للأداة
-    } else if ((info.kind === 'gold' || info.kind === 'usd' || info.kind === 'date-today') && info.param) {
-      const c = countryBySlug(info.param);
-      if (c && (c.langs || []).includes(code)) {
-        const seg = info.kind === 'gold' ? 'gold-price' : info.kind === 'usd' ? 'usd-rate' : 'date-today';
-        target = `${prefix}/${seg}/${info.param}`;
-      }
-    } else if (info.kind === 'letter' && info.param) {
+
+    if (info.kind === 'tool' && info.param && targetExists(code, 'tool', info.param)) {
+      const slug = toolSlugFor(code, info.param);
+      target = slug ? `${prefix}/${slug}` : (prefix || '/');
+    } else if ((info.kind === 'gold' || info.kind === 'usd' || info.kind === 'date-today') && info.param && targetExists(code, info.kind, info.param)) {
+      const seg = info.kind === 'gold' ? 'gold-price' : info.kind === 'usd' ? 'usd-rate' : 'date-today';
+      target = `${prefix}/${seg}/${info.param}`;
+    } else if (info.kind === 'letter' && info.param && targetExists(code, 'letter', info.param)) {
       target = `${prefix}/fancy-letter/${info.param}`;
-    } else if (info.kind === 'name' && info.param) {
+    } else if (info.kind === 'name' && info.param && targetExists(code, 'name', info.param)) {
       target = `${prefix}/name/${info.param}`;
     } else if (info.kind === 'list' && info.param) {
       target = `${prefix}/names/${info.param}`;
-    } else if (info.kind === 'article' && info.param) {
+    } else if (info.kind === 'article' && info.param && targetExists(code, 'article', info.param)) {
       target = code === 'ar' ? `/world/${info.param}` : `${prefix}/articles/${info.param}`;
+    } else if (info.kind === 'articles-list') {
+      target = `${prefix}/articles`;
     }
+    // أي نوع غير مدعوم في اللغة الهدف → محور اللغة
     navigate(target);
   };
 
