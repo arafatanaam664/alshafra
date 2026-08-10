@@ -551,5 +551,7 @@ export function mergeCatalog(existingRoutes) {
   });
   // المنشور (يظهر في sitemap): الصفحات القائمة + الفورية + ما حلّ أجله
   const published = all.filter((r) => r.publishDate <= today);
-  return { all, published, today: todayIso, total: all.length };
+  // start يُعاد لتحديد lastmod: الصفحات المجدولة (بعد بداية الجدولة) تُظهر تاريخ نشرها
+  // الفعلي، بينما الصفحات القائمة والفورية (تُعاد بناؤها يومياً) تُظهر تاريخ البناء.
+  return { all, published, today: todayIso, total: all.length, start };
 }
