@@ -46,7 +46,11 @@ export default function App() {
   const info = useMemo(() => parseRoute(path), [path]);
   const { lang, kind, param } = info;
 
-  const isGlobal = lang !== 'ar' || GLOBAL_KINDS.has(kind);
+  // الصفحات العالمية (غير العربية) تُعرض عبر GlobalPage.
+  // ملاحظة: صفحة /articles العربية (نوع article بدون param) ليست عالمية — بل
+  // تُعرض عبر ArticlesListPage العربية بتصميمها العربي الأصلي. لذلك نستثنيها هنا
+  // حتى لا تُوجَّه خطأً إلى GlobalPage (الذي يعرضها بتصميم/لغة أخرى).
+  const isGlobal = lang !== 'ar' || (GLOBAL_KINDS.has(kind) && !(kind === 'article' && !param));
 
   return (
     <div className="flex min-h-screen flex-col">

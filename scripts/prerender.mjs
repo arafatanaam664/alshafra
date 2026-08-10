@@ -19,6 +19,7 @@ import {
   weekdayName,
 } from './countdowns.mjs';
 import { mergeCatalog, PRERENDER_CSS as GLOBAL_CSS } from './catalog.mjs';
+import { buildTrendingRoutes, countWords } from './trending.mjs';
 
 const SITE_URL = 'https://alshafra.com';
 const SITE_NAME = 'تقويم السعودية';
@@ -954,7 +955,11 @@ const routes = [
 // يُدمج آلاف الصفحات العالمية (أدوات × 16 لغة، دول، حروف، أسماء، مقالات) مع
 // الصفحات الحالية، ويطبّق جدولة النشر التلقائي: كل صفحة تُنشر في تاريخها المحدد
 // (5 صفحات/يوم افتراضياً من schedule.json) وتظهر في sitemap فقط بعد تاريخ نشرها.
-const { all: routesAll, published: routesFinal, total: catalogTotal, today: buildDate } = mergeCatalog(routes);
+// دمج صفحات المواضيع الرائجة (المحتوى المؤتمت الطويل) مع الصفحات القائمة
+const trendingRoutes = buildTrendingRoutes();
+const allRoutes = [...routes, ...trendingRoutes];
+
+const { all: routesAll, published: routesFinal, total: catalogTotal, today: buildDate, start: startDate } = mergeCatalog(allRoutes);
 console.log(`[prerender] catalog merged: ${catalogTotal} total files, ${routesFinal.length} in sitemap (${buildDate}).`);
 
 // --- HTML helpers ------------------------------------------------------------
@@ -1032,10 +1037,81 @@ function setBody(html, bodyContent) {
   return html.replace(/<div id="root"><\/div>/, bodyContent);
 }
 
+// --- Internal linking engine ------------------------------------------------
+// يبني فهرساً بكلمات مفتاحية وفئات لكل صفحة، ثم لكل صفحة يختار صفحات ذات صلة
+// (نفس اللغة + تداخل الكلمات/الفئة) ويحقن رابط «مواضيع ذات صلة» داخل جسم الصفحة،
+// فلا تبقى أي صفحة يتيمة (orphan) — بل كل صفحة ترتبط بعدة صفحات وتُربط من غيرها.
+
+const STOPWORDS = new Set([
+  'في', 'من', 'على', 'إلى', 'التي', 'الذي', 'و', 'هي', 'هو', 'ما', 'لا', 'كل', 'كان', 'مع', 'عن', 'أن', 'أنه', 'لم', 'لن', 'بين', 'أو', 'لكن', 'ثم', 'هذا', 'هذه', 'ذلك',
+  'the', 'and', 'of', 'to', 'in', 'a', 'is', 'for', 'on', 'with', 'at', 'by', 'as', 'an',
+]);
+
+function normalizeTerms(str) {
+  const tokens = String(str || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\u0600-\u06FF\s]/g, ' ')
+    .split(/\s+/)
+    .filter((t) => t && t.length > 1 && !STOPWORDS.has(t));
+  return new Set(tokens);
+}
+
+function buildLinkIndex(routes) {
+  return routes.map((r) => ({
+    path: r.path,
+    title: r.title || '',
+    lang: r.lang || 'ar',
+    category: r.category || '',
+    terms: normalizeTerms(`${r.title} ${r.keywords || ''} ${r.path}`),
+  }));
+}
+
+function findRelated(route, index, limit = 6) {
+  const self = index.find((i) => i.path === route.path);
+  if (!self) return [];
+  const scored = [];
+  for (const other of index) {
+    if (other.path === route.path) continue;
+    if (other.lang !== self.lang) continue;
+    // تداخل الكلمات المفتاحية + تطابق الفئة
+    let score = 0;
+    for (const t of other.terms) if (self.terms.has(t)) score += 1;
+    if (other.category && other.category === self.category) score += 3;
+    if (score <= 0) continue;
+    scored.push({ ...other, score });
+  }
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit).map((s) => ({ href: s.path, title: s.title }));
+}
+
+function injectRelatedLinks(bodyHtml, related) {
+  if (!related || !related.length || !bodyHtml.includes('</main>')) return bodyHtml;
+  const block = `<section class="related-links"><h2>مواضيع ذات صلة</h2><div class="grid2">${related
+    .map((l) => `<a href="${l.href}">${l.title.replace(/ \|.*$/, '')}</a>`)
+    .join('')}</div></section>`;
+  // لا نضيف إذا كان هناك قسم مشابه موجود أصلاً
+  if (bodyHtml.includes('class="related-links"')) return bodyHtml;
+  return bodyHtml.replace('</main>', `${block}\n  </main>`);
+}
+
+const linkIndex = buildLinkIndex(routesAll);
+let orphanCount = 0;
+let totalWords = 0;
+
 // --- Generate pages ----------------------------------------------------------
 
 let count = 0;
 for (const route of routesAll) {
+  // حقن الروابط الداخلية في جسم الصفحة قبل البناء
+  const related = findRelated(route, linkIndex, 6);
+  if (route.body) {
+    if (related.length) {
+      route.body = injectRelatedLinks(route.body, related);
+    } else {
+      orphanCount++;
+    }
+    if (route.words) totalWords += route.words;
+  }
   let html = template;
   const canonical = SITE_URL + route.path;
 
@@ -1078,6 +1154,8 @@ for (const route of routesAll) {
 }
 
 console.log(`[prerender] Done. ${count} pages generated.`);
+console.log(`[prerender] Internal links: ${routesAll.length - orphanCount} pages have related links, ${orphanCount} orphans.`);
+if (totalWords) console.log(`[prerender] Long-form content: ~${totalWords} words across trending pages.`);
 
 // --- sitemap.xml -------------------------------------------------------------
 // Generated from the same route table that produced the HTML, so the sitemap
@@ -1097,10 +1175,17 @@ const sitemap = [
     const isCountdown = r.path.startsWith('/countdown/');
     const changefreq = r.changefreq || CHANGEFREQ[r.path] || (isCountdown ? 'daily' : 'monthly');
     const priority = r.priority || PRIORITY[r.path] || (isCountdown ? '0.8' : '0.6');
+    // lastmod = تاريخ بناء/نشر كل صفحة فعلاً (وليس تاريخ البناء الموحّد).
+    // الصفحات المجدولة العميقة (الدول/الحروف/الأسماء/القوائم/المقالات) تُظهر
+    // تاريخ نشرها الفعلي المتدرج — فيعكس أنها بُنيت في أوقات مختلفة «قديماً».
+    // أما الصفحات الفورية والقائمة (الرئيسية/الأدوات/العدادات/الأسعار/الترند)
+    // فتُعاد بناؤها يومياً وتُظهر تاريخ البناء الحالي.
+    const deepScheduled = r.publishDate && !r.immediate && !r.fromExisting;
+    const lastmod = deepScheduled ? r.publishDate.toISOString().slice(0, 10) : buildDate;
     return [
       '  <url>',
       `    <loc>${loc}</loc>`,
-      `    <lastmod>${buildDate}</lastmod>`,
+      `    <lastmod>${lastmod}</lastmod>`,
       `    <changefreq>${changefreq}</changefreq>`,
       `    <priority>${priority}</priority>`,
       '  </url>',
@@ -1124,7 +1209,7 @@ writeFileSync(join(distDir, 'published.json'), JSON.stringify(publishedData), 'u
 writeFileSync(join(rootDir, 'public', 'published.json'), JSON.stringify(publishedData), 'utf-8');
 console.log(`[prerender] published.json written (${publishedData.published.length} pages).`);
 
-const publishedToday = routesFinal.filter((r) => r.publishDate && r.publishDate.toISOString().slice(0, 10) === buildDate);
+const publishedToday = routesFinal.filter((r) => (r.publishDate && r.publishDate.toISOString().slice(0, 10) === buildDate) || r.immediate);
 const indexnowList = (publishedToday.length ? publishedToday : routesFinal).map((r) => SITE_URL + r.path);
 writeFileSync(join(distDir, 'indexnow-new.txt'), indexnowList.join('\n'), 'utf-8');
 console.log(`[prerender] indexnow-new.txt written (${indexnowList.length} URLs for today).`);
