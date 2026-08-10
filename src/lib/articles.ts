@@ -494,6 +494,9 @@ export function articleBySlug(slug: string): Article | undefined {
   return ARTICLES.find((a) => a.slug === slug);
 }
 
+/** أسماء (Slugs) المقالات السعودية — متاحة بالعربية فقط ولا تُترجم لبقية اللغات. */
+export const SAUDI_ARTICLE_SLUGS = new Set(ARTICLES.map((a) => a.slug));
+
 export const CATEGORY_LABELS_ARTICLE: Record<Article['category'], string> = {
   salaries: 'الرواتب',
   calendar: 'التقويم',

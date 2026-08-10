@@ -6,6 +6,7 @@ import { Globe } from 'lucide-react';
 import { LANGS, LANG_BY_CODE, useLang } from '../lib/i18n';
 import { parseRoute, useRoute } from '../lib/router';
 import { countryBySlug, nameBySlug, DHIKR_ARTICLES, ISLAMIC_LANGS } from '../lib/globalData';
+import { SAUDI_ARTICLE_SLUGS } from '../lib/articles';
 import toolSlugsData from '../data/toolslugs.json';
 
 const TOOL_SLUGS = (toolSlugsData as { slugs: Record<string, Record<string, string>> }).slugs;
@@ -20,6 +21,7 @@ function targetExists(code: string, kind: string, param?: string): boolean {
   if (kind === 'hub' || kind === 'home' || kind === 'articles-list') return true;
   if (kind === 'tool') {
     if (!param) return false;
+    if (param === 'tools') return true; // صفحة «كل الأدوات» موجودة في كل لغة
     if (code === 'ar' && AR_EXISTING.includes(param)) return true; // الصفحات العربية القائمة
     return !!toolSlugFor(code, param);
   }
@@ -42,6 +44,11 @@ function targetExists(code: string, kind: string, param?: string): boolean {
   }
   if (kind === 'list') return true;
   if (kind === 'article') {
+    if (param && SAUDI_ARTICLE_SLUGS.has(param)) return false; // مقالات سعودية: عربية فقط
+    if (param && DHIKR_ARTICLES.includes(param)) return ISLAMIC_LANGS.includes(code);
+    return true;
+  }
+  if (kind === 'world-article') {
     if (param && DHIKR_ARTICLES.includes(param)) return ISLAMIC_LANGS.includes(code);
     return true;
   }
@@ -61,9 +68,14 @@ export default function LangSwitcher() {
     const prefix = code === 'ar' ? '' : `/${code}`;
     let target = prefix || '/';
 
-    if (info.kind === 'tool' && info.param && targetExists(code, 'tool', info.param)) {
-      const slug = toolSlugFor(code, info.param);
-      target = slug ? `${prefix}/${slug}` : (prefix || '/');
+    if (info.kind === 'tool' && info.param) {
+      if (info.param === 'tools') {
+        // صفحة «كل الأدوات» موجودة في كل لغة بمسارها المحلي
+        target = code === 'ar' ? '/adawat' : `${prefix}/${toolSlugFor(code, 'tools') || 'tools'}`;
+      } else if (targetExists(code, 'tool', info.param)) {
+        const slug = toolSlugFor(code, info.param);
+        target = slug ? `${prefix}/${slug}` : (prefix || '/');
+      }
     } else if ((info.kind === 'gold' || info.kind === 'usd' || info.kind === 'date-today') && info.param && targetExists(code, info.kind, info.param)) {
       const seg = info.kind === 'gold' ? 'gold-price' : info.kind === 'usd' ? 'usd-rate' : 'date-today';
       target = `${prefix}/${seg}/${info.param}`;
@@ -73,12 +85,23 @@ export default function LangSwitcher() {
       target = `${prefix}/name/${info.param}`;
     } else if (info.kind === 'list' && info.param) {
       target = `${prefix}/names/${info.param}`;
-    } else if (info.kind === 'article' && info.param && targetExists(code, 'article', info.param)) {
+    } else if (info.kind === 'article' && info.param) {
+      if (lang === 'ar' && SAUDI_ARTICLE_SLUGS.has(info.param)) {
+        // مقال سعودي: متاح بالعربية فقط → محور اللغة الهدف
+        target = prefix || '/';
+      } else if (targetExists(code, 'article', info.param)) {
+        // مقالات عالمية: متاحة بكل اللغات
+        target = code === 'ar' ? `/world/${info.param}` : `${prefix}/articles/${info.param}`;
+      }
+    } else if (info.kind === 'world-article' && info.param && targetExists(code, 'world-article', info.param)) {
       target = code === 'ar' ? `/world/${info.param}` : `${prefix}/articles/${info.param}`;
     } else if (info.kind === 'articles-list') {
-      target = `${prefix}/articles`;
+      target = code === 'ar' ? '/articles' : `${prefix}/articles`;
+    } else if (info.kind === 'tools-hub') {
+      target = code === 'ar' ? '/adawat' : `${prefix}/${toolSlugFor(code, 'tools') || 'tools'}`;
     }
-    // أي نوع غير مدعوم في اللغة الهدف → محور اللغة
+    // أي نوع آخر (المواضيع الرائجة /trending* أو الصفحات السعودية) غير موجود
+    // في اللغة الهدف → محور اللغة.
     navigate(target);
   };
 
