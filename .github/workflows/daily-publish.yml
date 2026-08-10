@@ -1,9 +1,10 @@
 # Daily auto-publish: ينفّذ 3 مرات يومياً (04:30 / 12:30 / 20:30 UTC)
 # 1) يجلب أسعار الذهب والعملات تلقائياً (scripts/fetch-prices.mjs)
-# 2) يبني الموقع (vite build + prerender) فيُنشر تلقائياً عدد الصفحات المقرر لهذا اليوم
-#    من كتالوج النشر (schedule.json → ratePerDay = 5 صفحات/يوم)
-# 3) يحدّث public/published.json (قائمة الصفحات المنشورة) ويُحدِث commit → Vercel يعيد النشر
-# 4) يرسل الصفحات الجديدة إلى Bing IndexNow للفهرسة الفورية
+# 2) يجلب المواضيع الرائجة في الخليج (scripts/fetch-trending.mjs)
+# 3) يبني الموقع (vite build + prerender) فيُنشر تلقائياً عدد الصفحات المقرر لهذا اليوم
+#    من كتالوج النشر (schedule.json → ratePerDay = 20 صفحة/يوم)
+# 4) يحدّث public/published.json (قائمة الصفحات المنشورة) ويُحدِث commit → Vercel يعيد النشر
+# 5) يرسل الصفحات الجديدة إلى Bing IndexNow للفهرسة الفورية
 # ملاحظة: يعمل تلقائياً بعد دمج هذا الملف في الفرع الرئيسي (main) للمستودع.
 
 name: Daily auto-publish
@@ -40,18 +41,21 @@ jobs:
       - name: Fetch live gold & FX prices
         run: node scripts/fetch-prices.mjs
 
+      - name: Fetch GCC trending topics (Google Trends, graceful fallback)
+        run: node scripts/fetch-trending.mjs
+
       - name: Build site (publishes today's pages)
         run: npm run build
 
-      - name: Commit auto-updates (prices + published list)
+      - name: Commit auto-updates (prices + published list + trends)
         run: |
           git config user.name "shafra-bot"
           git config user.email "bot@alshafra.com"
-          git add src/data/prices.json public/published.json public/4f9c2a7e1b8d3f6a9c0e5b7d2a8f4c1e.txt
+          git add src/data/prices.json src/data/trending-snapshot.json public/published.json public/4f9c2a7e1b8d3f6a9c0e5b7d2a8f4c1e.txt
           if git diff --cached --quiet; then
             echo "No changes to commit (prices unchanged today)."
           else
-            git commit -m "chore: daily auto-publish $(date -u +%F) — prices + published pages"
+            git commit -m "chore: daily auto-publish $(date -u +%F) — prices + published pages + trends"
             git push
             echo "Committed and pushed. Vercel will rebuild."
           fi
