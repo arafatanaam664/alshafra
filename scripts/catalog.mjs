@@ -155,6 +155,45 @@ function relatedBlock(links) {
   return `<h2>${esc('🔗')}</h2><div class="grid2">${links.map((l) => `<a href="${l.href}">${esc(l.title)}</a>`).join('')}</div>`;
 }
 
+// ---------- إثراء المحتوى الطويل (لمحاربة الصفحات الرقيقة) ----------
+// كل صفحة عميقة تُضاف إليها أقسام موسّعة تعتمد على بياناتها الخاصة (اسم/دولة/حرف/اسم)
+// لتجاوز الحد الأدنى للكلمات وتقديم قيمة حقيقية، دون أن تتشابه الصفحات مع بعضها.
+function factsTableHtml(rows, heading) {
+  if (!rows || !rows.length) return '';
+  return `<section><h2>${esc(heading)}</h2><table><tbody>${rows
+    .map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`)
+    .join('')}</tbody></table></section>`;
+}
+// تسميات محلية لرؤوس الجداول الموسّعة (مع خيار لغات إضافية)
+const UI_LABEL = {
+  quickFacts: { ar: 'معلومات سريعة', en: 'Quick Facts', tr: 'Hızlı Bilgiler', fa: 'اطلاعات سریع', fr: 'En bref', es: 'Datos rápidos', pt: 'Fatos rápidos', id: 'Fakta Cepat', ms: 'Fakta Cepat', ur: 'فوری معلومات', de: 'Schnellfakten', ru: 'Кратко', it: 'Fatti rapidi', hi: 'त्वरित तथ्य', bn: 'দ্রুত তথ্য', sw: 'Habari za haraka' },
+  related: { ar: 'مواضيع ذات صلة', en: 'Related', tr: 'İlgili', fa: 'مطالب مرتبط', fr: 'Lié', es: 'Relacionado', pt: 'Relacionado', id: 'Terkait', ms: 'Berkaitan', ur: 'متعلقہ', de: 'Verwandt', ru: 'Связанное', it: 'Correlato', hi: 'संबंधित', bn: 'সম্পর্কিত', sw: 'Kuhusiana' },
+  guide: { ar: 'دليل شامل', en: 'Complete Guide', tr: 'Kapsamlı Rehber', fa: 'راهنمای جامع', fr: 'Guide complet', es: 'Guía completa', pt: 'Guia completo', id: 'Panduan Lengkap', ms: 'Panduan Lengkap', ur: 'مکمل رہنما', de: 'Umfassender Leitfaden', ru: 'Полное руководство', it: 'Guida completa', hi: 'पूर्ण गाइड', bn: 'সম্পূর্ণ গাইড', sw: 'Mwongozo kamili' },
+};
+function uiLabel(lang, key) {
+  const m = UI_LABEL[key];
+  return (m && (m[lang] || m.en)) || key;
+}
+const FACTS_LABEL = {
+  capital: { ar: 'العاصمة', en: 'Capital', tr: 'Başkent', fa: 'پایتخت', fr: 'Capitale', es: 'Capital', pt: 'Capital', id: 'Ibu kota', ms: 'Ibu negara', ur: 'دارالحکومت', de: 'Hauptstadt', ru: 'Столица', it: 'Capitale', hi: 'राजधानी', bn: 'রাজধানী', sw: 'Mji mkuu' },
+  currency: { ar: 'العملة', en: 'Currency', tr: 'Para birimi', fa: 'واحد پول', fr: 'Devise', es: 'Moneda', pt: 'Moeda', id: 'Mata uang', ms: 'Mata wang', ur: 'کرنسی', de: 'Währung', ru: 'Валюта', it: 'Valuta', hi: 'मुद्रा', bn: 'মুদ্রা', sw: 'Sarafu' },
+  region: { ar: 'المنطقة', en: 'Region', tr: 'Bölge', fa: 'منطقه', fr: 'Région', es: 'Región', pt: 'Região', id: 'Wilayah', ms: 'Wilayah', ur: 'علاقہ', de: 'Region', ru: 'Регион', it: 'Regione', hi: 'क्षेत्र', bn: 'অঞ্চল', sw: 'Mkoa' },
+  population: { ar: 'عدد السكان', en: 'Population', tr: 'Nüfus', fa: 'جمعیت', fr: 'Population', es: 'Población', pt: 'População', id: 'Populasi', ms: 'Penduduk', ur: 'آبادی', de: 'Bevölkerung', ru: 'Население', it: 'Popolazione', hi: 'जनसंख्या', bn: 'জনসংখ্যা', sw: 'Idadi' },
+};
+function fl(lang, key, v) {
+  const m = FACTS_LABEL[key];
+  return (m && (m[lang] || m.en)) || key;
+}
+function countryFactsTable(lang, c, cname) {
+  const rows = [
+    [fl(lang, 'capital'), c.cap],
+    [fl(lang, 'currency'), `${c.cur} — ${c.curName}`],
+    [fl(lang, 'region'), c.reg || ''],
+    [fl(lang, 'population'), `~${c.popM}M`],
+  ].filter(([, v]) => v);
+  return factsTableHtml(rows, uiLabel(lang, 'quickFacts'));
+}
+
 // ---------- بناة الصفحات ----------
 // ربط مفتاح الأداة (في المسارات) بمفتاحها في ملفات الترجمة
 const STRING_KEY = {
@@ -259,12 +298,33 @@ function countryRoute(lang, country, kind) {
       <tbody><tr><td>${esc(cname)}</td><td>${esc(country.cap)}</td><td>${esc(country.cur + ' — ' + country.curName)}</td></tr></tbody></table>`;
   }
   const hreflang = (country.langs || [lang]).filter((l) => l !== lang).map((l) => ({ code: l, path: `${l === 'ar' ? '' : `/${l}`}/${kind === 'gold' ? 'gold-price' : kind === 'usd' ? 'usd-rate' : 'date-today'}/${country.slug}` }));
+  // إثراء طويل: جدول حقائق + دليل شامل يعتمد على بيانات الدولة نفسها (مختلف لكل صفحة)
+  const facts = countryFactsTable(lang, country, cname);
+  const kindAr = kind === 'gold' ? 'الذهب' : kind === 'usd' ? 'الدولار' : 'التاريخ والوقت';
+  let guide = '';
+  if (lang === 'ar') {
+    guide = `<section><h2>${esc(`دليل ${kindAr} في ${cname}`)}</h2>
+      <p>عند التعامل مع ${kind === 'gold' ? `أسعار الذهب في ${cname}` : kind === 'usd' ? `سعر صرف الدولار في ${cname}` : `التاريخ والتوقيت في ${cname}`}، من المهم فهم السياق الاقتصادي والجغرافي الكامل للدولة؛ فالعاصمة ${esc(country.cap)} هي مركز النشاط الاقتصادي، والعملة الرسمية هي ${esc(country.cur)} (${esc(country.curName)}). هذه المعلومات تمنحك خلفية واضحة تساعدك على تفسير أي رقم تراه.</p>
+      <p>يبلغ عدد سكان ${esc(cname)} حوالي ${esc(country.popM)} مليون نسمة، وتقع في منطقة ${esc(country.reg)} التي تتميز بموقع جغرافي واقتصادي مؤثر. متابعة ${kind === 'gold' ? 'أسعار الذهب' : kind === 'usd' ? 'سعر الدولار' : 'التواريخ والتوقيت'} في ${esc(cname)} يهم المتعاملين والمستثمرين والمسافرين على حد سواء.</p>
+      <p>للاستفادة القصوى من هذه الصفحة، ننصح بمراجعة الأرقام الحالية في الأعلى ثم الاطلاع على جدول المعلومات السريع، وقراءة الأسئلة الشائعة في الأسفل؛ فهذه الأقسام مجتمعة تمنحك صورة متكاملة عن ${kind === 'gold' ? 'سوق الذهب' : kind === 'usd' ? 'سوق الصرف' : 'التقويم والتوقيت'} في ${esc(cname)} دون الحاجة إلى مصادر متعددة.</p>
+      <p>تذكّر أن الأسعار والقيم المذكورة تقريبية وتُحدَّث بانتظام، وقد تختلف بحسب السوق والمصدر. تابع الصفحة للبقاء على اطلاع بأحدث المستجدات المتعلقة بـ${esc(cname)}.</p></section>`;
+  } else {
+    const kw = kind === 'gold' ? `${cname} gold price` : kind === 'usd' ? `${cname} USD exchange rate` : `${cname} date and time`;
+    guide = `<section><h2>${esc(`${uiLabel(lang, 'guide')}: ${kw}`)}</h2>
+      <p>Use this page as a quick reference for ${kw}. We provide current figures at the top, a quick-facts table below, and a FAQ section at the bottom covering the most common questions.</p>
+      <p>Figures are indicative and updated regularly. Always verify with official sources for important transactions.</p></section>`;
+  }
+  const related = COUNTRIES.filter((c) => c.reg === country.reg && c.slug !== country.slug).slice(0, 8).map((c) => ({
+    href: `${prefix}/${kind === 'gold' ? 'gold-price' : kind === 'usd' ? 'usd-rate' : 'date-today'}/${c.slug}`,
+    title: `${countryName(lang, c)} — ${kind === 'gold' ? 'gold' : kind === 'usd' ? 'USD' : 'date'}`
+  }));
+  const relatedHtml = related.length ? `<section><h2>${esc(uiLabel(lang, 'related'))}</h2><div class="grid2">${related.map((l) => `<a href="${l.href}">${esc(l.title)}</a>`).join('')}</div></section>` : '';
   return {
     path, lang, kind: kind === 'gold' ? 'gold' : kind === 'usd' ? 'usd' : 'date-today', param: country.slug,
     title: `${title} | ${t(lang, 'siteName')}`,
     description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
     keywords: `${title}, ${cname}, ${country.cur}, ${t(lang, 'gold.title')}`,
-    body: shell(lang, `<h1>${esc(title)}</h1>${intro}${extra}${faq}`),
+    body: shell(lang, `<h1>${esc(title)}</h1>${intro}${extra}${facts}${guide}${faq}${relatedHtml}`),
     hreflang,
     jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebApplication', name: title, applicationCategory: 'FinanceApplication', operatingSystem: 'Web', inLanguage: lang }],
     changefreq: 'daily', priority: '0.7'
@@ -295,11 +355,22 @@ function letterRoute(lang, letter) {
     code: l.code,
     path: `${l.code === 'ar' ? '' : `/${l.code}`}/fancy-letter/${letter.slug}`
   }));
+  let extended = '';
+  if (lang === 'ar') {
+    extended = `<section><h2>${esc(`كل ما تريد معرفته عن حرف «${letter.name}»`)}</h2>
+      <p>حرف «${esc(letter.char)}» هو أحد حروف الأبجدية في اللغة العربية، ويُكتب ويكون موضعه بين الحروف حسب ترتيب الأبجدية. يظهر هذا الحرف في مئات الكلمات اليومية، وله أشكال مختلفة حسب موقعه في الكلمة: في أول الكلمة ووسطها وآخرها، وتختلف طريقة كتابته مع الحروف المتصلة.</p>
+      <p>يتعلم الأطفال هذا الحرف في مرحلة الروضة والابتدائية عبر أنشطة متنوعة، ويستخدم الخطاطون أشكالاً مزخرفة منه في اللوحات والتصاميم. كما يُعد الحرف أساساً في تعليم القراءة والكتابة، ويظهر في كثير من الأسماء العربية الشهيرة.</p>
+      <p>عند زخرفة حرف «${esc(letter.char)}» يمكنك اختيار أنماط متعددة تليق بالاسم الذي تريده، سواء للاستخدام في وسائل التواصل الاجتماعي أو الألعاب أو الشعارات. جرّب الحرف الآن وانسخ الشكل المزخرف مباشرة.</p>
+      <p>هذه الصفحة مرجعك السريع لحرف «${esc(letter.char)}» من حيث شكله ومواضعه واستخداماته في الزخرفة، مع روابط لباقي الحروف أدناه لتتنقل بسهولة بينها.</p></section>`;
+  } else {
+    extended = `<section><h2>${esc(`${uiLabel(lang, 'guide')}: letter ${display}`)}</h2>
+      <p>This page is your quick reference for the letter «${esc(display)}». Use the fancy-text generator to style this letter in many different ways for social media, gaming, or branding.</p></section>`;
+  }
   return {
     path, lang, kind: 'letter', param: letter.slug, title: `${title} | ${t(lang, 'siteName')}`,
     description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
     keywords: title,
-    body: shell(lang, `<h1>${esc(title)}</h1>${intro}${faq}${relatedHtml}`),
+    body: shell(lang, `<h1>${esc(title)}</h1>${intro}${extended}${faq}${relatedHtml}`),
     hreflang,
     jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebApplication', name: title, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web', inLanguage: lang }],
     changefreq: 'monthly', priority: '0.6'
@@ -334,13 +405,25 @@ function nameRoute(lang, name) {
     code: l.code,
     path: `${l.code === 'ar' ? '' : `/${l.code}`}/name/${name.slug}`
   }));
+  const originAr = { arabic: 'عربي', persian: 'فارسي', turkish: 'تركي', english: 'إنجليزي' }[name.origin] || name.origin;
+  let extended = '';
+  if (lang === 'ar') {
+    extended = `<section><h2>${esc(`تفاصيل اسم «${display}»`)}</h2>
+      <p>اسم «${esc(display)}» ${name.gender === 'male' ? 'اسم مذكر' : 'اسم مؤنث'} من أصل ${esc(originAr)}، ومعناه «${esc(meaning)}». يُعد هذا الاسم من الأسماء المتداولة في المجتمعات العربية والإسلامية، ويُختار كثيراً لجمال لفظه وحسن معناه.</p>
+      <p>تتعدد طرق كتابة الاسم وزخرفته؛ فبإمكانك تحويله إلى أشكال مزخرفة تناسب منصات التواصل والألعاب والشعارات عبر أدوات الزخرفة المتاحة في الموقع. جرّب أنماطاً مختلفة وانسخ ما يعجبك مباشرة.</p>
+      <p>اختيار الاسم قرار شخصي وهادف، وينظر الآباء إلى معناه وأصله وموقعه بين الأسماء الأخرى عند تسمية أطفالهم. تمنحك هذه الصفحة كل ما يخص اسم «${esc(display)}» في مكان واحد.</p>
+      <p>استعرض قائمة الأسماء ذات الصلة أدناه لاكتشاف أسماء قريبة من حيث الأصل والمعنى، وتصفّح معانيها بسهولة بالتنقل بين صفحاتها.</p></section>`;
+  } else {
+    extended = `<section><h2>${esc(`${uiLabel(lang, 'guide')}: name ${display}`)}</h2>
+      <p>This page covers the name «${esc(display)}»: its meaning, gender, origin and related names. Browse the related names below for more options.</p></section>`;
+  }
   return {
     path, lang, kind: 'name', param: name.slug, title: `${title} | ${t(lang, 'siteName')}`,
     description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
     keywords: `${title}, ${t(lang, 'names.title')}`,
     body: shell(lang, `<h1>${esc(title)}</h1>
       <p><strong>${esc(t(lang, 'ui.meaning'))}:</strong> ${esc(meaning)} &nbsp;·&nbsp; <strong>${esc(t(lang, 'ui.gender'))}:</strong> ${esc(gender)}</p>
-      ${intro}${faq}${relatedHtml}`),
+      ${intro}${extended}${faq}${relatedHtml}`),
     hreflang,
     jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebPage', name: title, inLanguage: lang }],
     changefreq: 'monthly', priority: '0.6'
@@ -363,7 +446,18 @@ function listRoute(lang, listKey) {
     items = NAMES.filter((n) => n.gender === g && origins.includes(n.origin)).slice(0, 120).map((n) => (lang === 'ar' || lang === 'fa' || lang === 'ur') && n.ar ? n.ar : n.en);
   }
   const chips = items.map((i) => `<span class="chip">${esc(i)}</span>`).join('');
-  const body = `<h1>${esc(title)}</h1>${intro}<p>${chips}</p>${faqBlock(s.faq || [])}`;
+  let extended = '';
+  if (lang === 'ar') {
+    const listLabel = { boy: 'أسماء الأولاد', girl: 'أسماء البنات', cat: 'أسماء القطط', dog: 'أسماء الكلاب', company: 'أسماء الشركات' }[listKey] || title;
+    extended = `<section><h2>${esc(`كل ما تريد معرفته عن ${listLabel}`)}</h2>
+      <p>تحتوي هذه القائمة على مجموعة مختارة من ${esc(listLabel)} التي يكثر البحث عنها، مرتبة لسهولة التصفح والاختيار. جمعنا لك ${esc(items.length)} اسماً متنوعاً مع إمكانية تصفحها والاستفادة منها مباشرة.</p>
+      <p>اختيار الاسم المناسب يعتمد على الذوق والمعنى والملاءمة؛ فبالنسبة للأسماء الشخصية يراعي الآباء المعنى والأصل، أما أسماء الحيوانات الأليفة فتميل إلى القصر واللطف وسهولة النطق، فيما تعكس أسماء الشركات هوية العلامة وقيمها.</p>
+      <p>استعرض القائمة أدناه، وانسخ ما يناسبك، وتصفّح الصفحات المرتبطة لمزيد من الخيارات والأفكار المتنوعة.</p></section>`;
+  } else {
+    extended = `<section><h2>${esc(`${uiLabel(lang, 'guide')}: ${title}`)}</h2>
+      <p>This curated list contains ${items.length} names to help you find the right one. Browse through and pick what suits you best.</p></section>`;
+  }
+  const body = `<h1>${esc(title)}</h1>${intro}${extended}<p>${chips}</p>${faqBlock(s.faq || [])}`;
   return {
     path, lang, kind: 'list', param: listKey, title: `${title} | ${t(lang, 'siteName')}`,
     description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
