@@ -25,6 +25,18 @@ const ArticlesListPage = lazy(() =>
 const NameDecorationHubPage = lazy(() =>
   import('./pages/NameDecorationPage').then((m) => ({ default: m.NameDecorationHubPage }))
 );
+const TrendingHubPage = lazy(() =>
+  import('./pages/TrendingPage').then((m) => ({ default: m.TrendingHubPage }))
+);
+const TrendingCategoryPage = lazy(() =>
+  import('./pages/TrendingPage').then((m) => ({ default: m.TrendingCategoryPage }))
+);
+const TrendingTopicPage = lazy(() =>
+  import('./pages/TrendingPage').then((m) => ({ default: m.TrendingTopicPage }))
+);
+const TrendingTodayPage = lazy(() =>
+  import('./pages/TrendingPage').then((m) => ({ default: m.TrendingTodayPage }))
+);
 const PrivacyPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.TermsPage })));
 const AboutPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.AboutPage })));
@@ -38,19 +50,26 @@ function PageLoader() {
   );
 }
 
-// الصفحات العالمية (غير العربية) تُعرض عبر GlobalPage
-const GLOBAL_KINDS = new Set(['hub', 'tool', 'gold', 'usd', 'date-today', 'letter', 'name', 'list', 'article']);
+// الصفحات العالمية (غير العربية) تُعرض عبر GlobalPage.
+// ملاحظة: المقالات السعودية (/articles و /articles/*) والمقالات العالمية
+// العربية (/world/*) والمواضيع الرائجة (/trending*) ليست «عالمية» — لكل منها
+// صفحاتها العربية الأصلية الخاصة، فلا تُوجَّه خطأً إلى GlobalPage.
+const GLOBAL_KINDS = new Set(['hub', 'tool', 'tools-hub', 'gold', 'usd', 'date-today', 'letter', 'name', 'list', 'article', 'world-article', 'articles-list']);
 
 export default function App() {
   const [path] = useRoute();
   const info = useMemo(() => parseRoute(path), [path]);
   const { lang, kind, param } = info;
 
-  // الصفحات العالمية (غير العربية) تُعرض عبر GlobalPage.
-  // ملاحظة: صفحة /articles العربية (نوع article بدون param) ليست عالمية — بل
-  // تُعرض عبر ArticlesListPage العربية بتصميمها العربي الأصلي. لذلك نستثنيها هنا
-  // حتى لا تُوجَّه خطأً إلى GlobalPage (الذي يعرضها بتصميم/لغة أخرى).
-  const isGlobal = lang !== 'ar' || (GLOBAL_KINDS.has(kind) && !(kind === 'article' && !param));
+  // الصفحات العالمية (غير العربية) تُعرض عبر GlobalPage:
+  //  - أي صفحة بلغة غير العربية
+  //  - الصفحات العالمية بالعربية: الأدوات، الذهب، الدولار، تاريخ اليوم،
+  //    الحروف، الأسماء، القوائم، والمقالات العالمية (/world/*)
+  // تُستثنى: المقالات السعودية (/articles و /articles/*) وصفحات المواضيع
+  // الرائجة (/trending و /trending/*) التي لها تصميم عربي مستقل.
+  const isGlobal =
+    lang !== 'ar' ||
+    (GLOBAL_KINDS.has(kind) && kind !== 'article' && kind !== 'articles-list');
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -72,6 +91,10 @@ export default function App() {
           {!isGlobal && kind === 'article' && !param && <ArticlesListPage />}
           {!isGlobal && kind === 'name-decoration' && param && <NameDecorationPage slug={param} />}
           {!isGlobal && kind === 'name-decoration' && !param && <NameDecorationHubPage />}
+          {!isGlobal && kind === 'trending-hub' && <TrendingHubPage />}
+          {!isGlobal && kind === 'trending-today' && <TrendingTodayPage />}
+          {!isGlobal && kind === 'trending-category' && param && <TrendingCategoryPage category={param} />}
+          {!isGlobal && kind === 'trending' && param && <TrendingTopicPage slug={param} />}
           {!isGlobal && kind === 'privacy' && <PrivacyPage />}
           {!isGlobal && kind === 'terms' && <TermsPage />}
           {!isGlobal && kind === 'about' && <AboutPage />}

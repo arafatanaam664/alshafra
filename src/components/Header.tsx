@@ -1,15 +1,19 @@
 import { useState } from 'react';
-import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText, Wand2, Timer, Sun } from 'lucide-react';
+import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText, Wand2, Timer, Sun, TrendingUp } from 'lucide-react';
 import { useRoute, parseRoute } from '../lib/router';
 import { useLang } from '../lib/i18n';
 import Link from './Link';
 import LangSwitcher from './LangSwitcher';
+import toolSlugsData from '../data/toolslugs.json';
+
+const TOOL_SLUGS = (toolSlugsData as { slugs: Record<string, Record<string, string>> }).slugs;
 
 const NAV = [
   { to: '/', label: 'الرئيسية', icon: Calendar },
   { to: '/countdown', label: 'كم باقي على…', icon: Timer },
   { to: '/today', label: 'التاريخ اليوم', icon: Sun },
   { to: '/salaries', label: 'مواعيد الرواتب', icon: Coins },
+  { to: '/trending', label: 'المواضيع الرائجة', icon: TrendingUp },
   { to: '/hijri-calendar', label: 'التقويم الهجري', icon: CalendarDays },
   { to: '/school-calendar', label: 'التقويم الدراسي', icon: BookOpen },
   { to: '/holidays', label: 'الإجازات الرسمية', icon: Flag },
@@ -26,14 +30,23 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
   const info = parseRoute(path);
-  const isGlobal = lang !== 'ar' || ['hub', 'tool', 'gold', 'usd', 'date-today', 'letter', 'name', 'list', 'article'].includes(info.kind);
+  // نفس منطق App.tsx: المقالات السعودية (/articles و /articles/*) والمواضيع
+  // الرائجة (/trending*) صفحات عربية مستقلة ولا تُعتبر «عالمية»، أما المقالات
+  // العالمية بالعربية (/world/*) فتُعرض بتصميم اللغات العالمي.
+  const isGlobal =
+    lang !== 'ar' ||
+    (['hub', 'tool', 'tools-hub', 'gold', 'usd', 'date-today', 'letter', 'name', 'list', 'article', 'world-article', 'articles-list'].includes(info.kind) &&
+      info.kind !== 'article' &&
+      info.kind !== 'articles-list');
   const brand = isGlobal ? t('siteName') : 'تقويم السعودية';
   const tagline = isGlobal ? t('siteTagline') : 'بوابة المواعيد الرسمية';
   const prefix = lang === 'ar' ? '' : `/${lang}`;
 
+  // مسار «كل الأدوات» الموضعي حسب اللغة (مثل /adawat للعربية و /tools للإنجليزية)
+  const toolsSlug = TOOL_SLUGS.tools && TOOL_SLUGS.tools[lang] ? TOOL_SLUGS.tools[lang] : 'tools';
   const globalNav = [
     { to: `${prefix || '/'}`, label: t('nav.home'), icon: Calendar },
-    { to: `${prefix}/tools`, label: t('nav.tools'), icon: Wand2 },
+    { to: `${prefix}/${toolsSlug}`, label: t('nav.tools'), icon: Wand2 },
     { to: `${prefix}/articles`, label: t('nav.articles'), icon: FileText },
   ];
 

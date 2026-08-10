@@ -8,6 +8,11 @@ import { langPrefix } from '../lib/router';
 import type { RouteInfo } from '../lib/router';
 import { gregorianToHijri } from '../lib/hijri';
 import Link from '../components/Link';
+import toolSlugsData from '../data/toolslugs.json';
+
+const TOOL_SLUGS = (toolSlugsData as { slugs: Record<string, Record<string, string>> }).slugs;
+const TOOL_ORDER = (toolSlugsData as { order: string[] }).order;
+const AR_EXISTING = (toolSlugsData as { arExisting: string[] }).arExisting;
 
 const SITE = 'https://alshafra.com';
 
@@ -390,7 +395,7 @@ function CountdownTool() {
 
 // ---------- صفحات الدول ----------
 function GoldPage({ slug }: { slug: string }) {
-  const { t, lang } = useLang();
+  const { t, ta, lang } = useLang();
   const c = countryBySlug(slug);
   useSeo({ title: `${fillTemplate(t('gold.title'), { country: c ? countryName(lang, c) : slug })} | ${t('siteName')}`, canonical: `${SITE}${langPrefix(lang)}/gold-price/${slug}` });
   if (!c) return null;
@@ -426,13 +431,13 @@ function GoldPage({ slug }: { slug: string }) {
         </table>
       </div>
       <div className="disclaimer mt-4 rounded-xl bg-amber-50 p-3 text-xs text-amber-800">{t('ui.disclaimer')}</div>
-      {(t('gold.intro') as unknown as string[]).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{fillTemplate(p, { country: countryName(lang, c), currency: c.curName })}</p>)}
+      {(ta('gold.intro') || []).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{fillTemplate(p, { country: countryName(lang, c), currency: c.curName })}</p>)}
     </div>
   );
 }
 
 function UsdPage({ slug }: { slug: string }) {
-  const { t, lang } = useLang();
+  const { t, ta, lang } = useLang();
   const c = countryBySlug(slug);
   useSeo({ title: `${fillTemplate(t('usd.title'), { country: c ? countryName(lang, c) : slug })} | ${t('siteName')}`, canonical: `${SITE}${langPrefix(lang)}/usd-rate/${slug}` });
   if (!c) return null;
@@ -448,13 +453,13 @@ function UsdPage({ slug }: { slug: string }) {
         </table>
       </div>
       <div className="mt-4 rounded-xl bg-amber-50 p-3 text-xs text-amber-800">{t('ui.disclaimer')}</div>
-      {(t('usd.intro') as unknown as string[]).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{fillTemplate(p, { country: countryName(lang, c), currency: c.curName })}</p>)}
+      {(ta('usd.intro') || []).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{fillTemplate(p, { country: countryName(lang, c), currency: c.curName })}</p>)}
     </div>
   );
 }
 
 function DateTodayPage({ slug }: { slug: string }) {
-  const { t, lang } = useLang();
+  const { t, ta, lang } = useLang();
   const c = countryBySlug(slug);
   useSeo({ title: `${fillTemplate(t('dateToday.title'), { country: c ? countryName(lang, c) : slug })} | ${t('siteName')}`, canonical: `${SITE}${langPrefix(lang)}/date-today/${slug}` });
   if (!c) return null;
@@ -477,7 +482,7 @@ function DateTodayPage({ slug }: { slug: string }) {
           <div className="text-brand-700">👥 ~{c.popM}M</div>
         </div>
       </div>
-      {(t('dateToday.intro') as unknown as string[]).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{fillTemplate(p, { country: countryName(lang, c), capital: c.cap, currency: c.curName })}</p>)}
+      {(ta('dateToday.intro') || []).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{fillTemplate(p, { country: countryName(lang, c), capital: c.cap, currency: c.curName })}</p>)}
     </div>
   );
 }
@@ -547,8 +552,8 @@ function NamePage({ slug }: { slug: string }) {
 }
 
 function ListPage({ slug }: { slug: string }) {
-  const { t, lang } = useLang();
-  const s = (t(`lists.${slug}`) as unknown as { title: string; intro: string[] }) || { title: slug, intro: [] };
+  const { t, tj, lang } = useLang();
+  const s = (tj(`lists.${slug}`) as unknown as { title: string; intro: string[] } | undefined) || { title: slug, intro: [] };
   useSeo({ title: `${s.title} | ${t('siteName')}`, canonical: `${SITE}${langPrefix(lang)}/names/${slug}` });
   let items: string[] = [];
   if (slug === 'cat') items = TRIVIA.catNames;
@@ -573,8 +578,8 @@ function ListPage({ slug }: { slug: string }) {
 }
 
 function ArticlePage({ slug }: { slug: string }) {
-  const { t, lang } = useLang();
-  const s = (t(`articles.${slug}`) as unknown as { title: string; intro: string[]; faq?: { q: string; a: string }[] }) || { title: slug, intro: [] };
+  const { t, tj, lang } = useLang();
+  const s = (tj(`articles.${slug}`) as unknown as { title: string; intro: string[]; faq?: { q: string; a: string }[] } | undefined) || { title: slug, intro: [] };
   const basePath = lang === 'ar' ? '/world' : `${langPrefix(lang)}/articles`;
   useSeo({ title: `${s.title} | ${t('siteName')}`, canonical: `${SITE}${basePath}/${slug}` });
   const data = articleData(lang, slug);
@@ -627,36 +632,67 @@ function ArticlesListPage() {
   );
 }
 
+// ---------- صفحة «كل الأدوات» لكل لغة (/{lang}/tools أو /adawat بالعربية) ----------
+function ToolsHubPage() {
+  const { t, ta, lang } = useLang();
+  const prefix = langPrefix(lang);
+  const slug = window.location.pathname.split('/').filter(Boolean).pop() || 'tools';
+  useSeo({ title: `${t('tools.hub.title')} | ${t('siteName')}`, canonical: `${SITE}${prefix}/${slug}` });
+  const items = TOOL_ORDER.filter((k) => k !== 'tools' && !(lang === 'ar' && AR_EXISTING.includes(k))).map((key) => {
+    const sk = STRING_KEY[key] || key;
+    const toolSlug = TOOL_SLUGS[key] && TOOL_SLUGS[key][lang] ? TOOL_SLUGS[key][lang] : TOOL_SLUGS[key]?.en;
+    return { key, slug: toolSlug, title: t(`tools.${sk}.title`) };
+  });
+  return (
+    <div className="container-page py-10">
+      <h1 className="section-title">{t('tools.hub.title')}</h1>
+      {(ta('tools.hub.intro') || []).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{p}</p>)}
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((it) => (
+          <Link key={it.key} to={`${prefix}/${it.slug}`} className="card flex items-center gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-soft">
+            <span className="font-bold text-brand-800">{it.title}</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ---------- المحور (الصفحة الرئيسية لكل لغة) ----------
 function HubPage() {
-  const { t, lang } = useLang();
+  const { t, ta, lang } = useLang();
   const prefix = langPrefix(lang);
   useSeo({ title: `${t('home.title')} | ${t('siteName')}`, canonical: `${SITE}${prefix || '/'}` });
   const tools = [
-    ['fancy-text', 'fancy-text-generator', '✨'],
-    ['symbols', 'text-symbols', '🔣'],
-    ['password-generator', 'password-generator', '🔒'],
-    ['word-counter', 'word-counter', '📝'],
-    ['percentage-calculator', 'percentage-calculator', '🧮'],
-    ['case-converter', 'case-converter', '🔠'],
-    ['number-converter', 'number-converter', '🔢'],
-    ['age-calculator', 'age-calculator', '🎂'],
-    ['date-converter', 'date-converter', '📅'],
-    ['today', 'today-date', '🗓️'],
-    ['countdown', 'countdown', '⏳'],
+    ['fancy-text', '✨'],
+    ['symbols', '🔣'],
+    ['password-generator', '🔒'],
+    ['word-counter', '📝'],
+    ['percentage-calculator', '🧮'],
+    ['case-converter', '🔠'],
+    ['number-converter', '🔢'],
+    ['age-calculator', '🎂'],
+    ['date-converter', '📅'],
+    ['today', '🗓️'],
+    ['countdown', '⏳'],
   ] as const;
   const topCountries = COUNTRIES.filter((c) => (c.langs || []).includes(lang)).sort((a, b) => b.popM - a.popM).slice(0, 12);
   return (
     <div className="container-page py-10">
       <h1 className="section-title">{t('home.title')}</h1>
-      {(t('home.intro') as unknown as string[]).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{p}</p>)}
+      {(ta('home.intro') || []).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{p}</p>)}
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {tools.map(([key, slug, icon]) => (
-          <Link key={key} to={`${prefix}/${slug}`} className="card flex items-center gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-soft">
-            <span className="text-2xl">{icon}</span>
-            <span className="font-bold text-brand-800">{t(`tools.${key}.title`)}</span>
-          </Link>
-        ))}
+        {tools.map(([key, icon]) => {
+          // روابط الأدوات بمساراتها الموضعية الصحيحة حسب اللغة (وليس بالإنجليزية دائماً)
+          const toolSlug = TOOL_SLUGS[key] && TOOL_SLUGS[key][lang] ? TOOL_SLUGS[key][lang] : TOOL_SLUGS[key]?.en;
+          const sk = STRING_KEY[key] || key;
+          return (
+            <Link key={key} to={`${prefix}/${toolSlug}`} className="card flex items-center gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-soft">
+              <span className="text-2xl">{icon}</span>
+              <span className="font-bold text-brand-800">{t(`tools.${sk}.title`)}</span>
+            </Link>
+          );
+        })}
       </div>
       <Section title={t('nav.gold')}>
         <div className="flex flex-wrap gap-1.5">
@@ -677,17 +713,21 @@ export default function GlobalPage({ info }: { info: RouteInfo }) {
   const { t } = useLang();
   switch (info.kind) {
     case 'tool': {
+      // صفحة «كل الأدوات» (مثل /en/tools أو /adawat) — قائمة بالأدوات لا أداة واحدة
+      if (info.param === 'tools') return <ToolsHubPage />;
       const Tool = TOOL_COMPONENTS[info.param || 'fancy-text'] || FancyTextTool;
       const sk = STRING_KEY[info.param || 'fancy-text'] || info.param;
       return <ToolShell title={t(`tools.${sk}.title`)}>{<Tool />}</ToolShell>;
     }
+    case 'tools-hub': return <ToolsHubPage />;
     case 'gold': return <GoldPage slug={info.param || ''} />;
     case 'usd': return <UsdPage slug={info.param || ''} />;
     case 'date-today': return <DateTodayPage slug={info.param || ''} />;
     case 'letter': return <LetterPage slug={info.param || 'a'} />;
     case 'name': return <NamePage slug={info.param || ''} />;
     case 'list': return <ListPage slug={info.param || 'boy'} />;
-    case 'article': return <ArticlePage slug={info.param || ''} />;
+    case 'article':
+    case 'world-article': return <ArticlePage slug={info.param || ''} />;
     case 'articles-list': return <ArticlesListPage />;
     case 'hub':
     case 'home':

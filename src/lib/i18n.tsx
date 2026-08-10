@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { ROUTE_CHANGE_EVENT } from './router';
 import ar from '../i18n/ar.json';
 import en from '../i18n/en.json';
 import tr from '../i18n/tr.json';
@@ -25,7 +26,12 @@ const STRINGS: Record<string, Record<string, unknown>> = { ar, en, tr, fa, fr, e
 interface LangCtxValue {
   lang: string;
   setLang: (l: string) => void;
+  /** نص مترجم (سلسلة). */
   t: (key: string) => string;
+  /** مصفوفة نصوص مترجمة (مثل home.intro) — undefined إن لم تكن مصفوفة. */
+  ta: (key: string) => string[] | undefined;
+  /** كائن مترجم (مثل articles.slug) — undefined إن لم يكن كائناً. */
+  tj: (key: string) => Record<string, unknown> | undefined;
   dir: string;
   prefix: string;
 }
@@ -34,6 +40,8 @@ const LangCtx = createContext<LangCtxValue>({
   lang: 'ar',
   setLang: () => {},
   t: (k) => k,
+  ta: () => undefined,
+  tj: () => undefined,
   dir: 'rtl',
   prefix: '',
 });
@@ -47,24 +55,45 @@ function resolve(obj: unknown, parts: string[]): unknown {
   return v;
 }
 
-function lookup(lang: string, parts: string[]): string | undefined {
+/** القيمة الخام بأي نوع (سلسلة، مصفوفة، كائن) مع سلسلة السقوط: اللغة ← en ← ar. */
+function lookupRaw(lang: string, parts: string[]): unknown {
   let v = resolve(STRINGS[lang], parts);
-  if (typeof v === 'string' && v) return v;
+  if (v !== undefined && v !== null && v !== '') return v;
   v = resolve(STRINGS.en, parts);
-  if (typeof v === 'string' && v) return v;
+  if (v !== undefined && v !== null && v !== '') return v;
   v = resolve(STRINGS.ar, parts);
-  return typeof v === 'string' && v ? v : undefined;
+  return v !== undefined && v !== null && v !== '' ? v : undefined;
 }
 
+function lookup(lang: string, parts: string[]): string | undefined {
+  const v = lookupRaw(lang, parts);
+  return typeof v === 'string' ? v : undefined;
+}
+
+/** بحث يرجع مصفوفة نصوص (مثل home.intro) — عادياً كانت المصفوفات تُفقد تماماً. */
+function lookupArray(lang: string, parts: string[]): string[] | undefined {
+  const v = lookupRaw(lang, parts);
+  return Array.isArray(v) ? (v as string[]) : undefined;
+}
+
+/** بحث يرجع كائناً (مثل articles.slug) — عادياً كان الكائن يتحول إلى المفتاح نفسه. */
+function lookupObject(lang: string, parts: string[]): Record<string, unknown> | undefined {
+  const v = lookupRaw(lang, parts);
+  return typeof v === 'object' && v !== null && !Array.isArray(v)
+    ? (v as Record<string, unknown>)
+    : undefined;
+}
+
+/**
+ * تحديد اللغة من عنوان URL نفسه (الرابط هو مصدر الحقيقة الوحيد):
+ *  - مسار بادئة من لغتين (مثل /en/… أو /tr/…) => اللغة المقابلة
+ *  - أي مسار آخر (مثل /articles/… أو /salaries أو /trending/…) => العربية
+ * لا نستخدم localStorage هنا إطلاقاً: كان حفظ لغة سابقة يتسبب في عرض الصفحات
+ * العربية القائمة (بدون بادئة) باللغة الإنجليزية المختزنة — خلط لغات واضح.
+ */
 function detectLang(): string {
-  const m = window.location.pathname.match(/^\/([a-z]{2})\//);
-  if (m && LANG_BY_CODE[m[1]]) return m[1];
-  try {
-    const saved = localStorage.getItem('alshafra-lang');
-    if (saved && LANG_BY_CODE[saved]) return saved;
-  } catch {
-    /* ignore */
-  }
+  const m = window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
+  if (m && m[1] !== 'ar' && LANG_BY_CODE[m[1]]) return m[1];
   return 'ar';
 }
 
@@ -86,6 +115,22 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.dir = dir;
   }, [lang]);
 
+  // اللغة تُستنتج من الرابط دائماً: عند التنقل عبر زر الرجوع/التقدم أو أي
+  // تغيير للمسار، نعيد مزامنة اللغة مع بادئة المسار حتى لا تبقى لغة قديمة
+  // معروضة على صفحة من لغة أخرى (سبب خلط اللغات عند التنقل).
+  useEffect(() => {
+    const syncLangFromPath = () => {
+      const detected = detectLang();
+      setLangState((cur) => (cur === detected ? cur : detected));
+    };
+    window.addEventListener('popstate', syncLangFromPath);
+    window.addEventListener(ROUTE_CHANGE_EVENT, syncLangFromPath);
+    return () => {
+      window.removeEventListener('popstate', syncLangFromPath);
+      window.removeEventListener(ROUTE_CHANGE_EVENT, syncLangFromPath);
+    };
+  }, []);
+
   const value = useMemo<LangCtxValue>(() => {
     const dir = LANG_BY_CODE[lang]?.dir || 'rtl';
     return {
@@ -95,6 +140,8 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
         const parts = key.split('.');
         return lookup(lang, parts) ?? key;
       },
+      ta: (key: string) => lookupArray(lang, key.split('.')),
+      tj: (key: string) => lookupObject(lang, key.split('.')),
       dir,
       prefix: lang === 'ar' ? '' : `/${lang}`,
     };
