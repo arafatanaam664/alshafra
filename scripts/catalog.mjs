@@ -17,6 +17,7 @@ export const NAMES = read('src/data/names.json').names;
 export const TRIVIA = read('src/data/trivia.json');
 export const SCHEDULE = read('src/data/schedule.json');
 export const PRICES = read('src/data/prices.json');
+const PRICE_GUIDES = read('src/data/price-guides.json');
 
 const I18N = {};
 for (const l of LANGUAGES) I18N[l.code] = read(`src/i18n/${l.code}.json`);
@@ -258,6 +259,47 @@ function toolRoute(lang, toolKey) {
   };
 }
 
+function fillPriceGuide(text, values) {
+  return String(text).replace(/\{(\w+)\}/g, (_, key) => values[key] ?? '');
+}
+function priceGuideHtml(kind, country) {
+  if (!['gold', 'usd'].includes(kind)) return '';
+  const rate = PRICES.rates[country.cur] || 1;
+  const gram21 = (PRICES.xauUsd * rate * 0.875) / 31.1034768;
+  const number = (value) => Number(value).toLocaleString('ar-EG', { maximumFractionDigits: ['IQD', 'YER', 'SYP', 'SDG', 'LBP', 'DJF', 'KMF'].includes(country.cur) ? 0 : 2 });
+  const values = {
+    country: country.ar || country.en, currency: country.curName, code: country.cur,
+    rate: number(rate), ten: number(rate * 10), hundred: number(rate * 100), reverseBase: number(rate * 100),
+    gram21: number(gram21), five21: number(gram21 * 5), updated: PRICES.updated,
+  };
+  return PRICE_GUIDES[kind].map((section) => `<section><h2>${esc(fillPriceGuide(section.heading, values))}</h2>${section.paragraphs.map((paragraph) => `<p>${esc(fillPriceGuide(paragraph, values))}</p>`).join('')}</section>`).join('');
+}
+
+function countryHubRoute(lang, kind) {
+  const prefix = lang === 'ar' ? '' : `/${lang}`;
+  const path = `${prefix}/${kind === 'gold' ? 'gold-price' : 'usd-rate'}`;
+  const countries = COUNTRIES.filter((country) => (country.langs || []).includes(lang)).sort((a, b) => b.popM - a.popM);
+  const isGold = kind === 'gold';
+  const title = lang === 'ar'
+    ? (isGold ? 'أسعار الذهب اليوم في الدول العربية حسب العيار' : 'سعر الدولار اليوم في الدول العربية')
+    : (isGold ? `Gold prices by country` : `US dollar rates by country`);
+  const rows = countries.map((country) => {
+    const rate = PRICES.rates[country.cur] || 1;
+    const value = isGold ? (PRICES.xauUsd * rate * 0.875) / 31.1034768 : rate;
+    return `<tr><td>${country.flag} <a href="${path}/${country.slug}">${esc(countryName(lang, country))}</a></td><td>${esc(country.cur)}</td><td>${esc(Number(value).toLocaleString(lang, { maximumFractionDigits: 2 }))}</td></tr>`;
+  }).join('');
+  const example = countries.find((country) => country.slug === 'saudi-arabia') || countries[0];
+  const reviewedGuide = lang === 'ar' && example ? priceGuideHtml(kind, example) : '';
+  const hubIntro = lang === 'ar' ? `<section><h2>طريقة استخدام جدول الدول</h2><p>ابدأ باسم الدولة ثم راجع رمز العملة وتاريخ اللقطة قبل قراءة الرقم. لا تقارن كبر الأرقام بين عملتين بوصفه حكمًا على قوة الاقتصاد؛ الوحدات الاسمية مختلفة. المقارنة الصحيحة تكون للمبلغ أو الوزن نفسه وبعد توحيد التاريخ والمصدر. افتح صفحة الدولة لأنها تعرض الأوزان أو مبالغ التحويل والمصدر والرسوم غير الداخلة في الحساب.</p><p>كل صف مرتبط مباشرة بصفحته حتى لا تبقى أسعار مصر أو السعودية أو اليمن أو بقية الدول صفحات يتيمة. يمكنك الانتقال من الذهب إلى الدولار للدولة نفسها والعودة إلى هذه البوابة. إذا كان تاريخ البيانات قديمًا أو كان قرارك بمبلغ كبير، اطلب سعر تنفيذ من بنك أو متجر مرخص ولا تعتمد على الجدول وحده. عند نسخ رقم اكتب الدولة ورمز العملة ونوع السعر والكمية معًا؛ الرقم المنفرد قد يُفهم خطأً عند مشاركته. أعد الحساب يوم التنفيذ واحتفظ بالعرض النهائي.</p><p>للمقارنة بين يومين، سجل القيمة والوقت والمصدر في صفين منفصلين ولا تقارن لقطة صباحية بعرض مسائي من دون تنبيه. حدّد كذلك هل السؤال عن سعر نقدي أم تحويل مصرفي أم بطاقة أم بيع وشراء متجر، لأن الهامش والرسوم تختلف. استخدم البوابة للوصول إلى الدولة المناسبة ثم أكّد السعر القابل للتنفيذ من الجهة التي ستتعامل معها.</p></section>` : '';
+  const body = `<h1>${esc(title)}</h1><p>${esc(lang === 'ar' ? 'اختر الدولة لعرض الجدول الكامل وطريقة الحساب والمصادر والتنبيهات قبل أي شراء أو تحويل.' : 'Choose a country for the full table, calculation method, sources and important limitations.')}</p><p class="updated">${esc(PRICES.updated)}</p><table><thead><tr><th>${esc(lang === 'ar' ? 'الدولة' : 'Country')}</th><th>${esc(lang === 'ar' ? 'العملة' : 'Currency')}</th><th>${esc(isGold ? '21K' : '1 USD')}</th></tr></thead><tbody>${rows}</tbody></table>${hubIntro}${reviewedGuide}`;
+  return {
+    path, lang, kind: isGold ? 'gold-hub' : 'usd-hub', title: `${title} | ${t(lang, 'siteName')}`,
+    description: title, keywords: title, body: shell(lang, body),
+    jsonLd: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, inLanguage: lang, url: SITE_URL + path }],
+    changefreq: 'daily', priority: '0.8', immediate: true,
+  };
+}
+
 function countryRoute(lang, country, kind) {
   const prefix = lang === 'ar' ? '' : `/${lang}`;
   const cname = countryName(lang, country);
@@ -277,7 +319,7 @@ function countryRoute(lang, country, kind) {
     const rate = PRICES.rates[country.cur] || 1;
     const oz = PRICES.xauUsd;
     const ozLocal = oz * rate;
-    const gLocal = (v) => (ozLocal * v).toFixed(country.cur === 'IRR' || country.cur === 'VND' || country.cur === 'IDR' ? 0 : 2);
+    const gLocal = (purity) => ((ozLocal * purity) / 31.1034768).toFixed(['IRR', 'VND', 'IDR'].includes(country.cur) ? 0 : 2);
     extra = `<h2>${esc(fill(t(lang, 'gold.title'), { country: cname }))}</h2>
       <p class="updated">🗓️ ${esc(updated)}</p>
       <table><thead><tr><th>${esc('24K')}</th><th>${esc('22K')}</th><th>${esc('21K')}</th><th>${esc('18K')}</th></tr></thead>
@@ -318,13 +360,14 @@ function countryRoute(lang, country, kind) {
     href: `${prefix}/${kind === 'gold' ? 'gold-price' : kind === 'usd' ? 'usd-rate' : 'date-today'}/${c.slug}`,
     title: `${countryName(lang, c)} — ${kind === 'gold' ? 'gold' : kind === 'usd' ? 'USD' : 'date'}`
   }));
-  const relatedHtml = related.length ? `<section><h2>${esc(uiLabel(lang, 'related'))}</h2><div class="grid2">${related.map((l) => `<a href="${l.href}">${esc(l.title)}</a>`).join('')}</div></section>` : '';
+  const relatedHtml = `<section><h2>${esc(uiLabel(lang, 'related'))}</h2><p><a href="${prefix}/${kind === 'gold' ? 'gold-price' : kind === 'usd' ? 'usd-rate' : 'date-today'}">${esc(lang === 'ar' ? 'كل الدول' : 'All countries')}</a>${kind === 'gold' || kind === 'usd' ? ` · <a href="${prefix}/${kind === 'gold' ? 'usd-rate' : 'gold-price'}/${country.slug}">${esc(lang === 'ar' ? (kind === 'gold' ? 'سعر الدولار في الدولة' : 'سعر الذهب في الدولة') : (kind === 'gold' ? 'USD rate' : 'Gold price'))}</a>` : ''}</p><div class="grid2">${related.map((l) => `<a href="${l.href}">${esc(l.title)}</a>`).join('')}</div></section>`;
+  const reviewedGuide = lang === 'ar' && (kind === 'gold' || kind === 'usd') ? priceGuideHtml(kind, country) : '';
   return {
     path, lang, kind: kind === 'gold' ? 'gold' : kind === 'usd' ? 'usd' : 'date-today', param: country.slug,
     title: `${title} | ${t(lang, 'siteName')}`,
     description: intro.replace(/<[^>]+>/g, '').slice(0, 155),
     keywords: `${title}, ${cname}, ${country.cur}, ${t(lang, 'gold.title')}`,
-    body: shell(lang, `<h1>${esc(title)}</h1>${intro}${extra}${facts}${guide}${faq}${relatedHtml}`),
+    body: shell(lang, `<h1>${esc(title)}</h1>${intro}${extra}${facts}${guide}${reviewedGuide}${faq}${relatedHtml}`),
     hreflang,
     jsonLd: [{ '@context': 'https://schema.org', '@type': 'WebApplication', name: title, applicationCategory: 'FinanceApplication', operatingSystem: 'Web', inLanguage: lang }],
     changefreq: 'daily', priority: '0.7'
@@ -568,6 +611,12 @@ export function buildCatalog() {
   // المرحلة 0: محاور اللغات (العربية الرئيسية = الصفحة السعودية القائمة)
   for (const lang of langs) if (lang !== 'ar') push(hubRoute(lang));
 
+  // بوابات الدول تبقى في الكتالوج، وتُنشر تلقائيًا عندما يجتاز محتواها الفحص.
+  for (const lang of langs) {
+    push(countryHubRoute(lang, 'gold'));
+    push(countryHubRoute(lang, 'usd'));
+  }
+
   // المرحلة 1: كل الأدوات لكل اللغات
   for (const lang of langs) for (const tk of TOOL_ORDER) push(toolRoute(lang, tk));
 
@@ -611,7 +660,14 @@ export function buildCatalog() {
     for (const a of WORLD_ARTICLES) push(articleRoute(lang, a));
     if (ISLAMIC_LANGS.includes(lang)) for (const a of DHIKR_ARTICLES) push(articleRoute(lang, a));
   }
-  return routes;
+  // تبقى كل المسارات في الكتالوج والجدولة؛ فحص الجودة يحدد الجاهز للنشر فقط
+  // من دون حذف المسار أو إلغاء دوره في النشر الآلي.
+  return routes.map((route) => {
+    const main = route.body?.match(/<main[^>]*>([\s\S]*?)<\/main>/i)?.[1] || '';
+    const text = main.replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&(?:#\d+|#x[\da-f]+|[a-z]+);/gi, ' ');
+    const qualityWords = (text.match(/[\p{L}\p{N}]+/gu) || []).length;
+    return { ...route, qualityWords, qualityReady: qualityWords >= 1500 };
+  });
 }
 
 // ---------- الجدولة ----------
@@ -643,8 +699,9 @@ export function mergeCatalog(existingRoutes) {
       all.push({ ...r, publishDate: d });
     }
   });
-  // المنشور (يظهر في sitemap): الصفحات القائمة + الفورية + ما حلّ أجله
-  const published = all.filter((r) => r.publishDate <= today);
+  // المنشور: الصفحات القائمة المحررة، ومن الكتالوج ما حل أجله واجتاز 1500 كلمة.
+  // غير الجاهز يبقى محفوظًا في الطابور ويُنشر تلقائيًا بعد اكتمال محتواه؛ لا يُحذف.
+  const published = all.filter((route) => route.publishDate <= today && ((route.fromExisting && !route.automated) || route.qualityReady));
   // start يُعاد لتحديد lastmod: الصفحات المجدولة (بعد بداية الجدولة) تُظهر تاريخ نشرها
   // الفعلي، بينما الصفحات القائمة والفورية (تُعاد بناؤها يومياً) تُظهر تاريخ البناء.
   return { all, published, today: todayIso, total: all.length, start };

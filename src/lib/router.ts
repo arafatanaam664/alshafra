@@ -107,8 +107,8 @@ export function parseRoute(path: RoutePath): RouteInfo {
     // صفحات /trending عربية فقط — أي مسار بادئ بـ trending في لغة أخرى يسقط على محور اللغة
     if (first === 'trending') return { lang, kind: 'hub' };
     if (SLUG_TO_TOOL[first]) return { lang, kind: 'tool', param: SLUG_TO_TOOL[first] };
-    if (first === 'gold-price' && second) return { lang, kind: 'gold', param: second };
-    if (first === 'usd-rate' && second) return { lang, kind: 'usd', param: second };
+    if (first === 'gold-price') return second ? { lang, kind: 'gold', param: second } : { lang, kind: 'gold-hub' };
+    if (first === 'usd-rate') return second ? { lang, kind: 'usd', param: second } : { lang, kind: 'usd-hub' };
     if (first === 'date-today' && second) return { lang, kind: 'date-today', param: second };
     if (first === 'fancy-letter' && second) return { lang, kind: 'letter', param: second };
     if (first === 'name' && second) return { lang, kind: 'name', param: second };
@@ -161,8 +161,8 @@ export function parseRoute(path: RoutePath): RouteInfo {
     return { lang: 'ar', kind: 'tool', param: key };
   }
 
-  if (first === 'gold-price' && second) return { lang: 'ar', kind: 'gold', param: second };
-  if (first === 'usd-rate' && second) return { lang: 'ar', kind: 'usd', param: second };
+  if (first === 'gold-price') return second ? { lang: 'ar', kind: 'gold', param: second } : { lang: 'ar', kind: 'gold-hub' };
+  if (first === 'usd-rate') return second ? { lang: 'ar', kind: 'usd', param: second } : { lang: 'ar', kind: 'usd-hub' };
   if (first === 'date-today' && second) return { lang: 'ar', kind: 'date-today', param: second };
   if (first === 'fancy-letter' && second) return { lang: 'ar', kind: 'letter', param: second };
   if (first === 'name' && second) return { lang: 'ar', kind: 'name', param: second };

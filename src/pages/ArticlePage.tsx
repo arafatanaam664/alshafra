@@ -9,7 +9,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
 
   useSeo({
     title: article
-      ? `${article.title} | تقويم السعودية`
+      ? `${article.seoTitle || article.title} | تقويم السعودية`
       : 'مقال غير موجود | تقويم السعودية',
     description: article?.description,
     canonical: `https://alshafra.com/articles/${slug}`,
@@ -22,9 +22,9 @@ export default function ArticlePage({ slug }: { slug: string }) {
             headline: article.title,
             description: article.description,
             datePublished: article.updatedAt,
-            dateModified: article.updatedAt,
+            dateModified: article.reviewedAt || article.updatedAt,
             inLanguage: 'ar-SA',
-            author: { '@type': 'Organization', name: 'تقويم السعودية' },
+            author: { '@type': 'Organization', name: 'فريق تحرير تقويم السعودية' },
             publisher: {
               '@type': 'Organization',
               name: 'تقويم السعودية',
@@ -84,7 +84,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
           </span>
           <span className="flex items-center gap-1 text-xs text-brand-600/70">
             <Calendar className="h-3.5 w-3.5" />
-            تحديث {article.updatedAt}
+            مراجعة تحريرية {article.reviewedAt || article.updatedAt}
           </span>
         </div>
         <h1 className="mt-3 font-display text-3xl font-bold leading-tight text-brand-900 sm:text-4xl">
@@ -101,6 +101,29 @@ export default function ArticlePage({ slug }: { slug: string }) {
             </section>
           ))}
         </div>
+
+        {article.sources && article.sources.length > 0 && (
+          <section className="mt-10 rounded-2xl border border-brand-100 bg-brand-50/60 p-5">
+            <h2 className="font-display text-xl font-bold text-brand-900">المصادر الرسمية والتحقق</h2>
+            <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
+              راجعنا هذا الدليل مقابل المصادر التالية. عند صدور إعلان أحدث تكون الجهة الرسمية هي المرجع النهائي.
+            </p>
+            <ul className="mt-3 list-disc space-y-2 pr-5 text-sm">
+              {article.sources.map((source) => (
+                <li key={source.url}>
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-brand-700 underline decoration-brand-300 underline-offset-4 hover:text-brand-900"
+                  >
+                    {source.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {article.faq && article.faq.length > 0 && (
           <section className="mt-10">

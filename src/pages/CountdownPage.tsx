@@ -6,6 +6,7 @@ import Countdown from '../components/Countdown';
 import Link from '../components/Link';
 import AdSlot from '../components/AdSlot';
 import type { GregorianDate } from '../lib/hijri';
+import countdownGuidesData from '../data/countdown-guides.json';
 import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
 import {
   COUNTDOWN_CATEGORY_LABELS,
@@ -18,6 +19,38 @@ import {
   type CountdownCategory,
   type ResolvedCountdown,
 } from '../lib/countdowns';
+
+type GuideSection = { heading: string; paragraphs: string[] };
+type CountdownGuides = {
+  universal: GuideSection[];
+  categories: Record<CountdownCategory, GuideSection[]>;
+};
+const COUNTDOWN_GUIDES = countdownGuidesData as CountdownGuides;
+
+function fillGuide(text: string, values: Record<string, string>) {
+  return text.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? '');
+}
+
+function CountdownGuide({ item }: { item?: ResolvedCountdown }) {
+  const values = {
+    event: item?.def.title || 'الموعد الذي تختاره',
+    date: item?.gregorianText || 'التاريخ المكتوب في صفحة كل عدّاد',
+  };
+  const sections = [
+    ...COUNTDOWN_GUIDES.universal,
+    ...(item ? COUNTDOWN_GUIDES.categories[item.def.category] : []),
+  ];
+  return (
+    <div className="mt-8 space-y-5">
+      {sections.map((section) => (
+        <section key={section.heading} className="card p-6 text-sm leading-loose text-brand-700/85 sm:p-8">
+          <h2 className="font-display text-lg font-bold text-brand-900">{fillGuide(section.heading, values)}</h2>
+          {section.paragraphs.map((paragraph) => <p key={paragraph} className="mt-3">{fillGuide(paragraph, values)}</p>)}
+        </section>
+      ))}
+    </div>
+  );
+}
 
 /* -------------------------------------------------------------------------- */
 /* Hub: /countdown                                                             */
@@ -146,6 +179,8 @@ export function CountdownHubPage() {
           </p>
         </div>
       </section>
+
+      <CountdownGuide />
     </div>
   );
 }
@@ -231,26 +266,14 @@ function CountdownDetailView({
     canonical: `${SITE_URL}/countdown/${def.slug}`,
     keywords: def.keywords,
     jsonLd: [
-      ...(item.date
-        ? [
-            {
-              '@context': 'https://schema.org',
-              '@type': 'Event',
-              name: item.displayTitle,
-              description: def.summary,
-              startDate: isoDate(item.date),
-              endDate: isoDate(item.date),
-              eventStatus: 'https://schema.org/EventScheduled',
-              eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-              location: {
-                '@type': 'Place',
-                name: 'المملكة العربية السعودية',
-                address: { '@type': 'PostalAddress', addressCountry: 'SA' },
-              },
-              inLanguage: 'ar-SA',
-            },
-          ]
-        : []),
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: def.question,
+        description,
+        url: `${SITE_URL}/countdown/${def.slug}`,
+        inLanguage: 'ar-SA',
+      },
       {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
@@ -380,6 +403,8 @@ function CountdownDetailView({
           )}
         </aside>
       </div>
+
+      <CountdownGuide item={item} />
 
       <section className="mt-8 card p-6 sm:p-8">
         <h2 className="font-display text-lg font-bold text-brand-900">الأسئلة الشائعة</h2>

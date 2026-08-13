@@ -1,15 +1,9 @@
-// fetch-trending.mjs — ميزة «استكشاف الترند» الذكية.
-// يحاول جلب أبرز المواضيع الرائجة اليومية في دول الخليج من Google Trends
-// (نقاط النهاية الداخلية غير الرسمية) ويكتب src/data/trending-snapshot.json.
-// تُعرض هذه المواضيع في صفحة /trending كـ«أكثر ما يبحث عنه الخليج اليوم».
-//
-// ملاحظة صادقة: Google Trends لا يوفّر API عاماً رسمياً، ونقطة النهاية هذه
-// غير رسمية وقد تتعرض للحجب أو تقييد المعدل (429). لذلك:
-//   - إن نجح الجلب => نُحدّث اللقطة ونستفيد منها.
-//   - إن فشل (لا إنترنت / حجب) => نحتفظ باللقطة السابقة ونكمل بنجاح.
-// لا يفشل السكربت أبداً ولا يعطّل البناء.
+// fetch-trending.mjs — يحفظ لقطة اختيارية من Google Trends لدول الخليج.
+// Google لا يوفّر API عاماً ثابتاً للترند؛ لذلك نستخدم موجز RSS العام، ونبقي
+// آخر لقطة صالحة عند تعذر الشبكة. الأهم أن ملف اللقطة يُنشأ دائماً حتى لا
+// يفشل `git add` في GitHub Actions عند أول تشغيل.
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -17,7 +11,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const SNAPSHOT = join(root, 'src', 'data', 'trending-snapshot.json');
 
-// دول الخليج وحرف المنطقة الجغرافية في Google Trends
 const GEO = [
   { code: 'SA', country: 'السعودية' },
   { code: 'AE', country: 'الإمارات' },
@@ -27,68 +20,96 @@ const GEO = [
   { code: 'OM', country: 'عُمان' },
 ];
 
-async function fetchJson(url, timeoutMs = 12000) {
+function emptySnapshot() {
+  return { date: '', countries: {} };
+}
+
+function readPrevious() {
+  if (!existsSync(SNAPSHOT)) return emptySnapshot();
+  try {
+    const value = JSON.parse(readFileSync(SNAPSHOT, 'utf-8'));
+    return value && typeof value === 'object' ? value : emptySnapshot();
+  } catch (error) {
+    console.warn(`[trending] invalid previous snapshot (${error.message}); resetting it.`);
+    return emptySnapshot();
+  }
+}
+
+async function fetchText(url, timeoutMs = 12000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; shafra-trends/1.0)', 'Accept': 'application/json' },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; alshafra-trends/2.0; +https://alshafra.com)',
+        Accept: 'application/rss+xml, application/xml, text/xml;q=0.9',
+      },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    // نقطة النهاية تبدأ بمقدمة 5 حروف ثم JSON
-    const json = JSON.parse(text.replace(/^\)\]\}'/, ''));
-    return json;
+    return await res.text();
   } finally {
     clearTimeout(timer);
   }
 }
 
-// مطابقة فئة لكل موضوع رائج (تستخدم لربطها بصفحات الكتالوج)
-const CATEGORY_KEYWORDS = {
-  economy: ['سعر', 'ذهب', 'دولار', 'عملة', 'أسعار', 'اقتصاد', 'بورصة', 'نفط', 'ربح', 'أسهم', 'دعم', 'راتب', 'حساب المواطن', 'ضمان', 'قرض', 'أرباح', 'تجارة', 'سوق'],
-  technology: ['تطبيق', 'هاتف', 'آيفون', 'ذكاء', 'تقنية', 'موقع', 'برنامج', 'أبل', 'سامسونج', 'إنترنت', 'تحديث', 'أندرويد', 'ألعاب', 'كمبيوتر', 'بلايستيشن'],
-  education: ['جامعة', 'دراسة', 'منحة', 'مدرسة', 'امتحان', 'طلاب', 'تعليم', 'نظام', 'مناهج', 'معدل'],
-  religion: ['صلاة', 'عيد', 'رمضان', 'حج', 'عمرة', 'قرآن', 'فجر', 'أذان', 'دعاء', 'ليلة'],
-  travel: ['سفر', 'سياحة', 'طيران', 'فيزا', 'تأشيرة', 'فندق', 'وجهة'],
-};
+function decodeXml(value) {
+  return value
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/<[^>]*>/g, '')
+    .trim();
+}
 
-function guessCategory(title) {
-  for (const [cat, kws] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (kws.some((k) => title.includes(k))) return cat;
+function titlesFromRss(xml) {
+  const titles = [];
+  const itemRe = /<item\b[\s\S]*?<title>([\s\S]*?)<\/title>[\s\S]*?<\/item>/gi;
+  for (const match of xml.matchAll(itemRe)) {
+    const title = decodeXml(match[1]);
+    if (title && !titles.includes(title)) titles.push(title);
   }
-  return 'social';
+  return titles.slice(0, 15);
 }
 
 async function main() {
-  const collected = {};
-  let fetchedAny = false;
-  for (const g of GEO) {
-    const url = `https://trends.google.com/trends/api/dailytrends?hl=ar&geo=${g.code}&ns=15`;
+  mkdirSync(dirname(SNAPSHOT), { recursive: true });
+  const previous = readPrevious();
+  const countries = {};
+
+  for (const geo of GEO) {
     try {
-      const data = await fetchJson(url);
-      const defaultBlock = data?.default?.trendingSearchesDays?.[0]?.trendingSearches || [];
-      const titles = defaultBlock.map((t) => t.title?.query).filter(Boolean).slice(0, 15);
-      collected[g.code] = { country: g.country, date: data?.default?.trendingSearchesDays?.[0]?.date || '', titles };
-      if (titles.length) fetchedAny = true;
-      console.log(`[trending] ${g.country}: ${titles.length} مواضيع رائجة`);
-    } catch (e) {
-      console.log(`[trending] ${g.country} فشل الجلب (${e.message}) — سنحتفظ باللقطة السابقة.`);
+      const xml = await fetchText(`https://trends.google.com/trending/rss?geo=${geo.code}`);
+      const titles = titlesFromRss(xml);
+      if (!titles.length) throw new Error('RSS returned no topics');
+      countries[geo.code] = { country: geo.country, date: new Date().toISOString().slice(0, 10), titles };
+      console.log(`[trending] ${geo.country}: ${titles.length} topics`);
+    } catch (error) {
+      const cached = previous.countries?.[geo.code];
+      if (cached?.titles?.length) countries[geo.code] = cached;
+      console.log(`[trending] ${geo.country}: ${error.message}; using cached data when available.`);
     }
   }
 
-  const now = new Date().toISOString().slice(0, 10);
-  const prev = existsSync(SNAPSHOT) ? JSON.parse(readFileSync(SNAPSHOT, 'utf-8')) : { date: '', countries: {} };
+  const hasFreshData = Object.values(countries).some(
+    (country) => country.date === new Date().toISOString().slice(0, 10) && country.titles?.length,
+  );
+  const payload = {
+    date: hasFreshData ? new Date().toISOString().slice(0, 10) : previous.date || '',
+    countries,
+  };
 
-  if (fetchedAny) {
-    const payload = { date: now, countries: collected };
-    writeFileSync(SNAPSHOT, JSON.stringify(payload, null, 2), 'utf-8');
-    console.log(`[trending] updated snapshot ${now}`);
-  } else {
-    // إن لم ينجح أي جلب، نحتفظ باللقطة القديمة حتى لا نفقد البيانات
-    console.log(`[trending] no live data; keeping previous snapshot (${prev.date || 'none'}).`);
-  }
+  // نكتب الملف حتى في أول فشل كامل. بهذه الطريقة يبقى سير النشر قابلاً للتكرار
+  // ولا يتوقف بسبب pathspec مفقود.
+  writeFileSync(SNAPSHOT, `${JSON.stringify(payload, null, 2)}\n`, 'utf-8');
+  console.log(`[trending] snapshot ready (${Object.keys(countries).length} countries, date ${payload.date || 'none'}).`);
 }
 
-main();
+main().catch((error) => {
+  console.error('[trending] unexpected error:', error);
+  // خطأ الترند الاختياري لا ينبغي أن يمنع تحديث الأسعار وبناء الموقع.
+  if (!existsSync(SNAPSHOT)) writeFileSync(SNAPSHOT, `${JSON.stringify(emptySnapshot(), null, 2)}\n`, 'utf-8');
+});

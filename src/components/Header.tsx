@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText, Wand2, Timer, Sun, TrendingUp } from 'lucide-react';
+import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText, Wand2, Timer, Sun, TrendingUp, Gem, BadgeDollarSign } from 'lucide-react';
 import { useRoute, parseRoute } from '../lib/router';
 import { useLang } from '../lib/i18n';
 import Link from './Link';
@@ -13,6 +13,8 @@ const NAV = [
   { to: '/countdown', label: 'كم باقي على…', icon: Timer },
   { to: '/today', label: 'التاريخ اليوم', icon: Sun },
   { to: '/salaries', label: 'مواعيد الرواتب', icon: Coins },
+  { to: '/gold-price', label: 'أسعار الذهب', icon: Gem },
+  { to: '/usd-rate', label: 'أسعار الدولار', icon: BadgeDollarSign },
   { to: '/trending', label: 'المواضيع الرائجة', icon: TrendingUp },
   { to: '/hijri-calendar', label: 'التقويم الهجري', icon: CalendarDays },
   { to: '/school-calendar', label: 'التقويم الدراسي', icon: BookOpen },
@@ -35,7 +37,7 @@ export default function Header() {
   // العالمية بالعربية (/world/*) فتُعرض بتصميم اللغات العالمي.
   const isGlobal =
     lang !== 'ar' ||
-    (['hub', 'tool', 'tools-hub', 'gold', 'usd', 'date-today', 'letter', 'name', 'list', 'article', 'world-article', 'articles-list'].includes(info.kind) &&
+    (['hub', 'tool', 'tools-hub', 'gold-hub', 'usd-hub', 'gold', 'usd', 'date-today', 'letter', 'name', 'list', 'article', 'world-article', 'articles-list'].includes(info.kind) &&
       info.kind !== 'article' &&
       info.kind !== 'articles-list');
   const brand = isGlobal ? t('siteName') : 'تقويم السعودية';
@@ -47,6 +49,8 @@ export default function Header() {
   const globalNav = [
     { to: `${prefix || '/'}`, label: t('nav.home'), icon: Calendar },
     { to: `${prefix}/${toolsSlug}`, label: t('nav.tools'), icon: Wand2 },
+    { to: `${prefix}/gold-price`, label: lang === 'ar' ? 'أسعار الذهب' : 'Gold', icon: Gem },
+    { to: `${prefix}/usd-rate`, label: lang === 'ar' ? 'أسعار الدولار' : 'USD', icon: BadgeDollarSign },
     { to: `${prefix}/articles`, label: t('nav.articles'), icon: FileText },
   ];
 
