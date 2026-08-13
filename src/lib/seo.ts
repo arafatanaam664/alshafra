@@ -16,6 +16,7 @@ interface SeoOptions {
    */
   jsonLdId?: string;
   keywords?: string;
+  robots?: string;
 }
 
 function setMeta(name: string, content: string, attr: 'name' | 'property' = 'name') {
@@ -64,6 +65,7 @@ export function useSeo(opts: SeoOptions) {
       setMeta('twitter:description', opts.description);
     }
     if (opts.keywords) setMeta('keywords', opts.keywords);
+    if (opts.robots) setMeta('robots', opts.robots);
     if (opts.canonical) {
       setLink('canonical', opts.canonical);
       setMeta('og:url', opts.canonical, 'property');
@@ -76,5 +78,5 @@ export function useSeo(opts: SeoOptions) {
     }
     // `jsonLdKey` is a stable string hash of the payload, so this effect no
     // longer re-runs on every render (the home page re-renders every second).
-  }, [opts.title, opts.description, opts.canonical, opts.keywords, jsonLdKey, jsonLdId]);
+  }, [opts.title, opts.description, opts.canonical, opts.keywords, opts.robots, jsonLdKey, jsonLdId]);
 }

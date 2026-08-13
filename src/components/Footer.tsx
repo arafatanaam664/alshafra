@@ -7,6 +7,8 @@ const LINKS = [
   { to: '/countdown', label: 'كم باقي على…' },
   { to: '/today', label: 'التاريخ اليوم' },
   { to: '/salaries', label: 'مواعيد الرواتب' },
+  { to: '/gold-price', label: 'أسعار الذهب في الدول العربية' },
+  { to: '/usd-rate', label: 'أسعار الدولار في الدول العربية' },
   { to: '/trending', label: 'المواضيع الرائجة' },
   { to: '/hijri-calendar', label: 'التقويم الهجري' },
   { to: '/school-calendar', label: 'التقويم الدراسي' },

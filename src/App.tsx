@@ -1,10 +1,12 @@
 import { lazy, Suspense, useMemo } from 'react';
 import { useRoute, parseRoute } from './lib/router';
+import { useSeo } from './lib/seo';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import HomePage from './pages/HomePage';
-import GlobalPage from './pages/GlobalPage';
 
+const HomePage = lazy(() => import('./pages/HomePage'));
+const GlobalPage = lazy(() => import('./pages/GlobalPage'));
+const EditorialGuide = lazy(() => import('./components/EditorialGuide'));
 const DateConverterPage = lazy(() => import('./pages/DateConverterPage'));
 const AgeCalculatorPage = lazy(() => import('./pages/AgeCalculatorPage'));
 const SalariesPage = lazy(() => import('./pages/SalariesPage'));
@@ -54,7 +56,11 @@ function PageLoader() {
 // ملاحظة: المقالات السعودية (/articles و /articles/*) والمقالات العالمية
 // العربية (/world/*) والمواضيع الرائجة (/trending*) ليست «عالمية» — لكل منها
 // صفحاتها العربية الأصلية الخاصة، فلا تُوجَّه خطأً إلى GlobalPage.
-const GLOBAL_KINDS = new Set(['hub', 'tool', 'tools-hub', 'gold', 'usd', 'date-today', 'letter', 'name', 'list', 'article', 'world-article', 'articles-list']);
+const GLOBAL_KINDS = new Set(['hub', 'tool', 'tools-hub', 'gold-hub', 'usd-hub', 'gold', 'usd', 'date-today', 'letter', 'name', 'list', 'article', 'world-article', 'articles-list']);
+const EDITORIAL_GUIDE_PATHS = new Set([
+  '/', '/salaries', '/hijri-calendar', '/school-calendar', '/holidays', '/date-converter',
+  '/age-calculator', '/today', '/faq', '/articles', '/privacy', '/terms', '/about', '/contact',
+]);
 
 export default function App() {
   const [path] = useRoute();
@@ -70,6 +76,12 @@ export default function App() {
   const isGlobal =
     lang !== 'ar' ||
     (GLOBAL_KINDS.has(kind) && kind !== 'article' && kind !== 'articles-list');
+  const qualityReadyGlobal = lang === 'ar' && ['gold-hub', 'usd-hub', 'gold', 'usd'].includes(kind);
+  useSeo({
+    robots: !isGlobal || qualityReadyGlobal
+      ? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+      : 'noindex, follow',
+  });
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -100,6 +112,7 @@ export default function App() {
           {!isGlobal && kind === 'about' && <AboutPage />}
           {!isGlobal && kind === 'contact' && <ContactPage />}
           {!isGlobal && kind === 'home' && <HomePage />}
+          {EDITORIAL_GUIDE_PATHS.has(path) && <EditorialGuide route={path} />}
         </Suspense>
       </main>
       <Footer />

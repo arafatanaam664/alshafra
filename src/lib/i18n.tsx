@@ -2,26 +2,28 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import { ROUTE_CHANGE_EVENT } from './router';
 import ar from '../i18n/ar.json';
 import en from '../i18n/en.json';
-import tr from '../i18n/tr.json';
-import fa from '../i18n/fa.json';
-import fr from '../i18n/fr.json';
-import es from '../i18n/es.json';
-import pt from '../i18n/pt.json';
-import id from '../i18n/id.json';
-import ms from '../i18n/ms.json';
-import ur from '../i18n/ur.json';
-import de from '../i18n/de.json';
-import ru from '../i18n/ru.json';
-import it from '../i18n/it.json';
-import hi from '../i18n/hi.json';
-import bn from '../i18n/bn.json';
-import sw from '../i18n/sw.json';
 import languagesData from '../data/languages.json';
 
 export const LANGS = (languagesData as { languages: { code: string; name: string; native: string; flag: string; dir: string; script: string; islamic: boolean }[] }).languages;
 export const LANG_BY_CODE = Object.fromEntries(LANGS.map((l) => [l.code, l]));
 
-const STRINGS: Record<string, Record<string, unknown>> = { ar, en, tr, fa, fr, es, pt, id, ms, ur, de, ru, it, hi, bn, sw };
+const STRINGS: Record<string, Record<string, unknown>> = { ar, en };
+const STRING_LOADERS: Record<string, () => Promise<{ default: Record<string, unknown> }>> = {
+  tr: () => import('../i18n/tr.json'),
+  fa: () => import('../i18n/fa.json'),
+  fr: () => import('../i18n/fr.json'),
+  es: () => import('../i18n/es.json'),
+  pt: () => import('../i18n/pt.json'),
+  id: () => import('../i18n/id.json'),
+  ms: () => import('../i18n/ms.json'),
+  ur: () => import('../i18n/ur.json'),
+  de: () => import('../i18n/de.json'),
+  ru: () => import('../i18n/ru.json'),
+  it: () => import('../i18n/it.json'),
+  hi: () => import('../i18n/hi.json'),
+  bn: () => import('../i18n/bn.json'),
+  sw: () => import('../i18n/sw.json'),
+};
 
 interface LangCtxValue {
   lang: string;
@@ -99,6 +101,7 @@ function detectLang(): string {
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<string>(detectLang);
+  const [stringsVersion, setStringsVersion] = useState(0);
 
   const setLang = (l: string) => {
     setLangState(l);
@@ -108,6 +111,21 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
       /* ignore */
     }
   };
+
+  // العربية والإنجليزية فقط في الحزمة الأساسية. تُحمّل بقية الترجمات عند فتح
+  // مسارها، بدل إرسال جميع القواميس لكل زائر عربي.
+  useEffect(() => {
+    const loader = STRING_LOADERS[lang];
+    if (!loader || STRINGS[lang]) return;
+    let active = true;
+    loader().then((module) => {
+      STRINGS[lang] = module.default;
+      if (active) setStringsVersion((version) => version + 1);
+    }).catch(() => {
+      // تبقى سلسلة السقوط إلى الإنجليزية ثم العربية متاحة عند فشل التحميل.
+    });
+    return () => { active = false; };
+  }, [lang]);
 
   useEffect(() => {
     const dir = LANG_BY_CODE[lang]?.dir || 'rtl';
@@ -145,7 +163,7 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
       dir,
       prefix: lang === 'ar' ? '' : `/${lang}`,
     };
-  }, [lang]);
+  }, [lang, stringsVersion]);
 
   return <LangCtx.Provider value={value}>{children}</LangCtx.Provider>;
 }

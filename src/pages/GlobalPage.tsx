@@ -9,12 +9,26 @@ import type { RouteInfo } from '../lib/router';
 import { gregorianToHijri } from '../lib/hijri';
 import Link from '../components/Link';
 import toolSlugsData from '../data/toolslugs.json';
+import priceGuidesData from '../data/price-guides.json';
 
 const TOOL_SLUGS = (toolSlugsData as { slugs: Record<string, Record<string, string>> }).slugs;
 const TOOL_ORDER = (toolSlugsData as { order: string[] }).order;
 const AR_EXISTING = (toolSlugsData as { arExisting: string[] }).arExisting;
 
 const SITE = 'https://alshafra.com';
+type PriceGuideKind = 'gold' | 'usd';
+type PriceGuideSection = { heading: string; paragraphs: string[] };
+const PRICE_GUIDES = priceGuidesData as Record<PriceGuideKind, PriceGuideSection[]>;
+function fillGuide(text: string, values: Record<string, string>) {
+  return text.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? '');
+}
+function PriceGuide({ kind, country }: { kind: PriceGuideKind; country: (typeof COUNTRIES)[number] }) {
+  const rate = rateFor(country.cur);
+  const gram21 = (PRICES.xauUsd * rate * 0.875) / 31.1034768;
+  const number = (value: number) => fmtNum(value, country.cur);
+  const values = { country: country.ar || country.en, currency: country.curName, code: country.cur, rate: number(rate), ten: number(rate * 10), hundred: number(rate * 100), reverseBase: number(rate * 100), gram21: number(gram21), five21: number(gram21 * 5), updated: PRICES.updated };
+  return <div className="mt-8 space-y-5">{PRICE_GUIDES[kind].map((section) => <section key={section.heading} className="card p-6 text-sm leading-loose text-brand-700/85"><h2 className="font-display text-lg font-bold text-brand-900">{fillGuide(section.heading, values)}</h2>{section.paragraphs.map((paragraph) => <p key={paragraph} className="mt-3">{fillGuide(paragraph, values)}</p>)}</section>)}</div>;
+}
 
 // ---------- أدوات مساعدة ----------
 function CopyBtn({ text, label }: { text: string; label: string }) {
@@ -394,6 +408,18 @@ function CountdownTool() {
 }
 
 // ---------- صفحات الدول ----------
+function PriceHubPage({ kind }: { kind: PriceGuideKind }) {
+  const { lang, t } = useLang();
+  const isGold = kind === 'gold';
+  const prefix = langPrefix(lang);
+  const countries = COUNTRIES.filter((country) => (country.langs || []).includes(lang)).sort((a, b) => b.popM - a.popM);
+  const path = `${prefix}/${isGold ? 'gold-price' : 'usd-rate'}`;
+  const title = lang === 'ar' ? (isGold ? 'أسعار الذهب اليوم في الدول العربية حسب العيار' : 'سعر الدولار اليوم في الدول العربية') : (isGold ? 'Gold prices by country' : 'US dollar rates by country');
+  useSeo({ title: `${title} | ${t('siteName')}`, canonical: `${SITE}${path}` });
+  const example = countries.find((country) => country.slug === 'saudi-arabia') || countries[0];
+  return <div className="container-page py-10"><h1 className="section-title">{title}</h1><p className="mt-2 text-sm text-brand-700/85">{lang === 'ar' ? 'اختر الدولة لعرض الجدول الكامل وطريقة الحساب والمصادر والتنبيهات.' : 'Choose a country for the full table, method and sources.'}</p><div className="card mt-5 overflow-x-auto p-5"><table className="w-full text-sm"><thead><tr><th>{lang === 'ar' ? 'الدولة' : 'Country'}</th><th>{lang === 'ar' ? 'العملة' : 'Currency'}</th><th>{isGold ? '21K' : '1 USD'}</th></tr></thead><tbody>{countries.map((country) => { const rate = rateFor(country.cur); const value = isGold ? (PRICES.xauUsd * rate * 0.875) / 31.1034768 : rate; return <tr key={country.slug}><td><Link to={`${path}/${country.slug}`}>{country.flag} {countryName(lang, country)}</Link></td><td>{country.cur}</td><td>{fmtNum(value, country.cur)}</td></tr>; })}</tbody></table></div>{lang === 'ar' && <section className="card mt-5 p-6 text-sm leading-loose text-brand-700/85"><h2 className="font-display text-lg font-bold text-brand-900">طريقة استخدام جدول الدول</h2><p className="mt-3">ابدأ باسم الدولة ثم راجع رمز العملة وتاريخ اللقطة قبل قراءة الرقم. لا تقارن كبر الأرقام بين عملتين بوصفه حكمًا على قوة الاقتصاد؛ الوحدات الاسمية مختلفة. افتح صفحة الدولة لعرض التفاصيل والمصدر والرسوم غير الداخلة في الحساب.</p><p className="mt-3">كل صف مرتبط مباشرة بصفحته حتى لا تبقى أسعار الدول صفحات يتيمة. عند نسخ رقم اكتب الدولة ورمز العملة ونوع السعر والكمية، وأعد الحساب يوم التنفيذ واطلب عرضًا من جهة مرخصة.</p><p className="mt-3">للمقارنة بين يومين، سجل القيمة والوقت والمصدر في صفين منفصلين ولا تقارن لقطة صباحية بعرض مسائي من دون تنبيه. حدّد هل السؤال عن سعر نقدي أم تحويل مصرفي أم بطاقة أم بيع وشراء متجر، لأن الهامش والرسوم تختلف. استخدم البوابة للوصول إلى الدولة المناسبة ثم أكّد السعر القابل للتنفيذ من الجهة التي ستتعامل معها.</p></section>}{lang === 'ar' && example ? <PriceGuide kind={kind} country={example} /> : null}</div>;
+}
+
 function GoldPage({ slug }: { slug: string }) {
   const { t, ta, lang } = useLang();
   const c = countryBySlug(slug);
@@ -418,8 +444,8 @@ function GoldPage({ slug }: { slug: string }) {
             {rows.map(([carat, f]) => (
               <tr key={carat} className="border-b border-brand-50">
                 <td className="py-2 font-bold">{carat}</td>
-                <td className="py-2 tabular-nums">{fmtNum(ozLocal * f, c.cur)} {c.cur}</td>
-                <td className="py-2 tabular-nums">${fmtNum(PRICES.xauUsd * f, 'USD')}</td>
+                <td className="py-2 tabular-nums">{fmtNum((ozLocal * f) / 31.1034768, c.cur)} {c.cur}</td>
+                <td className="py-2 tabular-nums">${fmtNum((PRICES.xauUsd * f) / 31.1034768, 'USD')}</td>
               </tr>
             ))}
             <tr>
@@ -432,6 +458,8 @@ function GoldPage({ slug }: { slug: string }) {
       </div>
       <div className="disclaimer mt-4 rounded-xl bg-amber-50 p-3 text-xs text-amber-800">{t('ui.disclaimer')}</div>
       {(ta('gold.intro') || []).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{fillTemplate(p, { country: countryName(lang, c), currency: c.curName })}</p>)}
+      {lang === 'ar' && <PriceGuide kind="gold" country={c} />}
+      <div className="mt-6 flex flex-wrap gap-2"><Link className="chip bg-brand-50 text-brand-700" to={`${langPrefix(lang)}/gold-price`}>{lang === 'ar' ? 'كل دول الذهب' : 'All countries'}</Link><Link className="chip bg-brand-50 text-brand-700" to={`${langPrefix(lang)}/usd-rate/${slug}`}>{lang === 'ar' ? 'سعر الدولار في الدولة' : 'USD rate'}</Link></div>
     </div>
   );
 }
@@ -454,6 +482,8 @@ function UsdPage({ slug }: { slug: string }) {
       </div>
       <div className="mt-4 rounded-xl bg-amber-50 p-3 text-xs text-amber-800">{t('ui.disclaimer')}</div>
       {(ta('usd.intro') || []).map((p, i) => <p key={i} className="mt-3 text-sm leading-relaxed text-brand-700/85">{fillTemplate(p, { country: countryName(lang, c), currency: c.curName })}</p>)}
+      {lang === 'ar' && <PriceGuide kind="usd" country={c} />}
+      <div className="mt-6 flex flex-wrap gap-2"><Link className="chip bg-brand-50 text-brand-700" to={`${langPrefix(lang)}/usd-rate`}>{lang === 'ar' ? 'كل دول الدولار' : 'All countries'}</Link><Link className="chip bg-brand-50 text-brand-700" to={`${langPrefix(lang)}/gold-price/${slug}`}>{lang === 'ar' ? 'سعر الذهب في الدولة' : 'Gold price'}</Link></div>
     </div>
   );
 }
@@ -720,6 +750,8 @@ export default function GlobalPage({ info }: { info: RouteInfo }) {
       return <ToolShell title={t(`tools.${sk}.title`)}>{<Tool />}</ToolShell>;
     }
     case 'tools-hub': return <ToolsHubPage />;
+    case 'gold-hub': return <PriceHubPage kind="gold" />;
+    case 'usd-hub': return <PriceHubPage kind="usd" />;
     case 'gold': return <GoldPage slug={info.param || ''} />;
     case 'usd': return <UsdPage slug={info.param || ''} />;
     case 'date-today': return <DateTodayPage slug={info.param || ''} />;
