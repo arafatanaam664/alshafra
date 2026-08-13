@@ -1,12 +1,4 @@
-# Daily auto-publish: ينفّذ 3 مرات يومياً (04:30 / 12:30 / 20:30 UTC)
-# 1) يجلب أسعار الذهب والعملات تلقائياً (scripts/fetch-prices.mjs)
-# 2) يجلب المواضيع الرائجة في الخليج (scripts/fetch-trending.mjs)
-# 3) يبني الموقع (vite build + prerender) فيُنشر تلقائياً عدد الصفحات المقرر لهذا اليوم
-#    من كتالوج النشر (schedule.json → ratePerDay = 20 صفحة/يوم)
-# 4) يحدّث public/published.json (قائمة الصفحات المنشورة) ويُحدِث commit → Vercel يعيد النشر
-# 5) يرسل الصفحات الجديدة إلى Bing IndexNow للفهرسة الفورية
-# ملاحظة: يعمل تلقائياً بعد دمج هذا الملف في الفرع الرئيسي (main) للمستودع.
-
+# تحديث بيانات الموقع وإعادة نشر الصفحات الجاهزة ثلاث مرات يومياً.
 name: Daily auto-publish
 
 on:
@@ -19,18 +11,24 @@ on:
 permissions:
   contents: write
 
+# يمنع تشغيل نسختين متزامنتين من المهمة ودفع commitين متعارضين إلى main.
+concurrency:
+  group: daily-auto-publish-main
+  cancel-in-progress: false
+
 jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -38,27 +36,47 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Fetch live gold & FX prices
+      - name: Fetch live gold and FX prices
         run: node scripts/fetch-prices.mjs
 
-      - name: Fetch GCC trending topics (Google Trends, graceful fallback)
+      - name: Refresh optional GCC trends snapshot
         run: node scripts/fetch-trending.mjs
 
-      - name: Build site (publishes today's pages)
+      - name: Build and run SEO quality checks
         run: npm run build
 
-      - name: Commit auto-updates (prices + published list + trends)
+      - name: Commit generated data
+        shell: bash
         run: |
+          set -euo pipefail
+
           git config user.name "shafra-bot"
           git config user.email "bot@alshafra.com"
-          git add src/data/prices.json src/data/trending-snapshot.json public/published.json public/4f9c2a7e1b8d3f6a9c0e5b7d2a8f4c1e.txt
+
+          # لا نمرر مساراً مفقوداً إلى git add؛
+          # pathspec مفقود هو سبب الفشل السابق.
+          generated_files=(
+            src/data/prices.json
+            src/data/trending-snapshot.json
+            public/published.json
+            public/4f9c2a7e1b8d3f6a9c0e5b7d2a8f4c1e.txt
+          )
+
+          for file in "${generated_files[@]}"; do
+            if [[ -e "$file" ]]; then
+              git add -- "$file"
+            else
+              echo "Optional generated file is absent: $file"
+            fi
+          done
+
           if git diff --cached --quiet; then
-            echo "No changes to commit (prices unchanged today)."
+            echo "No generated data changed."
           else
-            git commit -m "chore: daily auto-publish $(date -u +%F) — prices + published pages + trends"
-            git push
-            echo "Committed and pushed. Vercel will rebuild."
+            git commit -m "chore: refresh prices and published pages $(date -u +%F)"
+            git push origin HEAD:main
+            echo "Generated data committed; the hosting service can rebuild."
           fi
 
-      - name: Submit new pages to IndexNow (Bing/Yandex)
+      - name: Submit newly published pages to IndexNow
         run: node scripts/indexnow.mjs
