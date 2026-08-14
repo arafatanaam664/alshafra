@@ -1,58 +1,57 @@
 {
-  "date": "2026-08-13",
+  "date": "2026-08-14",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-13",
+      "date": "2026-08-14",
       "titles": [
-        "محافظة الإسماعيلية",
-        "فرانك كيسييه",
-        "وزير الدفاع السعودي",
-        "روتانا سبورت مع وليد",
-        "كأس الملك",
-        "ياسر جلال",
-        "prichard colon",
-        "hearts vs benfica",
-        "الكويت",
-        "همام الهمامي"
+        "cricbuzz",
+        "الرياض",
+        "conmebol sudamericana",
+        "نيمار",
+        "انفجار",
+        "islam makhachev",
+        "neymar",
+        "سانتوس ضد ماكارا",
+        "ربيع الاول اي شهر",
+        "مصعب الجوير"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-13",
+      "date": "2026-08-14",
       "titles": [
+        "centcom falcon strike unmanned systems",
+        "strait of hormuz news",
+        "independence day india",
+        "iga świątek",
+        "abhishek bachchan",
+        "neymar",
+        "santos vs macará",
         "hearts vs benfica",
         "prichard colon",
-        "الدرعية ضد الأهلي",
-        "diriyah vs al-ahli",
-        "google pixel 11 pro fold",
-        "കാലാവസ്ഥ",
-        "pakistan independence day",
-        "traitors season 2",
-        "gold",
-        "end of oak street"
+        "grok bot"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-13",
+      "date": "2026-08-14",
       "titles": [
+        "tanzid hasan",
+        "santos vs macará",
         "مدرسة",
         "gold",
         "scotland vs canada",
         "عقوبة",
-        "ban vs aus",
-        "cricbuzz",
-        "inter miami vs club león standings",
-        "australia vs bangladesh",
-        "aus vs ban",
-        "inter miami vs león"
+        "cricbuzz"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-13",
+      "date": "2026-08-14",
       "titles": [
+        "santos vs macará",
+        "وزارة التعليم العالي",
         "الدرعية ضد الأهلي",
         "أمن",
         "عام دراسي",
@@ -60,9 +59,7 @@
         "the end of oak street",
         "scotland vs canada",
         "تهريب",
-        "ديوان الخدمة المدنية",
-        "inter miami vs club león standings",
-        "cricbuzz"
+        "ديوان الخدمة المدنية"
       ]
     },
     "BH": {
@@ -76,18 +73,18 @@
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-13",
+      "date": "2026-08-14",
       "titles": [
+        "cricbuzz",
+        "tanzid hasan",
+        "santos vs macará",
+        "محمد بن سلمان بن عبد العزيز آل سعود",
         "الشباب ضد القادسية",
         "الدرعية ضد الأهلي",
         "الدوري السعودي",
-        "تيك",
-        "تيك توك",
+        "بلدية مسقط",
         "tiktok",
-        "مسقط",
-        "عام دراسي",
-        "ناقلة نفط",
-        "جودي جهاد جدوع"
+        "تيك توك"
       ]
     }
   }
