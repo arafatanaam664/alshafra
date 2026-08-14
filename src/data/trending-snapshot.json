@@ -5,61 +5,60 @@
       "country": "السعودية",
       "date": "2026-08-14",
       "titles": [
-        "cricbuzz",
-        "الرياض",
-        "conmebol sudamericana",
-        "نيمار",
-        "انفجار",
-        "islam makhachev",
-        "neymar",
-        "سانتوس ضد ماكارا",
-        "ربيع الاول اي شهر",
-        "مصعب الجوير"
+        "meralco vs ginebra",
+        "epic games",
+        "مانشستر يونايتد",
+        "ضاري العنزي",
+        "مباريات الهلال",
+        "إيرلينغ هالاند",
+        "منتخب مصر لكرة القدم",
+        "ന്യൂസ്",
+        "مانشستر سيتي",
+        "مواقيت الصلاة"
       ]
     },
     "AE": {
       "country": "الإمارات",
       "date": "2026-08-14",
       "titles": [
-        "centcom falcon strike unmanned systems",
-        "strait of hormuz news",
-        "independence day india",
-        "iga świątek",
-        "abhishek bachchan",
-        "neymar",
-        "santos vs macará",
-        "hearts vs benfica",
-        "prichard colon",
-        "grok bot"
+        "ഡല്ഹി",
+        "meralco vs ginebra",
+        "ইরান",
+        "flight",
+        "ஈரான்",
+        "الإمارات العربية المتحدة",
+        "ryanair",
+        "egypt",
+        "batwara 1947",
+        "ajay ahuja kargil war"
       ]
     },
     "QA": {
       "country": "قطر",
       "date": "2026-08-14",
       "titles": [
+        "awarapan 2",
+        "الإمارات العربية المتحدة",
+        "cricbuzz",
         "tanzid hasan",
+        "prichard colon",
         "santos vs macará",
         "مدرسة",
-        "gold",
-        "scotland vs canada",
-        "عقوبة",
-        "cricbuzz"
+        "gold"
       ]
     },
     "KW": {
       "country": "الكويت",
       "date": "2026-08-14",
       "titles": [
+        "قانون الجنسية الكويتية",
+        "ban vs aus",
+        "cricbuzz",
         "santos vs macará",
         "وزارة التعليم العالي",
         "الدرعية ضد الأهلي",
         "أمن",
-        "عام دراسي",
-        "قانون الجنسية الكويتية",
-        "the end of oak street",
-        "scotland vs canada",
-        "تهريب",
-        "ديوان الخدمة المدنية"
+        "عام دراسي"
       ]
     },
     "BH": {
@@ -75,6 +74,7 @@
       "country": "عُمان",
       "date": "2026-08-14",
       "titles": [
+        "سيارة",
         "cricbuzz",
         "tanzid hasan",
         "santos vs macará",
@@ -83,8 +83,7 @@
         "الدرعية ضد الأهلي",
         "الدوري السعودي",
         "بلدية مسقط",
-        "tiktok",
-        "تيك توك"
+        "مباريات اليوم"
       ]
     }
   }
