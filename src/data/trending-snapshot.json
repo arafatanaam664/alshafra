@@ -1,88 +1,93 @@
 {
-  "date": "2026-08-14",
+  "date": "2026-08-15",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-14",
+      "date": "2026-08-15",
       "titles": [
-        "أنصار الله الحوثيون",
-        "wolves vs blackburn rovers",
-        "النادي الأهلي",
-        "ريان ميسي",
-        "النادي الفيصلي",
-        "fiorentina vs benevento",
-        "china",
-        "الوليد بن طلال",
-        "ترتيب دوري روشن",
-        "galatasaray - çorum"
+        "live cricket",
+        "india vs sri lanka",
+        "icc",
+        "jake weatherald",
+        "marnus labuschagne",
+        "travis head",
+        "cricbuzz",
+        "riot",
+        "ufc",
+        "زلزال اندونيسيا"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-14",
+      "date": "2026-08-15",
       "titles": [
-        "scp vs vitória sc",
-        "jason arday",
-        "fiorentina vs benevento",
-        "galatasaray",
-        "wolves vs blackburn rovers",
-        "atalanta vs athletic",
-        "15 august",
-        "galatasaray vs çorum",
-        "coventry vs monaco",
-        "al-hilal vs al-faisaly"
+        "travis head",
+        "jake weatherald",
+        "live cricket",
+        "cricbuzz",
+        "india",
+        "india vs sri lanka",
+        "icc",
+        "august 14",
+        "avengers doomsday",
+        "cricinfo"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-14",
+      "date": "2026-08-15",
       "titles": [
+        "india vs sri lanka",
+        "happy independence day",
+        "طيران مدني",
         "independence day india",
         "الهلال ضد الفيصلي",
         "al-hilal vs al-faisaly",
         "marseille vs atlético madrid",
         "بسكويت",
         "awarapan 2",
-        "الإمارات العربية المتحدة",
-        "cricbuzz",
-        "tanzid hasan",
-        "prichard colon"
+        "الإمارات العربية المتحدة"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-14",
+      "date": "2026-08-15",
       "titles": [
+        "hasan mahmud",
+        "india vs sri lanka",
+        "independence day india",
+        "happy independence day",
         "al-hilal vs al-faisaly",
         "الهلال ضد الفيصلي",
+        "ufc",
+        "awarapan 2",
         "وفيات",
-        "قانون الجنسية الكويتية",
-        "ban vs aus",
-        "cricbuzz",
-        "santos vs macará"
+        "قانون الجنسية الكويتية"
       ]
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-14",
+      "date": "2026-08-15",
       "titles": [
+        "india vs sri lanka",
         "al-hilal vs al-faisaly",
         "الهلال ضد الفيصلي"
       ]
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-14",
+      "date": "2026-08-15",
       "titles": [
+        "india vs sri lanka",
+        "happy independence day",
+        "bangladesh vs australia",
+        "cricbuzz",
+        "independence day",
         "al-hilal vs al-faisaly",
         "كسوف",
         "الهلال ضد الفيصلي",
         "ربيع الأول",
-        "تسرب نفطي",
-        "سيارة",
-        "cricbuzz",
-        "tanzid hasan",
-        "santos vs macará"
+        "تسرب نفطي"
       ]
     }
   }
