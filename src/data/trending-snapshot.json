@@ -1,97 +1,98 @@
 {
-  "date": "2026-08-15",
+  "date": "2026-08-16",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-15",
+      "date": "2026-08-16",
       "titles": [
-        "sevilla vs rayo vallecano",
-        "كرة القدم",
-        "لا ليغا",
-        "مأرب",
-        "موسى ديمبيلي",
-        "مباريات الاتحاد",
-        "إشبيلية ضد رايو فاليكانو",
-        "kooora",
-        "ترتيب الدوري",
-        "mahindra scorpio pickup"
+        "icc",
+        "cricbuzz",
+        "عودة المدارس",
+        "josh hazlewood",
+        "نور",
+        "فارس",
+        "ليونيل ميسي",
+        "xfinity mobile arena",
+        "nathan lyon",
+        "mls"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-15",
+      "date": "2026-08-16",
       "titles": [
-        "alavés vs getafe",
-        "lottery",
-        "novak djokovic",
-        "الاتحاد ضد الخلود",
-        "al-ittihad vs al kholood",
-        "khor fakkan vs shabab alahli",
-        "النصر ضد الفتح",
-        "خورفكان ضد شباب الأهلي",
-        "al-nassr vs al fateh",
-        "inter vs betis"
+        "cricbuzz",
+        "weather sharjah",
+        "live cricket",
+        "josh hazlewood",
+        "mackenzie dern",
+        "погода",
+        "मौसम",
+        "mitchell starc",
+        "ufc live",
+        "mehidy hasan miraz"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-15",
+      "date": "2026-08-16",
       "titles": [
+        "cameron green",
+        "cricbuzz",
+        "nashville vs inter miami",
+        "al-nassr vs al fateh sc standings",
         "ufc",
+        "frozen 3",
         "مضيق هرمز",
         "النصر ضد الفتح",
         "iran",
-        "al-nassr vs al fateh",
-        "inter vs betis",
-        "dortmund vs roma",
-        "cincinnati open",
-        "ميلان ضد مان يونايتد",
-        "9to5mac"
+        "inter vs betis"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-15",
+      "date": "2026-08-16",
       "titles": [
+        "ban vs aus",
+        "nashville vs inter miami",
+        "ufc 330",
         "al-nassr vs al fateh",
         "النصر ضد الفتح",
         "inter vs betis",
         "dortmund vs roma",
         "قاسم باشا ضد طرابزون سبور",
         "oil spill",
-        "ميلان ضد مان يونايتد",
-        "milan vs man united",
-        "مباريات اليوم",
-        "9to5mac"
+        "ميلان ضد مان يونايتد"
       ]
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-15",
+      "date": "2026-08-16",
       "titles": [
+        "nashville vs inter miami",
+        "ufc",
         "النصر ضد الفتح",
         "al-nassr vs al fateh",
         "9to5mac",
         "milan vs man united",
-        "ireland vs afghanistan",
-        "sl vs ind",
-        "india vs sri lanka"
+        "devdutt padikkal",
+        "ireland vs afghanistan"
       ]
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-15",
+      "date": "2026-08-16",
       "titles": [
+        "ليونيل ميسي",
+        "bangladesh vs australia",
+        "ناشفيل ضد إنتر ميامي",
+        "nashville vs inter miami",
+        "ufc",
+        "عمان",
         "al-nassr vs al fateh",
         "النصر ضد الفتح",
         "الاتحاد ضد الخلود",
-        "inter vs betis",
-        "dortmund vs roma",
-        "9to5mac",
-        "milan vs man united",
-        "ميلان ضد مان يونايتد",
-        "air india",
-        "مانشستر سيتي"
+        "inter vs betis"
       ]
     }
   }
