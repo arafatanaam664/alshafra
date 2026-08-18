@@ -5,8 +5,11 @@ export type RoutePath = string;
 
 export interface RouteInfo {
   lang: string; // 'ar' | 'en' | 'tr' | ...
-  kind: string; // 'home' | 'tool' | 'gold' | 'usd' | 'date-today' | 'letter' | 'name' | 'list' | 'article' | 'world-article' | 'trending' | 'trending-hub' | 'trending-today' | 'trending-category' | 'tools-hub' | existing saudi kinds
-  param?: string; // tool key / country slug / letter slug / name slug / list key / article slug / trending slug / category
+  kind: string; // public content kind, admin, or home
+  param?: string; // tool key / country slug / article slug / category
+  device?: string; // fault-code device taxonomy
+  brand?: string; // fault-code manufacturer taxonomy
+  code?: string; // reviewed fault code slug
 }
 
 const LANGS = ['ar', 'en', 'tr', 'fa', 'fr', 'es', 'pt', 'id', 'ms', 'ur', 'de', 'ru', 'it', 'hi', 'bn', 'sw'];
@@ -122,6 +125,20 @@ export function parseRoute(path: RoutePath): RouteInfo {
   // === العربية (الجذر) ===
   if (!first) return { lang: 'ar', kind: 'home' };
 
+  // لوحة التحرير خاصة ولا تُنشأ لها صفحات فرعية قابلة للفهرسة.
+  if (first === 'admin') return { lang: 'ar', kind: 'admin' };
+
+  // دليل أكواد الأعطال: المحور ← الجهاز ← العلامة ← الكود.
+  if (first === 'fault-codes') {
+    return {
+      lang: 'ar',
+      kind: 'fault-codes',
+      device: second,
+      brand: rest[2],
+      code: rest[3],
+    };
+  }
+
   // المسارات السعودية القائمة (لها الأولوية على أدوات الكتالوج العالمية)
   if (first === 'salaries') return { lang: 'ar', kind: 'salaries' };
   if (first === 'date-converter') return { lang: 'ar', kind: 'date-converter' };
@@ -168,5 +185,5 @@ export function parseRoute(path: RoutePath): RouteInfo {
   if (first === 'name' && second) return { lang: 'ar', kind: 'name', param: second };
   if (first === 'names' && second) return { lang: 'ar', kind: 'list', param: second };
 
-  return { lang: 'ar', kind: 'home' };
+  return { lang: 'ar', kind: 'not-found' };
 }

@@ -42,19 +42,19 @@ export default function HijriCalendarPage() {
   const firstGreg = hijriToGregorian(firstHijri);
   const firstWeekday = weekdayIndex(firstGreg);
 
-  const eventsThisMonth = SAUDI_EVENTS.filter((e) => {
-    const h = gregorianToHijri(e.date.year, e.date.month, e.date.day);
-    return h.year === year && h.month === month;
-  });
+  const eventsThisMonth = useMemo(() => SAUDI_EVENTS.filter((event) => {
+    const hijri = gregorianToHijri(event.date.year, event.date.month, event.date.day);
+    return hijri.year === year && hijri.month === month;
+  }), [year, month]);
 
   const eventByDay = useMemo(() => {
     const map = new Map<number, typeof SAUDI_EVENTS[number]>();
-    for (const e of eventsThisMonth) {
-      const h = gregorianToHijri(e.date.year, e.date.month, e.date.day);
-      map.set(h.day, e);
+    for (const event of eventsThisMonth) {
+      const hijri = gregorianToHijri(event.date.year, event.date.month, event.date.day);
+      map.set(hijri.day, event);
     }
     return map;
-  }, [eventsThisMonth, year, month]);
+  }, [eventsThisMonth]);
 
   const cells: (HijriDate | null)[] = [];
   for (let i = 0; i < firstWeekday; i++) cells.push(null);

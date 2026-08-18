@@ -19,10 +19,10 @@ import {
   weekdayName,
 } from './countdowns.mjs';
 import { mergeCatalog, PRERENDER_CSS as GLOBAL_CSS } from './catalog.mjs';
-import { buildTrendingRoutes, countWords } from './trending.mjs';
+import { buildTrendingRoutes } from './trending.mjs';
 
 const SITE_URL = 'https://alshafra.com';
-const SITE_NAME = 'تقويم السعودية';
+const SITE_NAME = 'الشفرة';
 
 const distDir = join(process.cwd(), 'dist');
 const rootDir = process.cwd();
@@ -51,6 +51,124 @@ const ARTICLES = JSON.parse(
 const CORE_GUIDES = JSON.parse(
   readFileSync(join(rootDir, 'src', 'data', 'core-guides.json'), 'utf-8'),
 );
+const FAULT_CODES = JSON.parse(
+  readFileSync(join(rootDir, 'src', 'data', 'fault-codes.json'), 'utf-8'),
+).faultCodes.filter((item) => item.status === 'published');
+const CMS_CONTENT = JSON.parse(
+  readFileSync(join(rootDir, 'src', 'data', 'cms-content.json'), 'utf-8'),
+).items.filter((item) => item.status === 'published' && item.indexable);
+
+function faultPath(item) {
+  return `/fault-codes/${item.deviceSlug}/${item.brandSlug}/${item.slug}`;
+}
+
+function faultCardList(items) {
+  return `<ul>${items.map((item) => `<li><a href="${faultPath(item)}"><bdi>${esc(item.code)}</bdi> — ${esc(item.title)}</a></li>`).join('')}</ul>`;
+}
+
+function faultCodeRoutes() {
+  const latestReview = FAULT_CODES.map((item) => item.reviewedAt).sort().at(-1) || '2026-08-18';
+  const devices = [...new Map(FAULT_CODES.map((item) => [item.deviceSlug, item.deviceName])).entries()];
+  const brands = [...new Map(FAULT_CODES.map((item) => [`${item.deviceSlug}/${item.brandSlug}`, item])).values()];
+  const shared = { reviewed: true, indexable: true, lang: 'ar', kind: 'fault-code', lastmod: latestReview };
+  const hub = {
+    ...shared,
+    path: '/fault-codes',
+    kind: 'fault-code-hub',
+    title: 'دليل أكواد الأعطال للأجهزة المنزلية | الشفرة',
+    description: 'ابحث عن معنى كود العطل حسب الجهاز والعلامة التجارية، واقرأ الأسباب وخطوات الفحص الآمنة والمصادر الرسمية ومتى تحتاج إلى فني.',
+    keywords: 'أكواد الأعطال, رموز الأعطال, أعطال الغسالات, صيانة منزلية',
+    jsonLd: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'دليل أكواد الأعطال', url: `${SITE_URL}/fault-codes`, inLanguage: 'ar' }],
+    body: bodyWithNoscript(`<h1>دليل أكواد الأعطال للأجهزة المنزلية</h1><p>افهم الرمز الظاهر على جهازك قبل أن تطلب الفني. نربط كل شرح بنوع الجهاز والعلامة ونطاق الموديل ومصدر الشركة، ونفصل الفحوص الخارجية الآمنة عن الإصلاح الداخلي.</p><h2>تصفح حسب الجهاز</h2><ul>${devices.map(([slug, name]) => `<li><a href="/fault-codes/${slug}">أكواد أعطال ${esc(name)}</a></li>`).join('')}</ul><h2>الأكواد المراجعة</h2>${faultCardList(FAULT_CODES)}<h2>قبل تطبيق أي خطوة</h2><p>قد يحمل الرمز نفسه معنى مختلفاً بين علامتين أو سلسلتين. طابق رقم الموديل مع كتيب الجهاز، وافصل الكهرباء ومصدر الماء عند طلب التعليمات ذلك، وتوقف عند وجود تسريب أو رائحة احتراق أو خطر كهربائي.</p>`),
+  };
+  const deviceRoutes = devices.map(([slug, name]) => {
+    const items = FAULT_CODES.filter((item) => item.deviceSlug === slug);
+    return {
+      ...shared,
+      path: `/fault-codes/${slug}`,
+      kind: 'fault-code-device',
+      title: `أكواد أعطال ${name} ومعاني الرموز | الشفرة`,
+      description: `تصفح أكواد أعطال ${name} الموثقة بالمصادر، مع الأسباب المحتملة وخطوات الفحص الآمنة ومتى يحتاج الجهاز إلى فني.`,
+      keywords: `أكواد أعطال ${name}, رموز الأعطال, دليل الصيانة`,
+      jsonLd: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: `أكواد أعطال ${name}`, url: `${SITE_URL}/fault-codes/${slug}`, inLanguage: 'ar' }],
+      body: bodyWithNoscript(`<h1>أكواد أعطال ${esc(name)}</h1><p>اختر العلامة ثم الرمز الظاهر على الجهاز. يجب مطابقة نوع الجهاز والسلسلة ورقم الموديل قبل تطبيق الفحص لأن الرموز ليست موحدة بين الشركات.</p><h2>العلامات المتاحة</h2><ul>${brands.filter((item) => item.deviceSlug === slug).map((item) => `<li><a href="/fault-codes/${slug}/${item.brandSlug}">${esc(item.brandName)}</a></li>`).join('')}</ul><h2>الأكواد المنشورة</h2>${faultCardList(items)}`),
+    };
+  });
+  const brandRoutes = brands.map((brand) => {
+    const items = FAULT_CODES.filter((item) => item.deviceSlug === brand.deviceSlug && item.brandSlug === brand.brandSlug);
+    return {
+      ...shared,
+      path: `/fault-codes/${brand.deviceSlug}/${brand.brandSlug}`,
+      kind: 'fault-code-brand',
+      title: `أكواد أعطال ${brand.deviceName} ${brand.brandName} | الشفرة`,
+      description: `معاني أكواد أعطال ${brand.deviceName} ${brand.brandName} المراجعة، مع نطاق الموديل والمصادر الرسمية وخطوات الفحص الآمنة.`,
+      keywords: `أكواد ${brand.brandName}, أعطال ${brand.deviceName}, رموز الأعطال`,
+      jsonLd: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: `أكواد أعطال ${brand.deviceName} ${brand.brandName}`, url: `${SITE_URL}/fault-codes/${brand.deviceSlug}/${brand.brandSlug}`, inLanguage: 'ar' }],
+      body: bodyWithNoscript(`<h1>أكواد أعطال ${esc(brand.deviceName)} ${esc(brand.brandName)}</h1><p>هذه الصفحات تخص الرموز التي تحقق منها فريق التحرير من مصدر الشركة. طابق الرمز ورقم الموديل مع كتيب جهازك لأن موضع الفلتر والخطوات والمعنى قد تختلف.</p><h2>الرموز المتاحة</h2>${faultCardList(items)}<h2>حدود الدليل</h2><p>نشرح ما يمكن فحصه من الخارج بأمان. فتح الغطاء أو اختبار الأسلاك أو المضخات والصمامات الداخلية عمل فني مؤهل.</p>`),
+    };
+  });
+  const detailRoutes = FAULT_CODES.map((item) => ({
+    ...shared,
+    path: faultPath(item),
+    title: `${item.seoTitle} | الشفرة`,
+    description: item.description,
+    keywords: `${item.code}, ${item.brandName}, ${item.deviceName}, كود عطل, حل آمن`,
+    lastmod: item.reviewedAt,
+    jsonLd: [{
+      '@context': 'https://schema.org', '@type': 'TechArticle', headline: item.title,
+      description: item.description, datePublished: item.publishedAt, dateModified: item.reviewedAt,
+      inLanguage: 'ar', author: { '@type': 'Organization', name: 'فريق تحرير الشفرة' },
+      publisher: { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/` },
+      mainEntityOfPage: `${SITE_URL}${faultPath(item)}`,
+    }],
+    body: bodyWithNoscript(`<article><p class="updated">آخر مراجعة: ${esc(item.reviewedAt)}</p><h1>${esc(item.title)}</h1><p>${esc(item.description)}</p><section><h2>الإجابة المختصرة</h2><p>${esc(item.shortAnswer)}</p></section><section><h2>نطاق الموديلات</h2><p>${esc(item.modelScope)}</p></section><section><h2>تنبيه السلامة</h2><p>${esc(item.warning)}</p></section><section><h2>الأسباب المحتملة</h2>${item.causes.map((cause) => `<h3>${esc(cause.title)}</h3><p>${esc(cause.detail)}</p>`).join('')}</section><section><h2>خطوات الفحص الآمنة</h2><ol>${item.safeChecks.map((check) => `<li><strong>${esc(check.title)}:</strong> ${esc(check.detail)}</li>`).join('')}</ol></section><section><h2>جدول تشخيص سريع</h2><table><thead><tr><th>الملاحظة</th><th>السبب الأقرب</th><th>الإجراء الأول</th></tr></thead><tbody>${item.diagnosis.map((row) => `<tr><td>${esc(row.observation)}</td><td>${esc(row.likelyCause)}</td><td>${esc(row.firstAction)}</td></tr>`).join('')}</tbody></table></section><section><h2>متى تتوقف وتطلب فنيًا؟</h2><ul>${item.stopConditions.map((condition) => `<li>${esc(condition)}</li>`).join('')}</ul></section><section><h2>أسئلة شائعة</h2>${item.faq.map((faq) => `<h3>${esc(faq.q)}</h3><p>${esc(faq.a)}</p>`).join('')}</section><section><h2>المصادر الرسمية والتحقق</h2><p>يبقى كتيب رقم الموديل والدعم المحلي للشركة المرجع النهائي.</p><ul>${item.sources.map((source) => `<li><a href="${esc(source.url)}" rel="noopener noreferrer">${esc(source.label)}</a></li>`).join('')}</ul></section></article>`),
+  }));
+  return [hub, ...deviceRoutes, ...brandRoutes, ...detailRoutes];
+}
+
+function safeMarkdownHtml(markdown) {
+  const lines = String(markdown || '').replace(/\r\n/g, '\n').split('\n');
+  const output = [];
+  let paragraph = [];
+  let list = [];
+  const flushParagraph = () => { if (paragraph.length) output.push(`<p>${esc(paragraph.join(' '))}</p>`); paragraph = []; };
+  const flushList = () => { if (list.length) output.push(`<ul>${list.map((item) => `<li>${esc(item)}</li>`).join('')}</ul>`); list = []; };
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) { flushParagraph(); flushList(); continue; }
+    if (line.startsWith('### ')) { flushParagraph(); flushList(); output.push(`<h3>${esc(line.slice(4).trim())}</h3>`); continue; }
+    if (line.startsWith('## ')) { flushParagraph(); flushList(); output.push(`<h2>${esc(line.slice(3).trim())}</h2>`); continue; }
+    if (/^[-*]\s+/.test(line)) { flushParagraph(); list.push(line.replace(/^[-*]\s+/, '').trim()); continue; }
+    flushList(); paragraph.push(line);
+  }
+  flushParagraph(); flushList();
+  return output.join('');
+}
+
+function cmsRoutes() {
+  return CMS_CONTENT.map((item) => ({
+    path: item.canonical_path,
+    title: `${item.seo_title || item.title} | الشفرة`,
+    description: item.description,
+    keywords: (item.keywords || []).join(', '),
+    image: item.cover_image_url || null,
+    lastmod: item.reviewed_at || item.updated_at,
+    lang: item.locale,
+    kind: item.type,
+    reviewed: true,
+    indexable: true,
+    jsonLd: [{
+      '@context': 'https://schema.org', '@type': item.type === 'landing_page' ? 'WebPage' : 'Article',
+      headline: item.title, description: item.description,
+      datePublished: item.published_at || item.updated_at, dateModified: item.reviewed_at || item.updated_at,
+      inLanguage: item.locale, author: { '@type': 'Person', name: item.author_name || 'فريق تحرير الشفرة' },
+      publisher: { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/` },
+      mainEntityOfPage: `${SITE_URL}${item.canonical_path}`,
+      ...(item.cover_image_url ? { image: item.cover_image_url } : {}),
+    }],
+    body: bodyWithNoscript(`<article><p class="updated">آخر تحديث: ${esc(item.reviewed_at || item.updated_at)}</p><h1>${esc(item.title)}</h1><p>${esc(item.description)}</p>${item.cover_image_url ? `<img src="${esc(item.cover_image_url)}" alt="${esc(item.cover_image_alt || item.title)}" width="1280" height="720">` : ''}${safeMarkdownHtml(item.body_markdown)}${item.sources?.length ? `<section><h2>المصادر والمراجع</h2><ul>${item.sources.map((source) => `<li><a href="${esc(source.url)}" rel="noopener noreferrer">${esc(source.label)}</a></li>`).join('')}</ul></section>` : ''}</article>`),
+  }));
+}
 
 function editorialGuideHtml(path) {
   const sections = CORE_GUIDES[path];
@@ -108,7 +226,6 @@ ${a.sources && a.sources.length ? `      <section><h2>المصادر الرسم�
 ${a.faq && a.faq.length ? `      <section><h2>الأسئلة الشائعة</h2>\n${a.faq.map((f) => `      <h3>${esc(f.q)}</h3>\n      <p>${esc(f.a)}</p>`).join('\n')}</section>` : ''}
       </article>
     `),
-    minWords: 1500,
     lastmod: a.reviewedAt || a.updatedAt,
     kind: 'article',
     lang: 'ar',
@@ -347,11 +464,11 @@ ${upcoming
 const routes = [
   {
     path: '/',
-    title: 'تقويم السعودية | مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي',
+    title: 'الشفرة | تقويم السعودية ودليل أكواد الأعطال',
     description:
-      'بوابة سعودية لمواعيد الرواتب وحساب المواطن والتقويم الهجري والدراسي والإجازات، مع العدّادات وتحويل التاريخ وأسعار الذهب والدولار في الدول العربية.',
+      'الشفرة تجمع خدمات تقويم السعودية للمواعيد والرواتب والتاريخ مع دليل عربي موثق لفهم أكواد أعطال الأجهزة والفحوص الآمنة.',
     keywords:
-      'التقويم الهجري, مواعيد الرواتب, حساب المواطن, التقويم الدراسي, الإجازات الرسمية, تحويل التاريخ, أسعار الذهب, سعر الدولار, السعودية',
+      'أكواد الأعطال, التقويم الهجري, مواعيد الرواتب, حساب المواطن, التقويم الدراسي, الإجازات الرسمية, تحويل التاريخ, السعودية',
     jsonLd: [
       {
         '@context': 'https://schema.org',
@@ -362,15 +479,19 @@ const routes = [
       },
     ],
     body: bodyWithNoscript(`
-<h1>تقويم السعودية — مواعيد الرواتب والتقويم الهجري والميلادي والإجازات الرسمية</h1>
-    <p>بوابة سعودية تجمع مواعيد صرف الرواتب الحكومية وحساب المواطن والضمان والمتقاعدين، والتقويم الهجري والدراسي والإجازات، مع أدوات التاريخ وبوابتي أسعار الذهب والدولار في الدول العربية.</p>
-    <h2>خدماتنا</h2>
+<h1>الشفرة — تقويم السعودية ودليل أكواد الأعطال</h1>
+    <p>منصة للحلول والأدوات والمراجع العملية؛ تحافظ على خدمات تقويم السعودية للرواتب والتاريخ والإجازات، وتضيف دليلاً موثقاً لفهم رموز أعطال الأجهزة والفحوص الخارجية الآمنة.</p>
+    <h2>الشفرة إصلاح</h2>
+    <ul>
+      <li><a href="/fault-codes">دليل أكواد الأعطال</a> — ابحث حسب الجهاز والعلامة والرمز.</li>
+      <li><a href="/fault-codes/washing-machines/samsung/4e-4c">كود 4E و4C في غسالة Samsung</a> — معنى مشكلة تزويد الماء والفحوص الآمنة.</li>
+      <li><a href="/fault-codes/washing-machines/lg/oe">كود OE في غسالة LG</a> — معنى مشكلة التصريف ومتى تحتاج إلى فني.</li>
+    </ul>
+    <h2>خدمات تقويم السعودية</h2>
     <ul>
       <li><a href="/countdown">كم باقي على…</a> — عدّادات تنازلية مباشرة لرمضان والعيدين واليوم الوطني والرواتب وبداية الدراسة والإجازات.</li>
       <li><a href="/today">التاريخ اليوم</a> — التاريخ الهجري والميلادي الآن بتوقيت الرياض وفق تقويم أم القرى.</li>
       <li><a href="/salaries">مواعيد الرواتب</a> — رواتب الموظفين الحكوميين وحساب المواطن والمتقاعدين والضمان الاجتماعي والدعم السكني.</li>
-      <li><a href="/gold-price">أسعار الذهب</a> — سعر الجرام حسب العيار في 21 دولة عربية مع المصادر وطريقة الحساب.</li>
-      <li><a href="/usd-rate">أسعار الدولار</a> — سعر الدولار المرجعي وجداول التحويل للعملات العربية.</li>
       <li><a href="/hijri-calendar">التقويم الهجري</a> — تقويم أم القرى الرسمي لكل الشهور الهجرية مع المناسبات الدينية والوطنية.</li>
       <li><a href="/school-calendar">التقويم الدراسي</a> — موعد بداية الدراسة وإجازات المدارس وفق تقويم وزارة التعليم السعودية.</li>
       <li><a href="/holidays">الإجازات الرسمية</a> — قائمة كاملة بالإجازات الدينية والوطنية مع مدة كل إجازة وتاريخها.</li>
@@ -617,6 +738,20 @@ const routes = [
   countdownHubRoute(),
   ...countdownRoutes(),
   todayRoute(),
+  ...faultCodeRoutes(),
+  ...cmsRoutes(),
+  {
+    path: '/admin',
+    title: 'لوحة تحرير الشفرة',
+    description: 'منطقة خاصة للمحررين المخولين لإدارة محتوى موقع الشفرة ومصادره وملفاته.',
+    keywords: '',
+    jsonLd: [],
+    body: bodyWithNoscript('<h1>لوحة تحرير الشفرة</h1><p>هذه منطقة خاصة. فعّل JavaScript وسجّل الدخول بحساب منحه المالك صلاحية تحرير.</p>'),
+    indexable: false,
+    reviewed: true,
+    kind: 'admin',
+    lang: 'ar',
+  },
   {
     path: '/faq',
     title: 'الأسئلة الشائعة عن المواعيد والتقويم في السعودية | تقويم السعودية',
@@ -662,25 +797,25 @@ const routes = [
   },
   {
     path: '/about',
-    title: 'عن تقويم السعودية | تقويم السعودية',
-    description: 'تعرف على بوابة تقويم السعودية — منصة شاملة للمواعيد الرسمية والتقويمات والأدوات في المملكة العربية السعودية.',
-    keywords: 'عن تقويم السعودية, من نحن, البوابة السعودية',
+    title: 'عن الشفرة | حلول وأدوات ومراجع عملية',
+    description: 'تعرف على منصة الشفرة وقسمي تقويم السعودية والشفرة إصلاح، ورسالتها ومصادر معلوماتها وسياسة المراجعة.',
+    keywords: 'عن الشفرة, تقويم السعودية, الشفرة إصلاح, من نحن',
     jsonLd: [
       {
         '@context': 'https://schema.org',
         '@type': 'AboutPage',
-        name: 'عن تقويم السعودية',
+        name: 'عن الشفرة',
         inLanguage: 'ar-SA',
       },
     ],
     body: bodyWithNoscript(`
-      <h1>عن تقويم السعودية</h1>
-      <p>بوابة تقويم السعودية هي منصة شاملة للمواعيد الرسمية والتقويمات والأدوات في المملكة العربية السعودية. نقدم مواعيد صرف الرواتب الحكومية، حساب المواطن، الضمان الاجتماعي المطور، رواتب المتقاعدين، التقويم الهجري والميلادي، التقويم الدراسي، الإجازات الرسمية، وأدوات تحويل التاريخ وحاسبة العمر وزخرفة الأسماء — وفق تقويم أم القرى الرسمي.</p>
+      <h1>عن الشفرة</h1>
+      <p>الشفرة منصة مستقلة للحلول والأدوات والمراجع العملية. تحافظ على قسم تقويم السعودية للمواعيد والرواتب والتاريخ، وتضيف قسم الشفرة إصلاح لفهم أكواد أعطال الأجهزة من مصدر الشركة مع حدود سلامة واضحة.</p>
     `),
   },
   {
     path: '/contact',
-    title: 'تواصل معنا | تقويم السعودية',
+    title: 'تواصل معنا | الشفرة',
     description: 'تواصل مع فريق تقويم السعودية لأي استفسار أو اقتراح حول المواعيد الرسمية والتقويمات والأدوات.',
     keywords: 'تواصل معنا, اتصال, استفسار, تقويم السعودية',
     jsonLd: [
@@ -698,37 +833,40 @@ const routes = [
   },
   {
     path: '/privacy',
-    title: 'سياسة الخصوصية | تقويم السعودية',
-    description: 'سياسة الخصوصية لبوابة تقويم السعودية — كيف نجمع ونستخدم ونحمي بيانات المستخدمين.',
+    title: 'سياسة الخصوصية | الشفرة',
+    description: 'سياسة الخصوصية لموقع الشفرة — كيف نجمع ونستخدم ونحمي بيانات المستخدمين.',
     keywords: 'سياسة الخصوصية, الخصوصية, حماية البيانات',
     jsonLd: [],
     body: bodyWithNoscript(`
       <h1>سياسة الخصوصية</h1>
-      <p>سياسة الخصوصية لبوابة تقويم السعودية — كيف نجمع ونستخدم ونحمي بيانات المستخدمين. لا نجمع بيانات شخصية إلا ما يلزم لتشغيل الأدوات وعرض المواعيد الرسمية.</p>
+      <p>سياسة الخصوصية لموقع الشفرة — كيف نجمع ونستخدم ونحمي بيانات المستخدمين. لا نجمع بيانات شخصية إلا ما يلزم لتشغيل الأدوات وعرض المواعيد الرسمية.</p>
     `),
   },
   {
     path: '/terms',
-    title: 'شروط الاستخدام | تقويم السعودية',
-    description: 'شروط استخدام بوابة تقويم السعودية — القواعد والأحكام لاستخدام الموقع وخدماته.',
+    title: 'شروط الاستخدام | الشفرة',
+    description: 'شروط استخدام موقع الشفرة — القواعد والأحكام لاستخدام الموقع وخدماته.',
     keywords: 'شروط الاستخدام, الأحكام, القواعد',
     jsonLd: [],
     body: bodyWithNoscript(`
       <h1>شروط الاستخدام</h1>
-      <p>شروط استخدام بوابة تقويم السعودية — القواعد والأحكام لاستخدام الموقع وخدماته. المعلومات المعروضة على الموقع لأغراض معلوماتية فقط ولا تُغني عن الإعلانات الرسمية.</p>
+      <p>شروط استخدام موقع الشفرة — القواعد والأحكام لاستخدام الموقع وخدماته. المعلومات المعروضة على الموقع لأغراض معلوماتية فقط ولا تُغني عن الإعلانات الرسمية.</p>
     `),
   },
 ];
 
-// يبقى النشر الآلي للمواضيع الرائجة والكتالوج مفعّلًا. الصفحة المؤتمتة التي لم
-// تبلغ 1500 كلمة تبقى في طابور المراجعة بدل أن تُحذف أو تُنشر بجودة منخفضة.
-const trendingRoutes = buildTrendingRoutes().map((route) => {
-  const qualityWords = route.words || countWords(route.body || '');
-  return { ...route, automated: true, qualityWords, qualityReady: qualityWords >= 1500 };
-});
-const { all: routesAll, published: routesFinal, total: catalogTotal, today: buildDate } = mergeCatalog([...routes, ...trendingRoutes]);
-const waitingQuality = routesAll.filter((route) => (route.automated || !route.fromExisting) && !route.qualityReady).length;
-console.log(`[prerender] catalog: ${catalogTotal} retained routes; ${routesFinal.length} publishable now; ${waitingQuality} waiting for content review (${buildDate}).`);
+// تجميد صريح: بيان النشر السابق هو القائمة المسموحة لصفحات الكتالوج المؤتمتة.
+// المسارات الجديدة لا تدخل إلا إذا كانت تحريرية وموسومة reviewed في المصدر.
+const frozenManifestPath = join(rootDir, 'public', 'published.json');
+const frozenPaths = existsSync(frozenManifestPath)
+  ? JSON.parse(readFileSync(frozenManifestPath, 'utf-8')).published.map((item) => item.path)
+  : [];
+const trendingRoutes = buildTrendingRoutes().map((route) => ({ ...route, automated: true }));
+const { all: routesGenerated, published: routesFinal, total: catalogTotal, today: buildDate } = mergeCatalog(
+  [...routes, ...trendingRoutes],
+  { frozenPaths },
+);
+console.log(`[prerender] publication freeze: considered ${catalogTotal} catalog/editorial definitions; generating ${routesGenerated.length} reviewed or previously published routes (${buildDate}).`);
 
 // --- HTML helpers ------------------------------------------------------------
 
@@ -740,20 +878,17 @@ console.log(`[prerender] catalog: ${catalogTotal} retained routes; ${routesFinal
 function bodyWithNoscript(innerHtml) {
   return `<div id="root"><div class="prerender-shell" dir="rtl" lang="ar">
       <header class="prerender-nav">
-        <a href="/"><strong>تقويم السعودية</strong></a>
+        <a href="/"><strong>الشفرة</strong></a>
         <nav>
+          <a href="/fault-codes">أكواد الأعطال</a>
           <a href="/countdown">كم باقي على…</a>
           <a href="/today">التاريخ اليوم</a>
           <a href="/salaries">مواعيد الرواتب</a>
-          <a href="/gold-price">أسعار الذهب</a>
-          <a href="/usd-rate">أسعار الدولار</a>
           <a href="/hijri-calendar">التقويم الهجري</a>
           <a href="/school-calendar">التقويم الدراسي</a>
           <a href="/holidays">الإجازات الرسمية</a>
           <a href="/date-converter">تحويل التاريخ</a>
-          <a href="/age-calculator">حاسبة العمر</a>
           <a href="/articles">مقالات</a>
-          <a href="/faq">الأسئلة الشائعة</a>
         </nav>
       </header>
       <main>
@@ -793,12 +928,19 @@ function setLink(html, rel, href) {
   return html.replace('</head>', `    ${tag}\n  </head>`);
 }
 
+function setAlternateLink(html, hreflang, href) {
+  const regex = new RegExp(`<link\\s+rel=["']alternate["'][^>]*hreflang=["']${hreflang}["'][^>]*>`, 'i');
+  const tag = `<link rel="alternate" hreflang="${hreflang}" href="${href}" />`;
+  if (regex.test(html)) return html.replace(regex, tag);
+  return html.replace('</head>', `    ${tag}\n  </head>`);
+}
+
 function setTitle(html, title) {
   return html.replace(/<title[^>]*>[\s\S]*?<\/title>/i, `<title>${title}</title>`);
 }
 
 function setJsonLd(html, data) {
-  const tag = `<script type="application/ld+json" data-page-jsonld>${JSON.stringify(data)}</script>`;
+  const tag = `<script type="application/ld+json" id="page-jsonld">${JSON.stringify(data)}</script>`;
   return html.replace('</head>', `    ${tag}\n  </head>`);
 }
 
@@ -875,15 +1017,56 @@ function visibleMainWordCount(html) {
   return (text.match(/[\p{L}\p{N}]+/gu) || []).length;
 }
 
+function normalizeInternalHref(href) {
+  const clean = href.split(/[?#]/, 1)[0];
+  if (!clean.startsWith('/')) return clean;
+  return clean.length > 1 ? clean.replace(/\/+$/, '') : clean;
+}
+
+function removeUnpublishedLinks(html, allowedPaths) {
+  return html.replace(/<a\b([^>]*?)href="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/gi, (full, before, href, after, inner) => {
+    if (href.includes('undefined')) return inner;
+    if (!href.startsWith('/')) return full;
+    return allowedPaths.has(normalizeInternalHref(href)) ? full : inner;
+  });
+}
+
+function assertPageStructure(route, html) {
+  const errors = [];
+  const h1Count = (html.match(/<h1\b/gi) || []).length;
+  const canonicalCount = (html.match(/<link\s+rel=["']canonical["']/gi) || []).length;
+  const robots = html.match(/<meta name="robots" content="([^"]+)">/i)?.[1] || '';
+  const googlebot = html.match(/<meta name="googlebot" content="([^"]+)">/i)?.[1] || '';
+  if (!route.title || route.title.trim().length < 15) errors.push('missing/short title');
+  if (!route.description || route.description.trim().length < 30) errors.push('missing/short description');
+  if (!route.body?.includes('<main>')) errors.push('missing visible main content');
+  if (h1Count !== 1) errors.push(`expected one H1, found ${h1Count}`);
+  if (canonicalCount !== 1) errors.push(`expected one canonical, found ${canonicalCount}`);
+  if (route.indexable === false ? !robots.includes('noindex') : !robots.startsWith('index, follow')) {
+    errors.push('robots does not match indexable state');
+  }
+  if (googlebot !== robots) errors.push('googlebot conflicts with robots');
+  if (/href="[^"]*undefined/i.test(html)) errors.push('undefined link');
+  if (route.kind === 'article' || route.kind === 'fault-code') {
+    if ((html.match(/<h2\b/gi) || []).length < 2) errors.push('reviewed article needs section headings');
+    if (!html.includes('المصادر')) errors.push('reviewed article needs visible sources');
+  }
+  if (errors.length) throw new Error(`[prerender] Structural validation failed for ${route.path}: ${errors.join('; ')}`);
+}
+
 // --- Generate pages ----------------------------------------------------------
 
+const publishedPaths = new Set(routesFinal.map((route) => route.path));
+const routeByPath = new Map(routesFinal.map((route) => [route.path, route]));
 let count = 0;
-for (const route of routesFinal) {
-  // حقن الدليل التحريري المشترك بين React والنسخة الثابتة، ثم الروابط الداخلية.
+for (const route of routesGenerated) {
+  // حقن الدليل التحريري والروابط ذات الصلة من قائمة الصفحات المفهرسة فقط،
+  // ثم إزالة أي رابط بقي موجهاً إلى مسار غير منشور.
   if (route.body) route.body = injectEditorialGuide(route.body, route.path);
   const related = findRelated(route, linkIndex, 6);
   if (route.body) {
     if (related.length) route.body = injectRelatedLinks(route.body, related);
+    route.body = removeUnpublishedLinks(route.body, publishedPaths);
   }
   let html = template;
   const canonical = SITE_URL + route.path;
@@ -891,24 +1074,36 @@ for (const route of routesFinal) {
   html = setTitle(html, route.title);
   html = setMeta(html, 'description', route.description);
   html = setMeta(html, 'keywords', route.keywords);
-  // يبقى ملف SPA الاحتياطي noindex، ولا تُفتح الفهرسة إلا للصفحات التي اجتازت
-  // بوابة الجودة ووصلت إلى routesFinal فعلاً.
-  html = setMeta(html, 'robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+  // يبقى ملف SPA الاحتياطي noindex، ولا تُفتح الفهرسة إلا للمسارات ذات
+  // indexable=true في قرار النشر المراجع.
+  const robotsDirective = route.indexable === false
+    ? 'noindex, nofollow, noarchive'
+    : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+  html = setMeta(html, 'robots', robotsDirective);
+  html = setMeta(html, 'googlebot', robotsDirective);
   html = setLink(html, 'canonical', canonical);
   html = setMeta(html, 'og:title', route.title, 'property');
   html = setMeta(html, 'og:description', route.description, 'property');
   html = setMeta(html, 'og:url', canonical, 'property');
+  html = setMeta(html, 'og:type', route.kind === 'article' || route.kind === 'fault-code' ? 'article' : 'website', 'property');
+  html = setMeta(html, 'og:image', route.image || `${SITE_URL}/og-image.jpg`, 'property');
   html = setMeta(html, 'twitter:title', route.title);
   html = setMeta(html, 'twitter:description', route.description);
+  html = setMeta(html, 'twitter:image', route.image || `${SITE_URL}/og-image.jpg`);
 
-  // hreflang alternates for multilingual pages
+  // لا نعلن بديلاً إلا إذا كان مفهرساً ويعيد رابطاً متبادلاً إلى هذه الصفحة.
   if (route.hreflang && route.hreflang.length > 0) {
-    for (const alt of route.hreflang) {
-      html = setLink(html, `alternate hreflang="${alt.code}"`, SITE_URL + alt.path);
+    const validAlternates = route.hreflang.filter((alt) => {
+      if (!publishedPaths.has(alt.path)) return false;
+      if (alt.path === route.path) return true;
+      const counterpart = routeByPath.get(alt.path);
+      return counterpart?.hreflang?.some((candidate) => candidate.path === route.path);
+    });
+    for (const alt of validAlternates) {
+      html = setAlternateLink(html, alt.code, SITE_URL + alt.path);
     }
-    // x-default: الإصدار الإنجليزي إن وُجد
-    const xDefault = route.hreflang.find((a) => a.code === 'en');
-    if (xDefault) html = setLink(html, 'alternate hreflang="x-default"', SITE_URL + xDefault.path);
+    const xDefault = validAlternates.find((alt) => alt.code === 'en');
+    if (xDefault) html = setAlternateLink(html, 'x-default', SITE_URL + xDefault.path);
   }
 
   if (route.jsonLd && route.jsonLd.length > 0) {
@@ -920,6 +1115,7 @@ for (const route of routesFinal) {
     const css = route.lang && route.lang !== 'ar' ? GLOBAL_CSS : PRERENDER_CSS;
     html = html.replace('</head>', `    ${css}\n  </head>`);
   }
+  assertPageStructure(route, html);
   pageWordCounts.push({ path: route.path, words: visibleMainWordCount(html) });
 
   const outDir = route.path === '/' ? distDir : join(distDir, route.path);
@@ -930,16 +1126,11 @@ for (const route of routesFinal) {
   if (count <= 5 || count % 50 === 0) console.log(`[prerender] ${route.path}`);
 }
 
-const thinPages = pageWordCounts.filter((page) => page.words < 1500);
-if (thinPages.length) {
-  const details = thinPages.map((page) => `${page.path} (${page.words})`).join(', ');
-  throw new Error(`[prerender] Quality gate failed: pages below 1500 visible main-content words: ${details}`);
-}
-console.log(`[prerender] Quality gate: ${pageWordCounts.length} pages have at least 1500 visible main-content words.`);
-console.log(`[prerender] Done. ${count} pages generated.`);
+const wordRange = pageWordCounts.map((page) => page.words);
+console.log(`[prerender] Structural quality gate passed for ${pageWordCounts.length} pages (descriptive word range ${Math.min(...wordRange)}–${Math.max(...wordRange)}; no ranking-oriented minimum).`);
+console.log(`[prerender] Done. ${count} static pages generated; ${routesFinal.length} are indexable.`);
 // تدقيق الصفحات اليتيمة الحقيقي: نحسب الروابط الواردة، لا مجرد وجود روابط
 // خارجة من الصفحة. الروابط في الهيدر والبوابات والأقسام ذات الصلة كلها محتسبة.
-const publishedPaths = new Set(routesFinal.map((route) => route.path));
 const inbound = new Map(routesFinal.map((route) => [route.path, new Set()]));
 for (const route of routesFinal) {
   const hrefs = route.body ? [...route.body.matchAll(/href="([^"#?]+)(?:[?#][^"]*)?"/g)].map((match) => match[1]) : [];
@@ -958,35 +1149,24 @@ if (orphanPaths.length) console.warn(`[prerender] Orphan paths: ${orphanPaths.jo
 // Generated from the same route table that produced the HTML, so the sitemap
 // can never drift out of sync with the pages that actually exist.
 
-const EDITORIAL_REVIEW_DATE = '2026-08-12';
-const DAILY_DYNAMIC_PATHS = new Set(['/', '/today', '/salaries', '/hijri-calendar', '/school-calendar', '/holidays', '/countdown']);
+const EDITORIAL_REVIEW_DATE = '2026-08-18';
+const DAILY_DYNAMIC_PATHS = new Set(['/today', '/countdown']);
 function routeLastmod(route) {
-  if (route.lastmod) return route.lastmod;
+  if (route.lastmod) return String(route.lastmod).slice(0, 10);
   if (DAILY_DYNAMIC_PATHS.has(route.path) || route.path.startsWith('/countdown/')) return buildDate;
   return EDITORIAL_REVIEW_DATE;
 }
-
-// قيم افتراضية للصفحات القائمة (الكتالوج يحدد قيمه بنفسه)
-const CHANGEFREQ = { '/': 'daily', '/countdown': 'daily', '/today': 'daily', '/salaries': 'daily', '/hijri-calendar': 'weekly', '/school-calendar': 'weekly', '/holidays': 'weekly', '/articles': 'weekly' };
-const PRIORITY = { '/': '1.0', '/countdown': '0.9', '/today': '0.9', '/salaries': '0.9', '/hijri-calendar': '0.9', '/school-calendar': '0.8', '/holidays': '0.8', '/date-converter': '0.7', '/age-calculator': '0.7', '/articles': '0.7', '/faq': '0.6', '/about': '0.4', '/contact': '0.4', '/privacy': '0.3', '/terms': '0.3' };
 
 const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
   ...routesFinal.map((r) => {
     const loc = r.path === '/' ? `${SITE_URL}/` : SITE_URL + r.path;
-    const isCountdown = r.path.startsWith('/countdown/');
-    const changefreq = r.changefreq || CHANGEFREQ[r.path] || (isCountdown ? 'daily' : 'monthly');
-    const priority = r.priority || PRIORITY[r.path] || (isCountdown ? '0.8' : '0.6');
-    // لا نغيّر lastmod لمجرد إعادة البناء: المقالات تستخدم تاريخ مراجعتها،
-    // والأسعار تاريخ اللقطة، والصفحات الزمنية اليومية وحدها تستخدم يوم البناء.
-    const lastmod = routeLastmod(r);
+    // lastmod يعكس مراجعة تحريرية أو تغيراً يومياً حقيقياً في بيانات العدّاد.
     return [
       '  <url>',
       `    <loc>${loc}</loc>`,
-      `    <lastmod>${lastmod}</lastmod>`,
-      `    <changefreq>${changefreq}</changefreq>`,
-      `    <priority>${priority}</priority>`,
+      `    <lastmod>${routeLastmod(r)}</lastmod>`,
       '  </url>',
     ].join('\n');
   }),
@@ -997,18 +1177,12 @@ const sitemap = [
 writeFileSync(join(distDir, 'sitemap.xml'), sitemap, 'utf-8');
 console.log(`[prerender] sitemap.xml written with ${routesFinal.length} URLs (lastmod ${buildDate}).`);
 
-// --- published.json + indexnow-new.txt ----------------------------------------
-// published.json: قائمة الصفحات المنشورة (يقرأها تطبيق React لربط الصفحات المنشورة فقط)
-// indexnow-new.txt: الصفحات التي نُشرت اليوم (تُرسل لاحقاً إلى Bing IndexNow تلقائياً)
+// --- published.json ----------------------------------------------------------
+// هذه قائمة الصفحات المفهرسة فقط؛ لا تشمل المسودات أو صفحات الإدارة/المعاينة.
 const publishedData = {
   generatedAt: buildDate,
   published: routesFinal.map((r) => ({ path: r.path, title: r.title, lang: r.lang || 'ar', kind: r.kind || 'page' })),
 };
 writeFileSync(join(distDir, 'published.json'), JSON.stringify(publishedData), 'utf-8');
 writeFileSync(join(rootDir, 'public', 'published.json'), JSON.stringify(publishedData), 'utf-8');
-console.log(`[prerender] published.json written (${publishedData.published.length} pages).`);
-
-const publishedToday = routesFinal.filter((route) => routeLastmod(route) === buildDate);
-const indexnowList = publishedToday.map((route) => SITE_URL + route.path);
-writeFileSync(join(distDir, 'indexnow-new.txt'), indexnowList.join('\n'), 'utf-8');
-console.log(`[prerender] indexnow-new.txt written (${indexnowList.length} URLs for today).`);
+console.log(`[prerender] published.json written (${publishedData.published.length} indexable pages).`);

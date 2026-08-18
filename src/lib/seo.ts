@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 export const SITE_URL = 'https://alshafra.com';
-export const SITE_NAME = 'تقويم السعودية';
+export const SITE_NAME = 'الشفرة';
 
 interface SeoOptions {
   title?: string;
@@ -17,6 +17,7 @@ interface SeoOptions {
   jsonLdId?: string;
   keywords?: string;
   robots?: string;
+  image?: string;
 }
 
 function setMeta(name: string, content: string, attr: 'name' | 'property' = 'name') {
@@ -47,6 +48,7 @@ function setJsonLd(id: string, data: Record<string, unknown> | Record<string, un
     el.id = id;
     document.head.appendChild(el);
   }
+  el.dataset.owner = 'use-seo';
   el.textContent = JSON.stringify(data);
 }
 
@@ -65,18 +67,29 @@ export function useSeo(opts: SeoOptions) {
       setMeta('twitter:description', opts.description);
     }
     if (opts.keywords) setMeta('keywords', opts.keywords);
-    if (opts.robots) setMeta('robots', opts.robots);
+    if (opts.robots) {
+      setMeta('robots', opts.robots);
+      setMeta('googlebot', opts.robots);
+    }
+    const socialImage = opts.image || `${SITE_URL}/og-image.jpg`;
+    setMeta('og:image', socialImage, 'property');
+    setMeta('twitter:image', socialImage);
+    setMeta('twitter:card', 'summary_large_image');
     if (opts.canonical) {
       setLink('canonical', opts.canonical);
       setMeta('og:url', opts.canonical, 'property');
     }
-    if (opts.jsonLd) {
-      setJsonLd(jsonLdId, opts.jsonLd);
+    if (jsonLdKey) {
+      setJsonLd(jsonLdId, JSON.parse(jsonLdKey) as Record<string, unknown> | Record<string, unknown>[]);
     } else {
       const existing = document.getElementById(jsonLdId);
       if (existing) existing.remove();
     }
     // `jsonLdKey` is a stable string hash of the payload, so this effect no
     // longer re-runs on every render (the home page re-renders every second).
-  }, [opts.title, opts.description, opts.canonical, opts.keywords, opts.robots, jsonLdKey, jsonLdId]);
+    return () => {
+      const owned = document.getElementById(jsonLdId);
+      if (owned?.dataset.owner === 'use-seo') owned.remove();
+    };
+  }, [opts.title, opts.description, opts.canonical, opts.keywords, opts.robots, opts.image, jsonLdKey, jsonLdId]);
 }

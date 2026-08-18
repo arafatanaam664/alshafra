@@ -1,8 +1,10 @@
 import { lazy, Suspense, useMemo } from 'react';
 import { useRoute, parseRoute } from './lib/router';
 import { useSeo } from './lib/seo';
+import { cmsItemByPath } from './lib/cms';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import AdSenseScript from './components/AdSenseScript';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const GlobalPage = lazy(() => import('./pages/GlobalPage'));
@@ -43,6 +45,10 @@ const PrivacyPage = lazy(() => import('./pages/LegalPages').then((m) => ({ defau
 const TermsPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.TermsPage })));
 const AboutPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.ContactPage })));
+const FaultCodesPage = lazy(() => import('./pages/FaultCodesPage'));
+const CmsContentPage = lazy(() => import('./pages/CmsContentPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 function PageLoader() {
   return (
@@ -65,7 +71,9 @@ const EDITORIAL_GUIDE_PATHS = new Set([
 export default function App() {
   const [path] = useRoute();
   const info = useMemo(() => parseRoute(path), [path]);
+  const cmsItem = useMemo(() => cmsItemByPath(path), [path]);
   const { lang, kind, param } = info;
+  const isAdmin = kind === 'admin';
 
   // الصفحات العالمية (غير العربية) تُعرض عبر GlobalPage:
   //  - أي صفحة بلغة غير العربية
@@ -78,44 +86,52 @@ export default function App() {
     (GLOBAL_KINDS.has(kind) && kind !== 'article' && kind !== 'articles-list');
   const qualityReadyGlobal = lang === 'ar' && ['gold-hub', 'usd-hub', 'gold', 'usd'].includes(kind);
   useSeo({
-    robots: !isGlobal || qualityReadyGlobal
-      ? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
-      : 'noindex, follow',
+    jsonLdId: 'app-shell-jsonld',
+    robots: isAdmin || (kind === 'not-found' && !cmsItem)
+      ? 'noindex, nofollow, noarchive'
+      : !isGlobal || qualityReadyGlobal
+        ? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+        : 'noindex, follow',
   });
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      {!isAdmin && kind !== 'not-found' && <AdSenseScript />}
+      {!isAdmin && <Header />}
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
-          {isGlobal && <GlobalPage info={info} />}
-          {!isGlobal && lang === 'ar' && kind === 'salaries' && <SalariesPage />}
-          {!isGlobal && kind === 'date-converter' && <DateConverterPage />}
-          {!isGlobal && kind === 'age-calculator' && <AgeCalculatorPage />}
-          {!isGlobal && kind === 'hijri-calendar' && <HijriCalendarPage />}
-          {!isGlobal && kind === 'school-calendar' && <SchoolCalendarPage />}
-          {!isGlobal && kind === 'holidays' && <HolidaysPage />}
-          {!isGlobal && kind === 'countdown' && param && <CountdownDetailPage slug={param} />}
-          {!isGlobal && kind === 'countdown' && !param && <CountdownHubPage />}
-          {!isGlobal && kind === 'today' && <TodayPage />}
-          {!isGlobal && kind === 'faq' && <FaqPage />}
-          {!isGlobal && kind === 'article' && param && <ArticlePage slug={param} />}
-          {!isGlobal && kind === 'article' && !param && <ArticlesListPage />}
-          {!isGlobal && kind === 'name-decoration' && param && <NameDecorationPage slug={param} />}
-          {!isGlobal && kind === 'name-decoration' && !param && <NameDecorationHubPage />}
-          {!isGlobal && kind === 'trending-hub' && <TrendingHubPage />}
-          {!isGlobal && kind === 'trending-today' && <TrendingTodayPage />}
-          {!isGlobal && kind === 'trending-category' && param && <TrendingCategoryPage category={param} />}
-          {!isGlobal && kind === 'trending' && param && <TrendingTopicPage slug={param} />}
-          {!isGlobal && kind === 'privacy' && <PrivacyPage />}
-          {!isGlobal && kind === 'terms' && <TermsPage />}
-          {!isGlobal && kind === 'about' && <AboutPage />}
-          {!isGlobal && kind === 'contact' && <ContactPage />}
-          {!isGlobal && kind === 'home' && <HomePage />}
-          {EDITORIAL_GUIDE_PATHS.has(path) && <EditorialGuide route={path} />}
+          {isAdmin && <AdminPage />}
+          {!isAdmin && cmsItem && kind !== 'fault-codes' && <CmsContentPage item={cmsItem} />}
+          {!isAdmin && !cmsItem && isGlobal && <GlobalPage info={info} />}
+          {!isAdmin && !cmsItem && !isGlobal && lang === 'ar' && kind === 'salaries' && <SalariesPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'date-converter' && <DateConverterPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'age-calculator' && <AgeCalculatorPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'hijri-calendar' && <HijriCalendarPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'school-calendar' && <SchoolCalendarPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'holidays' && <HolidaysPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'countdown' && param && <CountdownDetailPage slug={param} />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'countdown' && !param && <CountdownHubPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'today' && <TodayPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'faq' && <FaqPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'article' && param && <ArticlePage slug={param} />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'article' && !param && <ArticlesListPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'name-decoration' && param && <NameDecorationPage slug={param} />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'name-decoration' && !param && <NameDecorationHubPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'trending-hub' && <TrendingHubPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'trending-today' && <TrendingTodayPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'trending-category' && param && <TrendingCategoryPage category={param} />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'trending' && param && <TrendingTopicPage slug={param} />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'privacy' && <PrivacyPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'terms' && <TermsPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'about' && <AboutPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'contact' && <ContactPage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'fault-codes' && <FaultCodesPage device={info.device} brand={info.brand} code={info.code} path={path} />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'home' && <HomePage />}
+          {!isAdmin && !cmsItem && !isGlobal && kind === 'not-found' && <NotFoundPage />}
+          {!isAdmin && !cmsItem && EDITORIAL_GUIDE_PATHS.has(path) && <EditorialGuide route={path} />}
         </Suspense>
       </main>
-      <Footer />
+      {!isAdmin && <Footer />}
     </div>
   );
 }

@@ -5,12 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prerender.mjs",
+    "cms:sync": "node scripts/sync-cms.mjs",
+    "publication-paths:sync": "node scripts/sync-published-paths.mjs",
+    "validate:build": "node scripts/validate-build.mjs",
+    "build": "npm run cms:sync && npm run publication-paths:sync && vite build && node scripts/prerender.mjs && npm run validate:build",
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

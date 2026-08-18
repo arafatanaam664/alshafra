@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- provider utilities intentionally share the locale registry */
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { ROUTE_CHANGE_EVENT } from './router';
 import ar from '../i18n/ar.json';
@@ -150,7 +151,8 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<LangCtxValue>(() => {
-    const dir = LANG_BY_CODE[lang]?.dir || 'rtl';
+    // stringsVersion invalidates this memo after a lazy dictionary is loaded.
+    const dir = stringsVersion >= 0 ? (LANG_BY_CODE[lang]?.dir || 'rtl') : 'rtl';
     return {
       lang,
       setLang,

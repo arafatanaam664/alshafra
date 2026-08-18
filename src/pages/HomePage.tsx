@@ -15,11 +15,9 @@ import {
   TrendingUp,
   FileText,
   HelpCircle,
-  Wand2,
   Timer,
   Sun,
-  Gem,
-  BadgeDollarSign,
+  Wrench,
 } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import { useNow } from '../lib/useNow';
@@ -67,9 +65,9 @@ export default function HomePage() {
   const nextHoliday = nextHolidayAfter(today) ?? upcoming[0];
 
   useSeo({
-    title: 'تقويم السعودية | مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي',
+    title: 'الشفرة | تقويم السعودية ودليل أكواد الأعطال',
     description:
-      'بوابة سعودية لمواعيد الرواتب وحساب المواطن والتقويم الهجري والدراسي والإجازات، مع الأدوات وأسعار الذهب والدولار وصفحات الأسماء والمحتوى المتجدد.',
+      'الشفرة تجمع خدمات تقويم السعودية للمواعيد والرواتب والتاريخ مع دليل عربي موثق لفهم أكواد أعطال الأجهزة والفحوص الآمنة.',
     canonical: 'https://alshafra.com/',
     keywords:
       'التقويم الهجري, التقويم الميلادي, مواعيد الرواتب, حساب المواطن, رواتب المتقاعدين, الضمان الاجتماعي, التقويم الدراسي, الإجازات الرسمية, تحويل التاريخ, حاسبة العمر, تقويم أم القرى, السعودية',
@@ -77,7 +75,8 @@ export default function HomePage() {
       {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        name: 'تقويم السعودية',
+        name: 'الشفرة',
+        alternateName: 'تقويم السعودية',
         url: 'https://alshafra.com/',
         inLanguage: 'ar-SA',
       },
@@ -109,28 +108,27 @@ export default function HomePage() {
             <div className="animate-fade-in-up">
               <span className="chip bg-white/15 text-white ring-1 ring-white/20">
                 <Sparkles className="h-3.5 w-3.5 text-gold-300" />
-                البوابة السعودية الأولى للمواعيد الرسمية
+                الشفرة — حلول وأدوات ومراجع عملية
               </span>
               <h1 className="mt-4 font-display text-4xl font-bold leading-tight text-balance sm:text-5xl">
-                مواعيد الرواتب، التقويم الهجري، والإجازات الرسمية في مكان واحد
+                مواعيدك اليومية ودليل إصلاح موثق في مكان واحد
               </h1>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-brand-50/90 sm:text-lg">
-                منصة سعودية شاملة تجمع مواعيد صرف الرواتب الحكومية، حساب المواطن، الضمان الاجتماعي
-                المطوّر، رواتب المتقاعدين، التقويم الهجري والميلادي، التقويم الدراسي، والإجازات
-                الرسمية، مع أدوات تحويل التاريخ وحاسبة العمر — وفق تقويم أم القرى الرسمي.
+                نحافظ على خدمات «تقويم السعودية» للرواتب والتاريخ والإجازات، ونضيف «الشفرة إصلاح»
+                لفهم أكواد أعطال الأجهزة من المصادر الرسمية، مع فحوص خارجية آمنة وحدود واضحة لطلب الفني.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <Link to="/salaries" className="btn bg-gold-500 text-brand-900 hover:bg-gold-400">
+                <Link to="/fault-codes" className="btn bg-gold-500 text-brand-900 hover:bg-gold-400">
+                  <Wrench className="h-4 w-4" />
+                  ابحث عن كود عطل
+                </Link>
+                <Link to="/salaries" className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
                   <Coins className="h-4 w-4" />
                   مواعيد الرواتب
                 </Link>
                 <Link to="/date-converter" className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
                   <Clock className="h-4 w-4" />
                   تحويل التاريخ
-                </Link>
-                <Link to="/hijri-calendar" className="btn bg-white/10 text-white ring-1 ring-white/25 hover:bg-white/20">
-                  <CalendarDays className="h-4 w-4" />
-                  التقويم الهجري
                 </Link>
               </div>
             </div>
@@ -168,6 +166,24 @@ export default function HomePage() {
           <Stat label="أقرب إجازة" value={`${daysUntilEvent(nextHoliday, today)} يوم`} sub={nextHoliday.title} />
           <Stat label="المناسبات هذا العام" value={`${SAUDI_EVENTS.length}`} sub="مناسبة رسمية" />
           <Stat label="برامج الرواتب" value="5" sub="حكومية ومستحقة" />
+        </div>
+      </section>
+
+      {/* Fault-code vertical */}
+      <section className="container-page mt-12">
+        <div className="overflow-hidden rounded-3xl bg-brand-900 text-white shadow-soft">
+          <div className="grid items-center gap-7 p-6 sm:p-8 lg:grid-cols-[1.1fr_1fr]">
+            <div>
+              <span className="chip bg-white/10 text-brand-50 ring-1 ring-white/15"><Wrench className="h-3.5 w-3.5" />الشفرة إصلاح</span>
+              <h2 className="mt-3 font-display text-2xl font-bold sm:text-3xl">ظهر رمز على شاشة جهازك؟ ابدأ بمعناه الصحيح</h2>
+              <p className="mt-3 text-sm leading-loose text-brand-50/80">تختلف الأكواد حسب العلامة والسلسلة والموديل. لذلك نربط كل شرح بنطاق تطبيقه ومصدر الشركة، ونقترح الفحوص الخارجية فقط دون فتح الجهاز.</p>
+              <Link to="/fault-codes" className="btn mt-5 bg-white text-brand-900 hover:bg-brand-50">تصفح دليل الأكواد<ArrowLeft className="h-4 w-4" /></Link>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Link to="/fault-codes/washing-machines/samsung/4e-4c" className="rounded-2xl bg-white/10 p-5 ring-1 ring-white/15 transition hover:bg-white/15"><div className="font-mono text-2xl font-bold" dir="ltr">4E / 4C</div><div className="mt-2 font-semibold">غسالات Samsung</div><div className="mt-1 text-xs leading-relaxed text-brand-100/75">مشكلة في تزويد الماء — المعنى والفحص الآمن.</div></Link>
+              <Link to="/fault-codes/washing-machines/lg/oe" className="rounded-2xl bg-white/10 p-5 ring-1 ring-white/15 transition hover:bg-white/15"><div className="font-mono text-2xl font-bold" dir="ltr">OE</div><div className="mt-2 font-semibold">غسالات LG</div><div className="mt-1 text-xs leading-relaxed text-brand-100/75">مشكلة في تصريف الماء — الأسباب ومتى تتوقف.</div></Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -254,8 +270,7 @@ export default function HomePage() {
             desc="رواتب الموظفين، حساب المواطن، المتقاعدين، الضمان الاجتماعي، والدعم السكني."
             to="/salaries"
           />
-          <ServiceCard icon={Gem} title="أسعار الذهب" desc="سعر الجرام حسب العيار في الدول العربية مع المصدر وطريقة الحساب." to="/gold-price" />
-          <ServiceCard icon={BadgeDollarSign} title="أسعار الدولار" desc="أسعار صرف مرجعية وجداول تحويل للدول والعملات العربية." to="/usd-rate" />
+          <ServiceCard icon={Wrench} title="أكواد الأعطال" desc="معنى الرمز، نطاق الموديل، الأسباب والفحوص الآمنة بالرجوع إلى المصدر." to="/fault-codes" />
           <ServiceCard
             icon={CalendarDays}
             title="التقويم الهجري"
@@ -287,10 +302,10 @@ export default function HomePage() {
             to="/age-calculator"
           />
           <ServiceCard
-            icon={Wand2}
-            title="زخرفة الأسماء"
-            desc="زخرف اسمك بأكثر من 75 نمط مجاناً — عربي، ببجي، إنجليزي، فري فاير، وفرنسي."
-            to="/name-decoration"
+            icon={BookOpen}
+            title="المقالات العملية"
+            desc="أدلة محررة عن المواعيد والخدمات مع مصادر وتاريخ مراجعة واضح."
+            to="/articles"
           />
         </div>
       </section>
@@ -440,18 +455,21 @@ export default function HomePage() {
       {/* SEO content */}
       <section className="container-page mt-14">
         <div className="card p-6 sm:p-8">
-          <h2 className="font-display text-xl font-bold text-brand-900">عن بوابة تقويم السعودية</h2>
+          <h2 className="font-display text-xl font-bold text-brand-900">عن الشفرة</h2>
           <div className="mt-4 space-y-3 text-sm leading-relaxed text-brand-700/85">
             <p>
-              <strong className="text-brand-900">تقويم السعودية</strong> هي بوابة إلكترونية متخصصة في عرض
-              التقويمات والمواعيد المهمة في المملكة العربية السعودية. نقدم لكم مواعيد صرف الرواتب
-              الحكومية، حساب المواطن، الضمان الاجتماعي المطوّر، رواتب المتقاعدين، والدعم السكني،
-              بالإضافة إلى التقويم الهجري والميلادي، التقويم الدراسي، وجميع المناسبات الوطنية والدينية.
+              <strong className="text-brand-900">الشفرة</strong> منصة للحلول والأدوات والمراجع العملية. نحافظ
+              داخلها على «تقويم السعودية» بوصفه قسمًا متخصصًا في التقويمات والمواعيد المهمة في المملكة:
+              مواعيد الرواتب وحساب المواطن والضمان والمتقاعدين، والتقويم الهجري والدراسي والإجازات.
             </p>
             <p>
               تعتمد البوابة على تقويم أم القرى الرسمي الصادر عن المملكة العربية السعودية كمرجع أساسي
               لتحديد مواعيد الإجازات الرسمية والمناسبات. توفر المنصة أيضاً أدوات تحويل التاريخ بين
               الهجري والميلادي، وحاسبة العمر بالسنوات والأشهر والأيام.
+            </p>
+            <p>
+              ويضيف قسم «الشفرة إصلاح» أدلة لأكواد أعطال الأجهزة المنزلية؛ تُراجع كل صفحة حسب العلامة
+              ونوع الجهاز ونطاق الموديل، وتفصل بين الفحوص الخارجية الآمنة والإصلاحات التي تستلزم فنيًا.
             </p>
             <p>
               نسعى لجعل المعلومات في متناول الجميع بسرعة ودقة، مع التذكير بأن التواريخ المعروضة

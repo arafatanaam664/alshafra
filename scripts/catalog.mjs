@@ -1,7 +1,6 @@
-// catalog.mjs — مولّد الكتالوج العالمي متعدد اللغات
-// يبني كل صفحات الموقع العالمية (أدوات × 16 لغة، دول، حروف، أسماء، قوائم، مقالات)
-// مع حساب تاريخ النشر لكل صفحة حسب schedule.json (نشر تلقائي بمعدل pages/day).
-// يُستخدم من scripts/prerender.mjs وقت البناء. البيانات مشتركة JSON مع تطبيق React.
+// catalog.mjs — تعريفات الكتالوج العالمي القديم متعدد اللغات.
+// يبني التعريفات كي نستطيع الحفاظ على URLs المنشورة سابقاً فقط. قرار النشر
+// محصور في mergeCatalog وبيان التجميد؛ لا توجد هنا جدولة أو إضافة تلقائية.
 
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
@@ -15,7 +14,6 @@ export const LANGUAGES = read('src/data/languages.json').languages;
 export const COUNTRIES = read('src/data/countries.json').countries;
 export const NAMES = read('src/data/names.json').names;
 export const TRIVIA = read('src/data/trivia.json');
-export const SCHEDULE = read('src/data/schedule.json');
 export const PRICES = read('src/data/prices.json');
 const PRICE_GUIDES = read('src/data/price-guides.json');
 
@@ -600,9 +598,9 @@ function hubRoute(lang) {
   };
 }
 
-// ---------- بناء الكتالوج بالمراحل ----------
-// المرحلة 0-2: المحاور + الأدوات + فهارس المقالات لكل اللغات (تُنشر فوراً — لا 404)
-// المرحلة 3+: المحتوى العميق (دول، حروف، أسماء، قوائم، مقالات) حسب جدولة ratePerDay
+// ---------- بناء تعريفات الكتالوج القديم ----------
+// لا تعني المراحل التالية أولوية نشر؛ يحتفظ بها المولّد فقط لإعادة إنشاء
+// الصفحة إذا كان مسارها موجوداً أصلاً في بيان التجميد.
 export function buildCatalog() {
   const routes = [];
   const push = (r) => { if (r) routes.push(r); };
@@ -611,7 +609,7 @@ export function buildCatalog() {
   // المرحلة 0: محاور اللغات (العربية الرئيسية = الصفحة السعودية القائمة)
   for (const lang of langs) if (lang !== 'ar') push(hubRoute(lang));
 
-  // بوابات الدول تبقى في الكتالوج، وتُنشر تلقائيًا عندما يجتاز محتواها الفحص.
+  // بوابات الدول تبقى كتعريفات تاريخية ولا تُضاف إلى النشر تلقائياً.
   for (const lang of langs) {
     push(countryHubRoute(lang, 'gold'));
     push(countryHubRoute(lang, 'usd'));
@@ -660,49 +658,40 @@ export function buildCatalog() {
     for (const a of WORLD_ARTICLES) push(articleRoute(lang, a));
     if (ISLAMIC_LANGS.includes(lang)) for (const a of DHIKR_ARTICLES) push(articleRoute(lang, a));
   }
-  // تبقى كل المسارات في الكتالوج والجدولة؛ فحص الجودة يحدد الجاهز للنشر فقط
-  // من دون حذف المسار أو إلغاء دوره في النشر الآلي.
-  return routes.map((route) => {
-    const main = route.body?.match(/<main[^>]*>([\s\S]*?)<\/main>/i)?.[1] || '';
-    const text = main.replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&(?:#\d+|#x[\da-f]+|[a-z]+);/gi, ' ');
-    const qualityWords = (text.match(/[\p{L}\p{N}]+/gu) || []).length;
-    return { ...route, qualityWords, qualityReady: qualityWords >= 1500 };
-  });
+  // إنشاء تعريف المسار لا يعني السماح بنشره. يختار mergeCatalog فقط المسارات
+  // الموجودة في بيان النشر المجمّد، ولا يعتمد القرار على طول اصطناعي للنص.
+  return routes;
 }
 
-// ---------- الجدولة ----------
-// الملفات: تُولَّد كلها (حتى لا يقع أي رابط في 404 عند تبديل اللغة أو التنقل).
-// sitemap + published.json + IndexNow: مقيدة بالجدولة — كل يوم تظهر 5 صفحات جديدة
-// (ratePerDay) في sitemap فقط، بينما الصفحات الفورية (immediate) تظهر من اليوم الأول.
-export function mergeCatalog(existingRoutes) {
+// ---------- تجميد الكتالوج ----------
+// لا توجد جدولة أو إضافة يومية. نستبقي فقط مسارات الكتالوج الموجودة في بيان
+// النشر المراجع، بينما تدخل المسارات التحريرية الجديدة بعلامة reviewed صريحة.
+// هذا يفصل توليد تعريفات الكتالوج عن قرار السماح بالفهرسة.
+export function mergeCatalog(existingRoutes, { frozenPaths = [] } = {}) {
   const catalog = buildCatalog();
-  const start = new Date(`${SCHEDULE.startDate}T00:00:00Z`);
-  const rate = SCHEDULE.ratePerDay || 5;
+  const frozen = new Set(frozenPaths);
   const now = new Date();
-  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const todayIso = today.toISOString().slice(0, 10);
-  const all = existingRoutes.map((r) => ({ ...r, publishDate: start, fromExisting: true }));
-  // إزالة أي تكرار: الصفحات القائمة لها الأولوية (لا نكتب فوق الرئيسية السعودية أبداً)
-  const seen = new Set(existingRoutes.map((r) => r.path));
-  // الفورية (محاور + أدوات + فهارس) تُنشر فوراً، والعميقة تُحسب أيامها من فهرسها الخاص
-  // (وليس من الفهرس العام) حتى تبدأ 10 صفحات يومياً من اليوم الأول.
-  let deepIndex = 0;
-  catalog.forEach((r) => {
-    if (seen.has(r.path)) return;
-    seen.add(r.path);
-    if (r.immediate) {
-      all.push({ ...r, publishDate: start });
-    } else {
-      const d = new Date(start);
-      d.setUTCDate(d.getUTCDate() + Math.floor(deepIndex / rate));
-      deepIndex++;
-      all.push({ ...r, publishDate: d });
-    }
-  });
-  // المنشور: الصفحات القائمة المحررة، ومن الكتالوج ما حل أجله واجتاز 1500 كلمة.
-  // غير الجاهز يبقى محفوظًا في الطابور ويُنشر تلقائيًا بعد اكتمال محتواه؛ لا يُحذف.
-  const published = all.filter((route) => route.publishDate <= today && ((route.fromExisting && !route.automated) || route.qualityReady));
-  // start يُعاد لتحديد lastmod: الصفحات المجدولة (بعد بداية الجدولة) تُظهر تاريخ نشرها
-  // الفعلي، بينما الصفحات القائمة والفورية (تُعاد بناؤها يومياً) تُظهر تاريخ البناء.
-  return { all, published, today: todayIso, total: all.length, start };
+  const todayIso = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+    .toISOString()
+    .slice(0, 10);
+  const seen = new Set();
+  const all = [];
+
+  for (const route of existingRoutes) {
+    if (seen.has(route.path)) throw new Error(`[catalog] Duplicate editorial route: ${route.path}`);
+    seen.add(route.path);
+    // المواضيع المؤتمتة القديمة لا تبقى إلا إذا كانت منشورة قبل التجميد. أما
+    // المسارات المكتوبة يدوياً وCMS المراجع فتدخل من دون بوابة عدد كلمات.
+    if (route.automated && !route.reviewed && !frozen.has(route.path)) continue;
+    all.push({ ...route, fromExisting: true });
+  }
+
+  for (const route of catalog) {
+    if (seen.has(route.path) || !frozen.has(route.path)) continue;
+    seen.add(route.path);
+    all.push({ ...route, fromFrozenCatalog: true });
+  }
+
+  const published = all.filter((route) => route.indexable !== false);
+  return { all, published, today: todayIso, total: catalog.length + existingRoutes.length };
 }

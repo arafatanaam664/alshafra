@@ -34,6 +34,9 @@
   .btn-ghost {
     @apply btn bg-white text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50;
   }
+  .field-input {
+    @apply w-full rounded-xl border border-brand-200 bg-white px-3.5 py-2.5 text-sm font-normal text-brand-900 outline-none transition placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+  }
   .chip {
     @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
   }
