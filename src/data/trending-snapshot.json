@@ -1,26 +1,27 @@
 {
-  "date": "2026-08-18",
+  "date": "2026-08-19",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-18",
+      "date": "2026-08-19",
       "titles": [
-        "دوري أبطال آسيا للنخبة",
-        "طيران الرياض",
-        "تسوية",
-        "fenerbahçe vs ol",
-        "fenerbahçe - lyon",
-        "فنربخشة ضد أولمبيك ليون",
-        "roberto carlos",
-        "al-jabalain vs al-ettifaq",
-        "مطار ابو الظهور العسكري",
-        "مطار الملك خالد الدولي"
+        "فارس",
+        "حضوري",
+        "السعودية",
+        "كاريس بشار",
+        "غرامة",
+        "رشاد العليمي",
+        "يوتيوب يوتيوب",
+        "كريستينا سيرا",
+        "বাংলাদেশ",
+        "الرياض"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-18",
+      "date": "2026-08-19",
       "titles": [
+        "pak vs eng",
         "السعودية",
         "fenerbahçe vs ol",
         "الدرعية ضد النصر",
@@ -29,30 +30,29 @@
         "روبرتو كارلوس",
         "roberto carlos",
         "صاروخ",
-        "al-najma vs al-ittihad",
-        "മിസൈല്"
+        "al-najma vs al-ittihad"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-18",
+      "date": "2026-08-19",
       "titles": [
+        "roberto carlos",
         "الدرعية ضد النصر",
         "identity document",
         "diriyah vs al-nassr",
-        "iran news",
         "اذان المغرب",
         "al jazeera",
         "sri lanka",
         "pasindu sooriyabandara",
-        "deportation",
-        "alexandra eala"
+        "deportation"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-18",
+      "date": "2026-08-19",
       "titles": [
+        "قانون الجنسية",
         "صاروخ",
         "روبرتو كارلوس",
         "الدرعية ضد النصر",
@@ -60,15 +60,15 @@
         "سوريا",
         "identity document",
         "تهريب",
-        "وزارة الداخلية",
         "প্রবাসী বাংলাদেশী",
         "gold"
       ]
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-18",
+      "date": "2026-08-19",
       "titles": [
+        "وزارة العمل",
         "الدرعية ضد النصر",
         "diriyah vs al-nassr",
         "دونالد ترمب",
@@ -78,8 +78,9 @@
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-18",
+      "date": "2026-08-19",
       "titles": [
+        "identity document",
         "سوريا",
         "diriyah vs al-nassr",
         "الدرعية ضد النصر",
@@ -88,8 +89,7 @@
         "الممثله هايدن بانتير",
         "سفر",
         "اذان المغرب",
-        "سي إن إن",
-        "ananya raj"
+        "سي إن إن"
       ]
     }
   }
