@@ -1,98 +1,98 @@
 {
-  "date": "2026-08-19",
+  "date": "2026-08-20",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-19",
+      "date": "2026-08-20",
       "titles": [
-        "نادي الفتح",
-        "الرئيس التنفيذي",
-        "مانشستر سيتي",
-        "رئيس وزراء قطر",
-        "لا ليغا",
-        "الدوري الاسباني",
-        "الخلود",
-        "بنك الراجحي",
-        "الاهلى وبرشلونه",
-        "الراجحي"
+        "فارس",
+        "حضوري",
+        "twitch",
+        "വേടന്",
+        "ليونيل ميسي",
+        "دانا الحلاني",
+        "سفير",
+        "philadelphia vs inter miami",
+        "فيلادلفيا ضد إنتر ميامي",
+        "كاريس بشار"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-19",
+      "date": "2026-08-20",
       "titles": [
-        "أنصار الله الحوثيون",
-        "yalla kora",
-        "يلا كورة",
-        "atlético madrid vs málaga",
-        "barcelona",
-        "police",
-        "في الجول",
-        "barcelona vs al ahly",
-        "la liga",
-        "برشلونة ضد الأهلي"
+        "btc usd",
+        "aryna sabalenka",
+        "excessive heat",
+        "apple iphone 18 pro max",
+        "hotel",
+        "سعر الذهب اليوم",
+        "philadelphia vs inter miami",
+        "meet",
+        "atlético madrid vs málaga cf standings",
+        "أنور قرقاش"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-19",
+      "date": "2026-08-20",
       "titles": [
+        "mls",
+        "philadelphia vs inter miami",
+        "la liga",
         "club friendlies",
         "atlético madrid vs málaga",
         "barcelona",
+        "مباريات اليوم",
         "برشلونة ضد الأهلي",
         "barcelona vs al ahly",
-        "ali usman",
-        "إيران",
-        "fine",
-        "bahrain",
-        "pakistan vs england"
+        "ali usman"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-19",
+      "date": "2026-08-20",
       "titles": [
+        "philadelphia vs inter miami",
         "club friendlies",
         "barcelona",
         "atlético madrid vs málaga",
+        "يلا كوره",
         "barcelona vs al ahly",
         "برشلونة ضد الأهلي",
-        "يلا كورة",
         "fine",
         "food",
-        "إيران",
-        "pakistan vs england"
+        "إيران"
       ]
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-19",
+      "date": "2026-08-20",
       "titles": [
+        "philadelphia vs inter miami",
         "atlético madrid vs málaga",
         "barcelona vs al ahly",
         "برشلونة ضد الأهلي",
         "إيران",
         "pakistan vs england",
         "manav suthar",
-        "bahrain",
-        "وزارة العمل"
+        "bahrain"
       ]
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-19",
+      "date": "2026-08-20",
       "titles": [
+        "فيلادلفيا ضد إنتر ميامي",
+        "philadelphia vs inter miami",
         "atlético madrid vs málaga",
         "يلا كوره",
         "barcelona vs al ahly",
+        "مباريات اليوم",
         "برشلونة ضد الأهلي",
         "ali usman",
         "paragliding",
-        "gta6",
-        "إيران",
-        "pakistan vs england",
-        "bahrain"
+        "gta6"
       ]
     }
   }
