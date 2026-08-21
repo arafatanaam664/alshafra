@@ -1,3 +1,8 @@
 # @alshafra/search
 
-`SearchProvider` port. Postgres FTS adapter is not implemented in Phase 2.
+Query pipeline + `SearchProvider`.
+
+- `CatalogSearchProvider` — static Astro index
+- `PostgresSearchProvider` — `search_tsv` + `search_queries`
+
+`normalizeArabic` lives here (also used by linking).

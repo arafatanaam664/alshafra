@@ -9,6 +9,7 @@
       "@alshafra/calendar": ["../../packages/calendar/src/index.ts"],
       "@alshafra/content/snapshot": ["../../packages/content/src/snapshot.ts"],
       "@alshafra/content/linking": ["../../packages/content/src/linking.ts"],
+      "@alshafra/search": ["../../packages/search/src/index.ts"],
       "@alshafra/seo": ["../../packages/seo/src/index.ts"],
       "@alshafra/ui": ["../../packages/ui/src/index.ts"],
       "@alshafra/tools": ["../../packages/tools/src/index.ts"],

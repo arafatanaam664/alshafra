@@ -11,13 +11,13 @@ Do not invent a second numbering system that puts Vite back in front of Astro.
 | M0 stabilize | Phases 0–5 committed on this branch |
 | **Phase 6** | Public integration: CMS → snapshot → **Astro SSG** |
 | **Phase 7** | SEO engine on Astro |
-| **Phase 8 (this cycle)** | Internal linking engine |
+| **Phase 8** | Internal linking engine |
+| **Phase 9 (this cycle)** | Public search `/search` noindex + FTS pipeline |
 
 ## Next (do not start until the owner says ابدأ)
 
 Follow the chat:
 
-9. Public search (`/search` noindex, Postgres FTS)  
 10. Tool engine expansions  
 11. Media / R2 (blocked on owner creating the bucket)  
 12. Community only after flags + Turnstile + moderation  

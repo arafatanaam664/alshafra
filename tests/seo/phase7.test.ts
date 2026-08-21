@@ -42,7 +42,7 @@ if (!graphHasType(article, 'FAQPage')) fail('article graph missing FAQPage');
 if (!graphHasType(article, 'BreadcrumbList')) fail('article graph missing BreadcrumbList');
 if (!graphHasType(article, 'Organization')) fail('missing Organization');
 if (!graphHasType(article, 'WebSite')) fail('missing WebSite');
-if (graphHasSearchAction(article)) fail('SearchAction must not exist until /search');
+if (!graphHasSearchAction(article)) fail('SearchAction required now that /search exists');
 if (graphHasType(article, 'JobPosting')) fail('do not invent JobPosting');
 if (graphHasType(article, 'Product')) fail('do not invent Product');
 

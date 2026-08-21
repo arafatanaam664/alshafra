@@ -39,7 +39,14 @@ if (!article.includes('"@type":"Article"') && !article.includes('"@type": "Artic
   seoFail.push('article missing Article JSON-LD');
 }
 if (!article.includes('FAQPage')) seoFail.push('article missing FAQPage JSON-LD');
-if (article.includes('SearchAction')) seoFail.push('SearchAction leaked');
+if (!article.includes('SearchAction')) seoFail.push('SearchAction missing after /search launched');
+const searchPage = join(dist, 'search/index.html');
+if (!existsSync(searchPage)) seoFail.push('missing /search');
+else {
+  const searchHtml = readFileSync(searchPage, 'utf8');
+  if (!/noindex/i.test(searchHtml)) seoFail.push('/search must be noindex');
+}
+if (!existsSync(join(dist, 'search-index.json'))) seoFail.push('missing search-index.json');
 if (article.includes('JobPosting')) seoFail.push('JobPosting leaked');
 
 const converter = readFileSync(join(dist, 'date-converter/index.html'), 'utf8');

@@ -376,9 +376,12 @@ export async function seedDatabase(client: SqlClient): Promise<{ roles: number; 
   await client.query(
     `INSERT INTO search_synonyms (id, term, synonym, locale) VALUES
       ($1,'ام القرى','أم القرى','ar'),
-      ($2,'هجري','هجري','ar')
+      ($2,'ام القرى','umm al qura','ar'),
+      ($3,'هجري','هجرى','ar'),
+      ($4,'واتساب','whatsapp','ar'),
+      ($5,'راتب','رواتب','ar')
      ON CONFLICT DO NOTHING`,
-    [systemId(0xc01), systemId(0xc02)],
+    [systemId(0xc01), systemId(0xc02), systemId(0xc03), systemId(0xc04), systemId(0xc05)],
   );
 
   return { roles: ROLES.length, flags: FEATURE_FLAG_SEEDS.length, redirects: REDIRECTS.length };

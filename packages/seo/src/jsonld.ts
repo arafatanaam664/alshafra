@@ -50,6 +50,11 @@ export function websiteNode() {
     url: `${SITE_URL}/`,
     inLanguage: 'ar-SA',
     publisher: { '@id': ORGANIZATION_ID },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${SITE_URL}/search?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
   };
 }
 
