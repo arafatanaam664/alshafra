@@ -221,11 +221,11 @@ Each ADR: Context, Decision, Alternatives, Reason, Trade-offs, Consequences.
 
 ---
 
-## ADR-022 Stay on Vercel until full cutover
+## ADR-022 Host vs renderer
 
-**Context:** Dual Vercel/Netlify configs. Target architecture is Cloudflare Pages.  
-**Decision:** **Vercel remains production** until the owner says the project is complete, then Cloudflare. Do not change DNS now. Vite remains the publish target.  
-**Alternatives:** Cut to Astro/Cloudflare immediately.  
-**Reason:** Owner lock 2026-08-21; avoid a mid-migration outage.  
-**Trade-offs:** Dual-app drift continues.  
-**Consequences:** `vercel.json` `buildCommand` is `npm run build:legacy`. Astro is preview-only until M3.
+**Context:** Chat lock is Astro SSG + Cloudflare Pages. Owner said production DNS stays on Vercel until the project is complete, then Cloudflare. An earlier note wrongly treated that as “keep Vite”.  
+**Decision:** **Renderer = Astro** (`npm run build` → `apps/web/dist`). **Host = Vercel now**, Cloudflare Pages later. Vite is rollback only. Do not change DNS. Do not delete `apps/web-legacy`.  
+**Alternatives:** Keep Vite as the public app; cut DNS to Cloudflare now.  
+**Reason:** Chat H3 / ADR-101 + owner D2. Host and renderer are different decisions.  
+**Trade-offs:** `main` remains the live Vite site until this branch is merged.  
+**Consequences:** This branch’s `vercel.json` / `netlify.toml` publish Astro. Daily-publish on `main` is unchanged until merge (see `docs/execution/04-daily-publish-cutover.md`).

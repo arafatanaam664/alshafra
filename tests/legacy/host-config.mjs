@@ -8,14 +8,14 @@ const netlify = readFileSync(join(root, 'netlify.toml'), 'utf8');
 
 const errors = [];
 
-if (vercel.buildCommand !== 'npm run build:legacy') {
-  errors.push(`vercel.json buildCommand must be npm run build:legacy, got ${JSON.stringify(vercel.buildCommand)}`);
+if (vercel.buildCommand !== 'npm run build') {
+  errors.push(`vercel.json buildCommand must be npm run build (Astro), got ${JSON.stringify(vercel.buildCommand)}`);
 }
-if (vercel.outputDirectory !== 'apps/web-legacy/dist') {
-  errors.push(`vercel.json outputDirectory must stay on Vite until cutover, got ${JSON.stringify(vercel.outputDirectory)}`);
+if (vercel.outputDirectory !== 'apps/web/dist') {
+  errors.push(`vercel.json outputDirectory must be the Astro app, got ${JSON.stringify(vercel.outputDirectory)}`);
 }
-if (vercel.buildCommand === 'npm run build') {
-  errors.push('vercel.json must not run the Astro build while outputDirectory is the Vite folder');
+if (vercel.buildCommand === 'npm run build:legacy') {
+  errors.push('This branch must not publish Vite as the public renderer (chat: Astro SSG)');
 }
 
 const gone = new Set(
@@ -29,14 +29,14 @@ for (const src of ['^/category(?:/.*)?$', '^/languages(?:/.*)?$', '^/news(?:/.*)
   }
 }
 
-if (!/command\s*=\s*"npm run build:legacy"/.test(netlify)) {
-  errors.push('netlify.toml build command must be npm run build:legacy');
+if (!/command\s*=\s*"npm run build"/.test(netlify)) {
+  errors.push('netlify.toml build command must be npm run build (Astro)');
 }
-if (!/publish\s*=\s*"apps\/web-legacy\/dist"/.test(netlify)) {
-  errors.push('netlify.toml publish must be apps/web-legacy/dist');
+if (!/publish\s*=\s*"apps\/web\/dist"/.test(netlify)) {
+  errors.push('netlify.toml publish must be apps/web/dist');
 }
-if (/command\s*=\s*"npm run build"/.test(netlify)) {
-  errors.push('netlify.toml must not run Astro while publishing the Vite folder');
+if (/command\s*=\s*"npm run build:legacy"/.test(netlify)) {
+  errors.push('netlify.toml must not publish the Vite rollback app');
 }
 
 if (errors.length) {
@@ -44,4 +44,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log('Host config ok: Vercel/Netlify stay on Vite; 410 routes present.');
+console.log('Host config ok: this branch publishes Astro SSG; 410 routes present.');

@@ -1,6 +1,13 @@
 import { newId } from '@alshafra/kernel';
 import { selfCanonical } from '@alshafra/seo';
-import type { DocumentStatus, DocumentType } from '@alshafra/content';
+import {
+  blocksToPlainText,
+  parseBlocks,
+  refreshPublicSnapshot,
+  wordCount,
+  type DocumentStatus,
+  type DocumentType,
+} from '@alshafra/content';
 import type { SqlClient } from '@alshafra/database';
 import { writeAudit } from './audit';
 import { type Actor, hasPermission, requirePermission } from './permissions';
@@ -327,6 +334,13 @@ export async function transitionDocument(db: SqlClient, actor: Actor, id: string
     [id, to, indexable, publishedAt, to === 'scheduled' ? scheduledAt ?? now : null],
   );
   await writeAudit(db, actor, `documents.${to}`, 'document', id, { status: from }, { status: to });
+  if (to === 'published' || to === 'unpublished' || to === 'archived') {
+    try {
+      await refreshPublicSnapshot(db);
+    } catch {
+      /* snapshot write is best-effort; publish must not fail */
+    }
+  }
   return { id, from, to, path: current.path };
 }
 

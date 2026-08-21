@@ -7,7 +7,7 @@ Reason: the GitHub App used here cannot update workflow files (`workflows` permi
 ## Do this in the merge-to-main PR (not now)
 
 1. Point scripts at `apps/web-legacy/`.
-2. Build with `npm run build:legacy` (never `npm run build` / Astro).
+2. Build the public site with `npm run build` (Astro). Keep `npm run build:legacy` only as a rollback job.
 3. Run the job only on `main`.
 
 Required job header and commands:

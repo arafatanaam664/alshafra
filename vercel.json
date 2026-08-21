@@ -2,8 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "npm ci",
-  "buildCommand": "npm run build:legacy",
-  "outputDirectory": "apps/web-legacy/dist",
+  "buildCommand": "npm run build",
+  "outputDirectory": "apps/web/dist",
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [

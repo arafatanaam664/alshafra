@@ -29,12 +29,19 @@ export interface RouteSnapshot {
 }
 
 export function loadContentSnapshot(): { routes: RouteSnapshot[] } | null {
-  const file = join(here, '../../../../packages/database/data/content-snapshot.json');
-  try {
-    return readJson<{ routes: RouteSnapshot[] }>(file);
-  } catch {
-    return null;
+  const candidates = [
+    join(here, '../data/cms-snapshot.json'),
+    join(here, '../../../../packages/database/data/content-snapshot.json'),
+  ];
+  for (const file of candidates) {
+    try {
+      const data = readJson<{ routes: RouteSnapshot[] }>(file);
+      if (data?.routes) return data;
+    } catch {
+      /* try next */
+    }
   }
+  return null;
 }
 
 export function contentSource(): 'legacy' | 'database' | 'composite' {

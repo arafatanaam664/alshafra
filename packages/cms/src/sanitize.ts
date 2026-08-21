@@ -31,11 +31,19 @@ export type BodyBlock =
   | { type: 'callout'; text: string };
 
 export function sanitizeBlocks(blocks: unknown): BodyBlock[] {
-  if (!Array.isArray(blocks)) return [];
+  let raw = blocks;
+  if (typeof raw === 'string') {
+    try {
+      raw = JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+  if (!Array.isArray(raw)) return [];
   const out: BodyBlock[] = [];
-  for (const raw of blocks) {
-    if (!raw || typeof raw !== 'object') continue;
-    const b = raw as Record<string, unknown>;
+  for (const item of raw) {
+    if (!item || typeof item !== 'object') continue;
+    const b = item as Record<string, unknown>;
     if (b.type === 'p' || b.type === 'h2' || b.type === 'h3' || b.type === 'callout') {
       out.push({ type: b.type, text: sanitizeHtml(String(b.text ?? '')) });
     } else if (b.type === 'ul' && Array.isArray(b.items)) {

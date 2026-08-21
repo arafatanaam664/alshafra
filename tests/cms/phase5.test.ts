@@ -48,6 +48,7 @@ async function main() {
   process.env.ALSHAFRA_ENV = 'development';
   process.env.ADMIN_DEV_LOGIN = 'true';
   process.env.ADMIN_SESSION_SECRET = 'test-secret-phase5';
+  process.env.ALSHAFRA_SNAPSHOT_PATH = `${root}/packages/database/data/phase5-snapshot.json`;
 
   const { PGlite } = await import('@electric-sql/pglite');
   const db = new PGlite();

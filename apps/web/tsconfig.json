@@ -7,6 +7,7 @@
     "baseUrl": ".",
     "paths": {
       "@alshafra/calendar": ["../../packages/calendar/src/index.ts"],
+      "@alshafra/content/snapshot": ["../../packages/content/src/snapshot.ts"],
       "@alshafra/seo": ["../../packages/seo/src/index.ts"],
       "@alshafra/ui": ["../../packages/ui/src/index.ts"],
       "@alshafra/tools": ["../../packages/tools/src/index.ts"],

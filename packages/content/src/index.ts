@@ -6,6 +6,16 @@ export type {
 export { DOCUMENT_STATUSES, canPublish, assertPublicPath } from './types';
 export { classify } from './legacy-classify';
 export type { BodyBlock } from './blocks';
-export { blocksToPlainText, wordCount } from './blocks';
-export type { ContentSnapshot, SnapshotRoute } from './snapshot';
-export { contentSnapshotSchema, snapshotRouteSchema } from './snapshot';
+export {
+  blocksToPlainText,
+  blocksToHtml,
+  escapeHtml,
+  parseBlocks,
+  wordCount,
+  passesQualityGate,
+  QUALITY_INDEX_MIN_WORDS,
+  QUALITY_PREFERRED_WORDS,
+} from './blocks';
+export type { ContentSnapshot, SnapshotRoute, PublicPage } from './snapshot';
+export { contentSnapshotSchema, snapshotRouteSchema, mergeLegacyAndSnapshot, snapshotRouteToPage } from './snapshot';
+export { buildPublicSnapshot, writePublicSnapshot, refreshPublicSnapshot, defaultSnapshotPath } from './export-snapshot';

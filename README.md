@@ -31,10 +31,11 @@ Details: `docs/product_architecture/56-eight-pillars.md` and `docs/execution/03-
 
 ## Production (do not guess)
 
-- **Live host today:** Vercel serving `apps/web-legacy/dist`.
-- **Build that Vercel must run:** `npm run build:legacy` (locked in `vercel.json`).
-- **Not yet:** Cloudflare Pages, hosted Supabase, R2. Those come after the project is complete enough to cut over. Do not change DNS.
-- `npm run build` is the Astro app. Pointing Vercel/Netlify at it while `outputDirectory`/`publish` is still the Vite folder will ship an empty site.
+- **Renderer (this branch, chat plan):** Astro SSG — `npm run build` → `apps/web/dist`.
+- **Live `main` today:** still the Vite calendar site until this branch is merged.
+- **Host today:** Vercel. **Later host:** Cloudflare Pages. Do not change DNS now.
+- **Rollback:** `apps/web-legacy` + `npm run build:legacy`. Do not delete it.
+- **Not yet:** hosted Supabase, R2. Do not paste secrets in chat.
 
 ## Docs
 

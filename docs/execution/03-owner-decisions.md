@@ -14,8 +14,8 @@ Recorded from the product owner. Source of truth order is still: repo/tests → 
 
 ## Consequences for engineering
 
-- Vercel must keep building **Vite**: `buildCommand = npm run build:legacy`, `outputDirectory = apps/web-legacy/dist`.
-- `npm run build` (Astro) is for preview/cutover work only.
+- Public renderer is **Astro** (chat). This branch publishes `apps/web/dist`.
+- Live `main` stays Vite until you merge. Host stays Vercel until Cloudflare cutover. No DNS change.
 - Daily auto-publish stays the `main` Vite-root workflow until merge. The required `apps/web-legacy` + `build:legacy` patch is documented in `04-daily-publish-cutover.md` (this App cannot update `.github/workflows`).
 - Hosted database and R2 wait for a later milestone. Local CMS uses PGlite / `ADMIN_DEV_LOGIN`.
 - Implementing “all eight ideas” means architecture + sequenced activation, not eight indexed empty hubs.

@@ -8,6 +8,7 @@ import {
   todayGregorian,
   weekdayName,
 } from '@alshafra/calendar';
+import { mergeLegacyAndSnapshot, type ContentSnapshot } from '@alshafra/content/snapshot';
 import { DATA, contentSource, loadContentSnapshot, loadPublished, readJson } from './load';
 import { esc, faqHtml, h2, p, relatedHtml, sourcesHtml, ul } from './html';
 import type { PageModel } from './types';
@@ -533,19 +534,19 @@ let cache: PageModel[] | null = null;
 
 function applySnapshot(pages: PageModel[]): PageModel[] {
   const source = contentSource();
-  const snap = loadContentSnapshot();
-  if (!snap || source === 'legacy') return pages;
-  if (source === 'composite') return pages;
-  const byPath = Object.fromEntries(snap.routes.map((r) => [r.path, r]));
-  return pages.map((page) => {
-    const row = byPath[page.path];
-    if (!row) return page;
+  const snap = loadContentSnapshot() as ContentSnapshot | null;
+  const merged = mergeLegacyAndSnapshot(pages, snap, source);
+  return merged.map((page) => {
+    const existing = pages.find((p) => p.path === page.path);
+    if (existing) return existing;
     return {
-      ...page,
-      title: row.title || page.title,
-      description: row.description || page.description,
-      h1: row.h1 || page.h1,
-      robots: row.robots || page.robots,
+      path: page.path,
+      title: page.title,
+      description: page.description,
+      h1: page.h1,
+      robots: page.robots,
+      kind: page.kind,
+      html: page.html,
     };
   });
 }

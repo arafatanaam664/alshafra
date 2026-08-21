@@ -13,6 +13,10 @@ export const snapshotRouteSchema = z.object({
   handlerKind: z.string(),
   indexable: z.boolean(),
   kind: z.string(),
+  html: z.string().optional(),
+  isLegacy: z.boolean().optional(),
+  uniqueTextWordCount: z.number().optional(),
+  qualityPass: z.boolean().optional(),
 });
 
 export const contentSnapshotSchema = z.object({
@@ -24,3 +28,59 @@ export const contentSnapshotSchema = z.object({
 
 export type SnapshotRoute = z.infer<typeof snapshotRouteSchema>;
 export type ContentSnapshot = z.infer<typeof contentSnapshotSchema>;
+
+export interface PublicPage {
+  path: string;
+  title: string;
+  description: string;
+  h1: string;
+  robots: 'index, follow' | 'noindex, follow';
+  kind: string;
+  html: string;
+}
+
+/**
+ * Chat Phase 6: JSON fallback stays. Do not rewrite the identity of the 127
+ * legacy URLs. New published CMS routes are appended. `database` mode uses
+ * the snapshot only and is rejected unless every legacy path is present.
+ */
+export function mergeLegacyAndSnapshot(
+  legacyPages: PublicPage[],
+  snapshot: ContentSnapshot | null,
+  source: 'legacy' | 'database' | 'composite',
+): PublicPage[] {
+  if (!snapshot || source === 'legacy') return legacyPages;
+
+  const legacyByPath = new Map(legacyPages.map((page) => [page.path, page]));
+  const snapByPath = new Map(snapshot.routes.map((route) => [route.path, route]));
+
+  if (source === 'database') {
+    const missing = legacyPages.filter((page) => !snapByPath.has(page.path)).map((page) => page.path);
+    if (missing.length) {
+      throw new Error(`database source missing legacy paths: ${missing.slice(0, 8).join(', ')}`);
+    }
+    return snapshot.routes.filter((route) => route.status === 'published').map(snapshotRouteToPage);
+  }
+
+  const merged = legacyPages.map((page) => page);
+  for (const route of snapshot.routes) {
+    if (route.status !== 'published') continue;
+    if (legacyByPath.has(route.path) || route.isLegacy) continue;
+    if (!route.html?.trim()) continue;
+    merged.push(snapshotRouteToPage(route));
+  }
+  return merged;
+}
+
+export function snapshotRouteToPage(route: SnapshotRoute): PublicPage {
+  const indexable = Boolean(route.indexable && route.qualityPass && route.robots.startsWith('index'));
+  return {
+    path: route.path,
+    title: route.title,
+    description: route.description,
+    h1: route.h1,
+    robots: indexable ? 'index, follow' : 'noindex, follow',
+    kind: route.documentType || route.kind,
+    html: route.html || '',
+  };
+}
