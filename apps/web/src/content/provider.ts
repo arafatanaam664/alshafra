@@ -11,6 +11,7 @@ import {
 import { mergeLegacyAndSnapshot, type ContentSnapshot } from '@alshafra/content/snapshot';
 import { DATA, contentSource, loadContentSnapshot, loadPublished, readJson } from './load';
 import { esc, faqHtml, h2, p, relatedHtml, sourcesHtml, ul } from './html';
+import { FAQ_PAGE_ITEMS } from './faq-page';
 import type { PageModel } from './types';
 
 const SITE = 'https://alshafra.com';
@@ -245,6 +246,9 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
       h1: a.title,
       kind: 'article',
       html: articleHtml(a),
+      faq: a.faq,
+      datePublished: a.updatedAt,
+      dateModified: a.reviewedAt || a.updatedAt,
     });
   }
 
@@ -255,6 +259,7 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
       description: 'مقالات ودلائل عن المواعيد والتقويم في السعودية.',
       h1: 'مقالات ودلائل',
       kind: 'collection',
+      itemList: articles.map((a) => ({ name: a.title, path: `/articles/${a.slug}` })),
       html: `${p('مقالات تحريرية عن الرواتب والتقويم والإجازات والتحويل.')}${ul(
         articles.map((a) => `<a href="/articles/${a.slug}">${esc(a.title)}</a>`),
       )}${guideHtml('/articles')}`,
@@ -274,6 +279,7 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
       island: 'countdown',
       countdownSlug: def.slug,
       isoDate: `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`,
+      faq: def.faq,
       html: countdownHtml(def),
     });
   }
@@ -285,6 +291,7 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
       description: 'عدّادات تنازلية للمناسبات والرواتب والدراسة في السعودية.',
       h1: 'كم باقي على…؟',
       kind: 'collection',
+      itemList: countdowns.map((c) => ({ name: c.question, path: `/countdown/${c.slug}` })),
       html: `${p('عدّادات وفق أم القرى وتوقيت الرياض.')}${ul(
         countdowns.map((c) => `<a href="/countdown/${c.slug}">${esc(c.question)}</a>`),
       )}`,
@@ -347,7 +354,15 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
         ? `<table class="w-full text-sm my-4">${t.facts.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>`
         : ''
     }${faqHtml(t.faq || [])}${relatedHtml((t.related || []).filter((s) => topicBy[s]).map((s) => ({ href: `/trending/${s}`, title: topicBy[s].title })))}`;
-    return page({ path, title: publishedTitle, description: t.description, h1: t.title, kind: 'guide', html });
+    return page({
+      path,
+      title: publishedTitle,
+      description: t.description,
+      h1: t.title,
+      kind: 'guide',
+      html,
+      faq: t.faq,
+    });
   }
 
   if (path === '/gold-price') {

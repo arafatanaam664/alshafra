@@ -19,7 +19,21 @@ type Props = PageModel;
 const page = Astro.props;
 const url = `https://alshafra.com${page.path}`;
 ---
-<SiteLayout title={page.title} description={page.description} path={page.path} robots={page.robots} keywords={page.keywords}>
+<SiteLayout
+  title={page.title}
+  description={page.description}
+  path={page.path}
+  h1={page.h1}
+  robots={page.robots}
+  keywords={page.keywords}
+  kind={page.kind}
+  island={page.island}
+  faq={page.faq}
+  datePublished={page.datePublished}
+  dateModified={page.dateModified}
+  isoDate={page.isoDate}
+  itemList={page.itemList}
+>
   <h1 class="section-title">{page.h1}</h1>
   {page.island === 'date-converter' && <DateConverterIsland client:load />}
   {page.island === 'age-calculator' && <AgeCalculatorIsland client:load />}

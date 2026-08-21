@@ -1,3 +1,5 @@
+import type { FaqItem } from '@alshafra/seo';
+
 export interface PageModel {
   path: string;
   title: string;
@@ -10,6 +12,11 @@ export interface PageModel {
   countdownSlug?: string;
   isoDate?: string;
   html: string;
+  faq?: FaqItem[];
+  datePublished?: string;
+  dateModified?: string;
+  itemList?: { name: string; path: string }[];
+  imageAlt?: string;
 }
 
 export interface ContentProvider {

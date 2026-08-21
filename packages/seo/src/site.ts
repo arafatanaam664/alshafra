@@ -1,0 +1,10 @@
+export const SITE_URL = 'https://alshafra.com';
+export const SITE_NAME = 'Alshafra';
+export const SITE_ALTERNATE_NAMES = ['تقويم السعودية', 'Saudi Calendar', 'شفرة'] as const;
+export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
+export const DEFAULT_OG_WIDTH = 1200;
+export const DEFAULT_OG_HEIGHT = 630;
+export const DEFAULT_LOCALE = 'ar-SA';
+export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+export const WEBSITE_ID = `${SITE_URL}/#website`;
+export const LOGO_URL = `${SITE_URL}/favicon.svg`;

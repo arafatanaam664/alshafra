@@ -6,7 +6,14 @@ import { getPage } from '../content/provider';
 const page = getPage('/');
 if (!page) throw new Error('Missing homepage model');
 ---
-<SiteLayout title={page.title} description={page.description} path="/" robots={page.robots}>
+<SiteLayout
+  title={page.title}
+  description={page.description}
+  path="/"
+  h1={page.h1}
+  robots={page.robots}
+  kind={page.kind}
+>
   <h1 class="section-title">{page.h1}</h1>
   <div class="prose-alshafra mt-6 space-y-4 text-sm leading-loose text-brand-800" set:html={page.html} />
   <ShareIsland client:visible url="https://alshafra.com/" title={page.title} />

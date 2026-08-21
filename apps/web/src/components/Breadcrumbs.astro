@@ -1,0 +1,29 @@
+---
+import { breadcrumbsFor, type Crumb } from '@alshafra/seo';
+
+interface Props {
+  path: string;
+  h1: string;
+  crumbs?: Crumb[];
+}
+
+const { path, h1, crumbs } = Astro.props;
+const items = crumbs?.length ? crumbs : breadcrumbsFor(path, h1);
+---
+{path !== '/' && (
+  <nav aria-label="مسار التنقل" class="mb-4 flex flex-wrap items-center gap-1 text-xs text-brand-600/80">
+    {items.map((item, i) => {
+      const last = i === items.length - 1;
+      return (
+        <span class="flex items-center gap-1">
+          {item.path && !last ? (
+            <a href={item.path} class="hover:text-brand-800 hover:underline">{item.name}</a>
+          ) : (
+            <span class="font-medium text-brand-800">{item.name}</span>
+          )}
+          {!last && <span aria-hidden="true">‹</span>}
+        </span>
+      );
+    })}
+  </nav>
+)}
