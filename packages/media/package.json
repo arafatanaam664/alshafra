@@ -3,5 +3,19 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" }
+  "exports": {
+    ".": "./src/index.ts",
+    "./public": "./src/public.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@alshafra/database": "*",
+    "@alshafra/kernel": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.5.3"
+  }
 }

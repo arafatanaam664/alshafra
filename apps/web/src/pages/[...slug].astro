@@ -35,6 +35,8 @@ const url = `https://alshafra.com${page.path}`;
   dateModified={page.dateModified}
   isoDate={page.isoDate}
   itemList={page.itemList}
+  image={page.image}
+  imageAlt={page.imageAlt}
 >
   <h1 class="section-title">{page.h1}</h1>
   {page.island === 'date-converter' && <DateConverterIsland client:load />}

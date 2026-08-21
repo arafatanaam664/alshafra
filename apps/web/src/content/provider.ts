@@ -557,6 +557,7 @@ function applySnapshot(pages: PageModel[]): PageModel[] {
       robots: page.robots,
       kind: page.kind,
       html: page.html,
+      image: page.image,
     };
   });
 }

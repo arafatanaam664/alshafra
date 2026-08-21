@@ -48,12 +48,8 @@ export async function listRedirects(db: SqlClient, actor: Actor | null) {
 
 export async function listMedia(db: SqlClient, actor: Actor | null) {
   requirePermission(actor, 'media.read');
-  return (
-    await db.query(
-      `SELECT id, object_key, mime, byte_size, width, height, alt, visibility::text, created_at
-       FROM media WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 200`,
-    )
-  ).rows;
+  const { listMediaLibrary } = await import('@alshafra/media');
+  return listMediaLibrary(db);
 }
 
 export async function listTools(db: SqlClient, actor: Actor | null) {

@@ -13,6 +13,7 @@
     "@alshafra/content": "*",
     "@alshafra/database": "*",
     "@alshafra/kernel": "*",
+    "@alshafra/media": "*",
     "@alshafra/seo": "*",
     "zod": "^3.24.2"
   },

@@ -17,6 +17,7 @@ export const snapshotRouteSchema = z.object({
   isLegacy: z.boolean().optional(),
   uniqueTextWordCount: z.number().optional(),
   qualityPass: z.boolean().optional(),
+  image: z.string().optional(),
 });
 
 export const contentSnapshotSchema = z.object({
@@ -37,6 +38,7 @@ export interface PublicPage {
   robots: 'index, follow' | 'noindex, follow';
   kind: string;
   html: string;
+  image?: string;
 }
 
 /**
@@ -82,5 +84,6 @@ export function snapshotRouteToPage(route: SnapshotRoute): PublicPage {
     robots: indexable ? 'index, follow' : 'noindex, follow',
     kind: route.documentType || route.kind,
     html: route.html || '',
+    image: route.image,
   };
 }

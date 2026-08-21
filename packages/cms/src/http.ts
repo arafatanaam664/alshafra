@@ -1,6 +1,18 @@
 import type { SqlClient } from '@alshafra/database';
 import type { DocumentStatus, DocumentType } from '@alshafra/content';
 import {
+  createStorageFromEnv,
+  decodeBase64Upload,
+  getMedia,
+  ingestEditorial,
+  isR2Configured,
+  listMediaLibrary,
+  mediaStatus,
+  readMediaBytes,
+  softDeleteMedia,
+  updateMediaMeta,
+} from '@alshafra/media';
+import {
   addRelation,
   addSource,
   createDocument,
@@ -17,7 +29,6 @@ import {
   getAnalyticsOverview,
   getDocumentAnalytics,
   listFlags,
-  listMedia,
   listRedirects,
   listSettings,
   listTools,
@@ -25,8 +36,8 @@ import {
   setFlag,
   setSetting,
 } from './flags-settings';
-import { listAudit } from './audit';
-import { canAccessAdmin, hasPermission, type Actor } from './permissions';
+import { listAudit, writeAudit } from './audit';
+import { canAccessAdmin, hasPermission, requirePermission, type Actor } from './permissions';
 import { auditSeo } from './seo-audit';
 import {
   actorFromCookie,
@@ -61,6 +72,7 @@ export interface HttpOutput {
   status: number;
   body: unknown;
   headers?: Record<string, string>;
+  raw?: Uint8Array;
 }
 
 function json(status: number, body: unknown, headers?: Record<string, string>): HttpOutput {
@@ -225,7 +237,75 @@ export async function handleAdminApi(input: HttpInput, db: SqlClient): Promise<H
     if (method === 'POST' && path === '/api/v1/admin/authors') return json(201, await upsertAuthor(db, actor, input.body as never));
 
     if (method === 'GET' && path === '/api/v1/admin/tools') return json(200, await listTools(db, actor));
-    if (method === 'GET' && path === '/api/v1/admin/media') return json(200, await listMedia(db, actor));
+    if (method === 'GET' && path === '/api/v1/admin/media/status') {
+      requirePermission(actor, 'media.read');
+      return json(200, { ...mediaStatus(), r2Ready: isR2Configured() });
+    }
+    if (method === 'GET' && path === '/api/v1/admin/media') {
+      requirePermission(actor, 'media.read');
+      return json(200, await listMediaLibrary(db));
+    }
+    if (method === 'POST' && path === '/api/v1/admin/media') {
+      requirePermission(actor, 'media.upload');
+      const b = input.body as {
+        filename?: string;
+        contentType?: string;
+        base64?: string;
+        alt?: string;
+        caption?: string;
+        credit?: string;
+        visibility?: 'public' | 'private';
+      };
+      if (!b?.base64) return json(400, { error: 'missing_file' });
+      const storage = createStorageFromEnv();
+      const result = await ingestEditorial(db, storage, {
+        filename: b.filename || 'upload',
+        contentType: b.contentType || 'application/octet-stream',
+        bytes: decodeBase64Upload(b.base64),
+        alt: b.alt,
+        caption: b.caption,
+        credit: b.credit,
+        visibility: b.visibility,
+        uploadedBy: actor.userId,
+      });
+      await writeAudit(db, actor, result.reused ? 'media.reuse' : 'media.upload', 'media', result.media.id, null, {
+        objectKey: result.media.objectKey,
+        mime: result.media.mime,
+      });
+      return json(result.reused ? 200 : 201, result);
+    }
+    const mediaMatch = path.match(/^\/api\/v1\/admin\/media\/([^/]+)(?:\/(file))?$/);
+    if (mediaMatch) {
+      const id = mediaMatch[1];
+      const sub = mediaMatch[2];
+      if (method === 'GET' && sub === 'file') {
+        requirePermission(actor, 'media.read');
+        const file = await readMediaBytes(db, createStorageFromEnv(), id);
+        if (!file) return json(404, { error: 'not_found' });
+        return {
+          status: 200,
+          body: null,
+          raw: file.bytes,
+          headers: { 'content-type': file.mime, 'cache-control': 'private, max-age=60' },
+        };
+      }
+      if (method === 'GET' && !sub) {
+        requirePermission(actor, 'media.read');
+        const row = await getMedia(db, id);
+        if (!row) return json(404, { error: 'not_found' });
+        return json(200, row);
+      }
+      if (method === 'PATCH' && !sub) {
+        requirePermission(actor, 'media.upload');
+        const b = input.body as { alt?: string; caption?: string; credit?: string };
+        return json(200, await updateMediaMeta(db, id, b));
+      }
+      if (method === 'DELETE' && !sub) {
+        requirePermission(actor, 'media.delete');
+        await softDeleteMedia(db, id);
+        return json(200, { ok: true });
+      }
+    }
     if (method === 'GET' && path === '/api/v1/admin/redirects') return json(200, await listRedirects(db, actor));
     if (method === 'GET' && path === '/api/v1/admin/flags') return json(200, await listFlags(db, actor));
     if (method === 'PATCH' && path.startsWith('/api/v1/admin/flags/')) {

@@ -44,11 +44,16 @@ export function adminApiPlugin(): Plugin {
             db,
           );
           res.statusCode = out.status;
-          res.setHeader('content-type', 'application/json; charset=utf-8');
           res.setHeader('x-robots-tag', 'noindex, nofollow');
           if (out.headers) {
             for (const [k, v] of Object.entries(out.headers)) res.setHeader(k, v);
           }
+          if (out.raw) {
+            if (!out.headers?.['content-type']) res.setHeader('content-type', 'application/octet-stream');
+            res.end(Buffer.from(out.raw));
+            return;
+          }
+          res.setHeader('content-type', 'application/json; charset=utf-8');
           res.end(JSON.stringify(out.body));
         } catch (err) {
           res.statusCode = 500;

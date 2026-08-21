@@ -18,6 +18,7 @@ export interface PageModel {
   datePublished?: string;
   dateModified?: string;
   itemList?: { name: string; path: string }[];
+  image?: string;
   imageAlt?: string;
   related?: RelatedLink[];
 }

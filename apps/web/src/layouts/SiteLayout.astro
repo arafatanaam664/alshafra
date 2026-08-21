@@ -26,6 +26,7 @@ interface Props {
   dateModified?: string;
   isoDate?: string;
   itemList?: { name: string; path: string }[];
+  image?: string;
   imageAlt?: string;
 }
 
@@ -43,11 +44,12 @@ const {
   dateModified,
   isoDate,
   itemList,
+  image,
   imageAlt,
 } = Astro.props;
 
 const canonical = selfCanonical(path);
-const og = openGraph({ title, description, path, kind, imageAlt });
+const og = openGraph({ title, description, path, kind, image, imageAlt });
 const graph = buildJsonLdGraph({
   path,
   title,
@@ -60,6 +62,7 @@ const graph = buildJsonLdGraph({
   dateModified,
   isoDate,
   itemList,
+  image,
 });
 const jsonLd = JSON.stringify(graph);
 const hreflang = hreflangAlternates(path);

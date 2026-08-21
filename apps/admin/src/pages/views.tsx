@@ -113,6 +113,7 @@ export function ContentEditor({ id, isNew, user }: { id?: string; isNew?: boolea
   const [tab, setTab] = useState('edit');
   const [preview, setPreview] = useState(false);
   const [createRedirect, setCreateRedirect] = useState(false);
+  const [featuredMediaId, setFeaturedMediaId] = useState('');
 
   useEffect(() => {
     if (!docId || isNew) return;
@@ -140,6 +141,7 @@ export function ContentEditor({ id, isNew, user }: { id?: string; isNew?: boolea
       setFaq((row.faq || []).map((f) => ({ q: f.question, a: f.answer })));
       setRevisions(row.revisions || []);
       setAudit(row.seoAudit || []);
+      setFeaturedMediaId(String(d.featured_media_id || ''));
     }).catch((e: Error) => setMsg(e.message));
   }, [id, isNew]);
 
@@ -152,7 +154,17 @@ export function ContentEditor({ id, isNew, user }: { id?: string; isNew?: boolea
   }, [body]);
 
   async function save(autosave = false) {
-    const payload = { title, excerpt, body: blocks, seoTitle, metaDescription: meta, autosave, createRedirect, path: path || undefined };
+    const payload = {
+      title,
+      excerpt,
+      body: blocks,
+      seoTitle,
+      metaDescription: meta,
+      autosave,
+      createRedirect,
+      path: path || undefined,
+      featuredMediaId: featuredMediaId || undefined,
+    };
     if (isNew && !docId) {
       const created = await api<{ id: string; path: string }>('/api/v1/admin/documents', {
         method: 'POST',
@@ -222,6 +234,7 @@ export function ContentEditor({ id, isNew, user }: { id?: string; isNew?: boolea
               إنشاء تحويل عند تغيير المسار
             </label>
             <div className="field"><label>وسوم (فاصلة)</label><input value={tags} onChange={(e) => setTags(e.target.value)} /></div>
+            <div className="field"><label>معرّف صورة بارزة (من مكتبة الوسائط)</label><input value={featuredMediaId} onChange={(e) => setFeaturedMediaId(e.target.value)} /></div>
             <p>الحالة: <span className={`badge b-${status}`}>{status}</span></p>
           </div>
           <div className="card">
@@ -358,7 +371,13 @@ export function HealthView() {
   const { data, err, loading } = useLoad(() => api<Record<string, unknown>>('/api/v1/admin/health'), []);
   if (loading) return <div className="empty">جارٍ التحميل…</div>;
   if (err) return <div className="empty crit">{err}</div>;
-  const d = data as { database: string; routes: { label: string }; seo: { label: string }; analytics: string };
+  const d = data as {
+    database: string;
+    routes: { label: string };
+    seo: { label: string };
+    analytics: string;
+    media?: { label?: string; driver?: string };
+  };
   return (
     <>
       <div className="page-h"><h2>صحة النظام</h2></div>

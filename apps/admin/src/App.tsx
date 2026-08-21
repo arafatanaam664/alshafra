@@ -14,6 +14,7 @@ import {
   SettingsView,
   SimpleList,
 } from './pages/views';
+import { MediaView } from './pages/MediaView';
 
 export function App() {
   const route = useRoute();
@@ -47,7 +48,7 @@ export function App() {
   } else if (path === '/content') page = <ContentList route={route} />;
   else if (path === '/taxonomy') page = <SimpleList title="التصنيفات" path="/api/v1/admin/categories" />;
   else if (path === '/tools') page = <SimpleList title="الأدوات" path="/api/v1/admin/tools" />;
-  else if (path === '/media') page = <SimpleList title="الوسائط" path="/api/v1/admin/media" />;
+  else if (path === '/media') page = <MediaView user={user} />;
   else if (path === '/seo') page = <SimpleList title="التحويلات و410" path="/api/v1/admin/redirects" />;
   else if (path === '/analytics') page = <AnalyticsView />;
   else if (path === '/users') page = <SimpleList title="المستخدمون" path="/api/v1/admin/users" />;

@@ -149,6 +149,7 @@ export interface UpdateDocumentInput {
   createRedirect?: boolean;
   autosave?: boolean;
   indexable?: boolean;
+  featuredMediaId?: string | null;
 }
 
 export async function updateDocument(db: SqlClient, actor: Actor, id: string, input: UpdateDocumentInput) {

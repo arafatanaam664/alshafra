@@ -15,6 +15,7 @@
     "@alshafra/calendar": "*",
     "@alshafra/database": "*",
     "@alshafra/kernel": "*",
+    "@alshafra/media": "*",
     "@alshafra/search": "*",
     "@alshafra/seo": "*",
     "@alshafra/tools": "*",

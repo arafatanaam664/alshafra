@@ -1,4 +1,5 @@
 import type { SqlClient } from '@alshafra/database';
+import { mediaStatus } from '@alshafra/media';
 import { requirePermission, type Actor } from './permissions';
 
 export async function getDashboardOverview(db: SqlClient, actor: Actor | null) {
@@ -92,7 +93,7 @@ export async function getSystemHealth(db: SqlClient, actor: Actor | null, expect
     content: nDocs > 0 ? 'healthy' : 'empty',
     routes: { count: nRoutes, expected: expectedRoutes, label: `${nRoutes}/${expectedRoutes}` },
     seo: { count: nSeo, of: nDocs, label: `${nSeo}/${nDocs}` },
-    media: 'healthy' as const,
+    media: mediaStatus(),
     analytics: (events.rows[0]?.n ?? 0) > 0 ? 'receiving' : 'no_data',
   };
 }

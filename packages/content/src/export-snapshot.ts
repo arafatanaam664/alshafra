@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type { SqlClient } from '@alshafra/database';
+import { publicObjectUrl } from '@alshafra/media';
 import { selfCanonical } from '@alshafra/seo';
 import { blocksToHtml, blocksToPlainText, escapeHtml, parseBlocks, passesQualityGate, wordCount } from './blocks';
 import { contentSnapshotSchema, type ContentSnapshot, type SnapshotRoute } from './snapshot';
@@ -50,12 +51,17 @@ export async function buildPublicSnapshot(db: SqlClient, legacyPaths: Set<string
     canonical_url: string | null;
     robots: string | null;
     h1_override: string | null;
+    featured_key: string | null;
+    og_key: string | null;
   }>(
     `SELECT d.id, d.path, d.slug, d.title, d.excerpt, d.body_json, d.type::text AS type, d.status::text AS status,
             d.indexable, d.unique_text_word_count, d.legacy_path,
-            s.seo_title, s.meta_description, s.canonical_url, s.robots::text AS robots, s.h1_override
+            s.seo_title, s.meta_description, s.canonical_url, s.robots::text AS robots, s.h1_override,
+            fm.object_key AS featured_key, om.object_key AS og_key
      FROM documents d
      LEFT JOIN document_seo s ON s.document_id = d.id
+     LEFT JOIN media fm ON fm.id = d.featured_media_id AND fm.deleted_at IS NULL
+     LEFT JOIN media om ON om.id = s.og_image_media_id AND om.deleted_at IS NULL
      WHERE d.deleted_at IS NULL AND d.status = 'published'
      ORDER BY d.path`,
   );
@@ -110,6 +116,7 @@ export async function buildPublicSnapshot(db: SqlClient, legacyPaths: Set<string
       isLegacy,
       uniqueTextWordCount: unique,
       qualityPass,
+      image: publicObjectUrl(doc.og_key || doc.featured_key || '') || undefined,
     });
   }
 
