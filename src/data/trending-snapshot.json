@@ -1,72 +1,73 @@
 {
-  "date": "2026-08-20",
+  "date": "2026-08-21",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-20",
+      "date": "2026-08-21",
       "titles": [
-        "ترتيب الدوري السعودي",
-        "saudi pro league",
-        "mohamed salah",
-        "طقس",
-        "benfica vs agf",
-        "8",
-        "مباريات الهلال",
-        "شي ان",
-        "ألفيحاء ضد الهلال",
-        "ترومسو ضد برايتون"
+        "منصة احسان",
+        "الفنان حسن الزهراني",
+        "كرة القدم النسائية",
+        "ايفون 18",
+        "بنك الاهلي",
+        "هيفاء وهبي",
+        "أحمد الفيشاوي",
+        "رونالدينيو",
+        "فيلم mutiny",
+        "سيارة فارهة"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-20",
+      "date": "2026-08-21",
       "titles": [
-        "mutiny 2026",
+        "khalifa film",
+        "epl",
+        "ben gurion airport",
+        "macará vs santos",
+        "activision",
         "benfica vs agf",
         "resignation",
         "mohamed salah",
         "محمد صلاح",
-        "al-fayha vs al-hilal",
-        "ألفيحاء ضد الهلال",
-        "binance app",
-        "വൈറല് വീഡിയോ",
-        "trabzonspor vs ferencváros"
+        "jason statham"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-20",
+      "date": "2026-08-21",
       "titles": [
-        "al-fayha vs al-hilal",
+        "traffic collision",
+        "macará vs santos",
         "qatar",
+        "al-fayha vs al-hilal",
         "airbus a320 family",
         "tromso vs brighton",
         "الدوري القطري",
         "ali usman",
         "jordan cox",
-        "aircraft pilot",
-        "united arab emirates",
-        "പ്രതിഷേധം"
+        "aircraft pilot"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-20",
+      "date": "2026-08-21",
       "titles": [
+        "قانون",
+        "سعر الصرف",
         "محمد صلاح",
         "ألفيحاء ضد الهلال",
+        "activision",
         "ali usman",
         "united arab emirates",
         "gold",
         "প্রবাসী",
-        "بنك بوبيان",
-        "twitch",
-        "philadelphia vs inter miami"
+        "بنك بوبيان"
       ]
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-20",
+      "date": "2026-08-21",
       "titles": [
         "ali usman",
         "al-fayha vs al-hilal",
@@ -74,23 +75,22 @@
         "pakistan vs england",
         "السعودية",
         "united arab emirates",
-        "مالية",
-        "philadelphia vs inter miami"
+        "مالية"
       ]
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-20",
+      "date": "2026-08-21",
       "titles": [
+        "macará vs santos",
+        "هطول",
         "al-fayha vs al-hilal",
         "ألفيحاء ضد الهلال",
         "المولد النبوي",
         "ali usman",
         "الطيران العماني",
         "السعودية",
-        "united arab emirates",
-        "فيلادلفيا ضد إنتر ميامي",
-        "philadelphia vs inter miami"
+        "united arab emirates"
       ]
     }
   }
