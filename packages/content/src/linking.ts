@@ -49,6 +49,15 @@ export const CLUSTERS: Record<string, readonly string[]> = {
     '/countdown/fall-break',
     '/countdown/midyear-break',
   ],
+  calculators: [
+    '/tools',
+    '/tool/percentage',
+    '/tool/discount',
+    '/tool/bmi',
+    '/tool/loan',
+    '/tool/unit-converter',
+    '/age-calculator',
+  ],
   holidays: [
     '/holidays',
     '/articles/official-holidays-saudi-arabia',
@@ -68,10 +77,11 @@ export const HUBS: Record<string, (path: string) => boolean> = {
   '/trending': (path) => path.startsWith('/trending/') && path !== '/trending',
   '/gold-price': (path) => path.startsWith('/gold-price/') && path !== '/gold-price',
   '/usd-rate': (path) => path.startsWith('/usd-rate/') && path !== '/usd-rate',
+  '/tools': (path) => path.startsWith('/tool/') && path !== '/tools',
 };
 
 export const STRUCTURAL_OUTBOUND: Record<string, readonly string[]> = {
-  '/': ['/today', '/date-converter', '/salaries', '/countdown', '/articles', '/gold-price'],
+  '/': ['/today', '/date-converter', '/salaries', '/countdown', '/articles', '/gold-price', '/tools'],
   '/today': ['/date-converter', '/hijri-calendar'],
   '/date-converter': ['/hijri-calendar', '/today'],
   '/salaries': ['/articles/salary-dates-saudi-arabia'],
@@ -173,6 +183,7 @@ function kindFamily(kind: string, path: string): string {
   if (path.startsWith('/countdown/')) return 'countdown';
   if (path.startsWith('/trending/')) return 'guide';
   if (path.startsWith('/gold-price') || path.startsWith('/usd-rate')) return 'prices';
+  if (path.startsWith('/tool/') || path === '/tools') return 'tool';
   if (['/date-converter', '/age-calculator', '/hijri-calendar', '/today', '/salaries'].includes(path)) return 'tool';
   return kind || 'page';
 }

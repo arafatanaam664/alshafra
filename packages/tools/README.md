@@ -1,3 +1,7 @@
 # @alshafra/tools
 
-User-facing tools platform registry (legacy paths frozen). Not `tools/` developer CLI.
+Tool registry + pure engines.
+
+- `LEGACY_TOOLS` — frozen public paths
+- `NEW_TOOLS` — `/tool/:slug` only
+- Engines have no React and no network

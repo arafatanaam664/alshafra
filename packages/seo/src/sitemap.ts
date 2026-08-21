@@ -16,6 +16,7 @@ export function sitemapBucket(path: string): SitemapBucket {
   if (path.startsWith('/articles/') && path !== '/articles') return 'articles';
   if (path.startsWith('/trending/') && path !== '/trending') return 'guides';
   if (path.startsWith('/countdown/') || path.startsWith('/gold-price') || path.startsWith('/usd-rate')) return 'tools';
+  if (path === '/tools' || path.startsWith('/tool/')) return 'tools';
   if (path === '/date-converter' || path === '/age-calculator') return 'tools';
   if (['/today', '/hijri-calendar', '/school-calendar', '/holidays', '/salaries'].includes(path)) return 'calendar';
   return 'core';

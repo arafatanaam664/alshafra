@@ -1,3 +1,4 @@
+import type { RelatedLink } from '@alshafra/content/linking';
 import type { FaqItem } from '@alshafra/seo';
 
 export interface PageModel {
@@ -8,7 +9,8 @@ export interface PageModel {
   h1: string;
   robots: 'index, follow' | 'noindex, follow';
   kind: string;
-  island?: 'date-converter' | 'age-calculator' | 'countdown' | 'hijri-calendar' | 'today' | 'salaries';
+  island?: 'date-converter' | 'age-calculator' | 'countdown' | 'hijri-calendar' | 'today' | 'salaries' | 'tool';
+  engineKey?: string;
   countdownSlug?: string;
   isoDate?: string;
   html: string;
@@ -17,7 +19,7 @@ export interface PageModel {
   dateModified?: string;
   itemList?: { name: string; path: string }[];
   imageAlt?: string;
-  related?: { path: string; title: string; reason: string; kind: string }[];
+  related?: RelatedLink[];
 }
 
 export interface ContentProvider {

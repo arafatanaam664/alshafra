@@ -24,7 +24,7 @@ export function prepareQuery(raw: string, synonymPairs?: [string, string][]): Pr
 }
 
 export function typeBoost(kind: string, path: string): number {
-  if (['/date-converter', '/hijri-calendar', '/salaries', '/today'].includes(path)) return 1.25;
+  if (['/date-converter', '/hijri-calendar', '/salaries', '/today'].includes(path) || path.startsWith('/tool/')) return 1.25;
   if (kind === 'tool' || kind === 'gold' || kind === 'usd' || path.startsWith('/countdown/')) return 1.2;
   if (kind === 'article' || kind === 'guide' || kind === 'solution') return 1.1;
   if (kind === 'calendar_content') return 1.15;

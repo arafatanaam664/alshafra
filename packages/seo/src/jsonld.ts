@@ -149,14 +149,24 @@ function itemListNode(items: { name: string; path: string }[], canonical: string
 const TOOL_ISLANDS = new Set(['date-converter', 'age-calculator', 'hijri-calendar']);
 const TOOL_PATHS = new Set(['/date-converter', '/age-calculator', '/hijri-calendar']);
 
+function isWebApplicationPage(page: SeoPageInput): boolean {
+  const path = page.path ?? '';
+  return (
+    TOOL_ISLANDS.has(page.island || '') ||
+    TOOL_PATHS.has(path) ||
+    page.island === 'tool' ||
+    path.startsWith('/tool/') ||
+    page.kind === 'gold' ||
+    page.kind === 'usd'
+  );
+}
+
 export function schemaTypesFor(page: SeoPageInput): string[] {
   const types = ['Organization', 'WebSite', 'WebPage', 'BreadcrumbList'];
   if (page.kind === 'article' || page.kind === 'guide' || page.kind === 'solution') types.push('Article');
   if (page.kind === 'news') types.push('NewsArticle');
   if ((page.faq?.length || 0) >= 2) types.push('FAQPage');
-  if (TOOL_ISLANDS.has(page.island || '') || TOOL_PATHS.has(page.path) || page.kind === 'gold' || page.kind === 'usd') {
-    types.push('WebApplication');
-  }
+  if (isWebApplicationPage(page)) types.push('WebApplication');
   if (page.kind === 'countdown' && page.isoDate) types.push('Event');
   if (page.itemList?.length) types.push('ItemList');
   return types;
@@ -176,7 +186,7 @@ export function buildJsonLdGraph(page: SeoPageInput): { '@context': string; '@gr
     graph.push(articleNode(page, canonical));
   }
   if ((page.faq?.length || 0) >= 2) graph.push(faqNode(page.faq!, canonical));
-  if (TOOL_ISLANDS.has(page.island || '') || TOOL_PATHS.has(page.path) || page.kind === 'gold' || page.kind === 'usd') {
+  if (isWebApplicationPage(page)) {
     graph.push(webAppNode(page, canonical));
   }
   if (page.kind === 'countdown' && page.isoDate) graph.push(eventNode(page, canonical));

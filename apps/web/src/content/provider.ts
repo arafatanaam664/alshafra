@@ -12,6 +12,7 @@ import { mergeLegacyAndSnapshot, type ContentSnapshot } from '@alshafra/content/
 import { loadManualLinks, relatedMap, type LinkablePage } from '@alshafra/content/linking';
 import { DATA, contentSource, loadContentSnapshot, loadPublished, readJson } from './load';
 import { esc, faqHtml, h2, p, sourcesHtml, ul } from './html';
+import { LEGACY_TOOLS, NEW_TOOLS } from '@alshafra/tools';
 import { FAQ_PAGE_ITEMS } from './faq-page';
 import type { PageModel } from './types';
 
@@ -207,7 +208,7 @@ function homeHtml(): string {
     `<a href="/school-calendar">التقويم الدراسي</a>`,
     `<a href="/holidays">الإجازات الرسمية</a>`,
     `<a href="/countdown">كم باقي على…</a>`,
-  ])}${h2('أدوات')}${ul([`<a href="/age-calculator">حاسبة العمر</a>`, `<a href="/gold-price">أسعار الذهب</a>`, `<a href="/usd-rate">أسعار الدولار</a>`])}${h2('أدلة')}${ul([`<a href="/articles">المقالات</a>`, `<a href="/trending">أدلة عملية</a>`])}${guideHtml('/')}`;
+  ])}${h2('أدوات')}${ul([`<a href="/tools">كل الأدوات</a>`, `<a href="/age-calculator">حاسبة العمر</a>`, `<a href="/gold-price">أسعار الذهب</a>`, `<a href="/usd-rate">أسعار الدولار</a>`])}${h2('أدلة')}${ul([`<a href="/articles">المقالات</a>`, `<a href="/trending">أدلة عملية</a>`])}${guideHtml('/')}`;
 }
 
 function legalHtml(path: string, intro: string): string {
@@ -560,6 +561,65 @@ function applySnapshot(pages: PageModel[]): PageModel[] {
   });
 }
 
+function extraToolPages(): PageModel[] {
+  const pages = NEW_TOOLS.map((tool) =>
+    page({
+      path: tool.path,
+      title: tool.title,
+      description: tool.description,
+      h1: tool.h1,
+      kind: 'tool',
+      island: 'tool',
+      engineKey: tool.engineKey,
+      robots: tool.indexable ? 'index, follow' : 'noindex, follow',
+      faq: tool.faq,
+      html: `${tool.sections.map((section) => `<section>${h2(section.heading)}${p(section.body)}</section>`).join('')}${faqHtml(tool.faq)}`,
+    }),
+  );
+  const legacyLabels: Record<string, string> = {
+    'date-converter': 'تحويل التاريخ',
+    'hijri-calendar': 'التقويم الهجري',
+    today: 'التاريخ اليوم',
+    'age-calculator': 'حاسبة العمر',
+    salaries: 'مواعيد الرواتب',
+    'school-calendar': 'التقويم الدراسي',
+    holidays: 'الإجازات الرسمية',
+    countdown: 'كم باقي على…',
+    'gold-price': 'أسعار الذهب',
+    'usd-rate': 'أسعار الدولار',
+  };
+  const listed = [
+    ...LEGACY_TOOLS.filter((tool) => tool.path !== '/name-decoration').map((tool) => ({
+      name: legacyLabels[tool.key] || tool.key,
+      path: tool.path,
+    })),
+    ...NEW_TOOLS.map((tool) => ({ name: tool.h1, path: tool.path })),
+  ];
+  pages.unshift(
+    page({
+      path: '/tools',
+      title: 'أدوات Alshafra',
+      description: 'حاسبات ومحوّلات عربية مع الإبقاء على أدوات التقويم والمواعيد في مساراتها القديمة.',
+      h1: 'الأدوات',
+      kind: 'collection',
+      itemList: listed,
+      html: `${p('الأدوات الجديدة على /tool/... والحسابات القديمة مثل تحويل التاريخ بقيت على روابطها.')}${h2('جديدة')}${ul(
+        NEW_TOOLS.map((tool) => `<a href="${tool.path}">${esc(tool.h1)}</a>`),
+      )}${h2('المواعيد والتقويم')}${ul(
+        [
+          ['/date-converter', 'تحويل التاريخ'],
+          ['/age-calculator', 'حاسبة العمر'],
+          ['/today', 'اليوم'],
+          ['/salaries', 'الرواتب'],
+          ['/gold-price', 'الذهب'],
+          ['/usd-rate', 'الدولار'],
+        ].map(([href, label]) => `<a href="${href}">${esc(label)}</a>`),
+      )}`,
+    }),
+  );
+  return pages;
+}
+
 function attachRelated(pages: PageModel[]): PageModel[] {
   const catalog: LinkablePage[] = pages.map((page) => ({
     path: page.path,
@@ -575,7 +635,12 @@ function attachRelated(pages: PageModel[]): PageModel[] {
 
 export function getAllPages(): PageModel[] {
   if (cache) return cache;
-  cache = attachRelated(applySnapshot(loadPublished().map((row) => buildForPublished(row.path, row.title, row.kind))));
+  cache = attachRelated(
+    applySnapshot([
+      ...loadPublished().map((row) => buildForPublished(row.path, row.title, row.kind)),
+      ...extraToolPages(),
+    ]),
+  );
   return cache;
 }
 

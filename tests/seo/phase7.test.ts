@@ -46,16 +46,29 @@ if (!graphHasSearchAction(article)) fail('SearchAction required now that /search
 if (graphHasType(article, 'JobPosting')) fail('do not invent JobPosting');
 if (graphHasType(article, 'Product')) fail('do not invent Product');
 
-const tool = buildJsonLdGraph({
+const toolPage = {
   path: '/date-converter',
   title: 'تحويل التاريخ',
   description: 'أداة تحويل',
   h1: 'تحويل التاريخ بين الهجري والميلادي',
   kind: 'tool',
   island: 'date-converter',
-});
+};
+const tool = buildJsonLdGraph(toolPage);
 if (!graphHasType(tool, 'WebApplication')) fail('tool missing WebApplication');
-if (schemaTypesFor(tool).includes('Article')) fail('tool must not be Article');
+if (schemaTypesFor(toolPage).includes('Article')) fail('tool must not be Article');
+
+const newToolPage = {
+  path: '/tool/percentage',
+  title: 'حاسبة النسبة المئوية',
+  description: 'احسب النسبة',
+  h1: 'حاسبة النسبة المئوية',
+  kind: 'tool',
+  island: 'tool',
+};
+const newTool = buildJsonLdGraph(newToolPage);
+if (!graphHasType(newTool, 'WebApplication')) fail('new /tool page missing WebApplication');
+if (schemaTypesFor(newToolPage).includes('Article')) fail('new tool must not be Article');
 
 const event = buildJsonLdGraph({
   path: '/countdown/ramadan',

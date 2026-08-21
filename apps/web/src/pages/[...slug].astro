@@ -4,6 +4,7 @@ import ShareIsland from '../islands/ShareIsland';
 import DateConverterIsland from '../islands/DateConverterIsland';
 import AgeCalculatorIsland from '../islands/AgeCalculatorIsland';
 import CountdownIsland from '../islands/CountdownIsland';
+import ToolIsland from '../islands/ToolIsland';
 import { getAllPages, type PageModel } from '../content/provider';
 import RelatedLinks from '../components/RelatedLinks.astro';
 
@@ -39,6 +40,7 @@ const url = `https://alshafra.com${page.path}`;
   {page.island === 'date-converter' && <DateConverterIsland client:load />}
   {page.island === 'age-calculator' && <AgeCalculatorIsland client:load />}
   {page.island === 'countdown' && page.isoDate && <CountdownIsland client:visible iso={page.isoDate} />}
+  {page.island === 'tool' && page.engineKey && <ToolIsland client:load engineKey={page.engineKey} />}
   <div class="prose-alshafra mt-6 space-y-4 text-sm leading-loose text-brand-800" set:html={page.html} />
   <RelatedLinks links={page.related || []} />
   <ShareIsland client:visible url={url} title={page.title} />

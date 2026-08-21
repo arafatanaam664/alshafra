@@ -47,6 +47,13 @@ else {
   if (!/noindex/i.test(searchHtml)) seoFail.push('/search must be noindex');
 }
 if (!existsSync(join(dist, 'search-index.json'))) seoFail.push('missing search-index.json');
+if (!existsSync(join(dist, 'tools/index.html'))) seoFail.push('missing /tools hub');
+const percentFile = join(dist, 'tool/percentage/index.html');
+if (!existsSync(percentFile)) seoFail.push('missing /tool/percentage');
+else if (!readFileSync(percentFile, 'utf8').includes('WebApplication')) {
+  seoFail.push('new tool missing WebApplication');
+}
+if (!existsSync(join(dist, 'date-converter/index.html'))) seoFail.push('legacy converter missing');
 if (article.includes('JobPosting')) seoFail.push('JobPosting leaked');
 
 const converter = readFileSync(join(dist, 'date-converter/index.html'), 'utf8');
