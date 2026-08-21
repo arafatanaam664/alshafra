@@ -440,6 +440,16 @@ export async function addRelation(db: SqlClient, actor: Actor, fromId: string, t
      VALUES ($1,$2,$3::relation_kind,true,0) ON CONFLICT DO NOTHING`,
     [fromId, toId, kind],
   );
+  const from = await one<{ path: string }>(db, 'SELECT path FROM documents WHERE id = $1', [fromId]);
+  const to = await one<{ path: string }>(db, 'SELECT path FROM documents WHERE id = $1', [toId]);
+  if (from?.path && to?.path) {
+    try {
+      const { writeManualLink } = await import('@alshafra/content');
+      writeManualLink(from.path, to.path);
+    } catch {
+      /* file write is best-effort for the static graph */
+    }
+  }
 }
 
 export async function countPublishedRoutes(db: SqlClient): Promise<number> {

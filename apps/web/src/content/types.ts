@@ -17,6 +17,7 @@ export interface PageModel {
   dateModified?: string;
   itemList?: { name: string; path: string }[];
   imageAlt?: string;
+  related?: { path: string; title: string; reason: string; kind: string }[];
 }
 
 export interface ContentProvider {

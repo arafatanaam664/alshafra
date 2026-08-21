@@ -5,6 +5,7 @@ import DateConverterIsland from '../islands/DateConverterIsland';
 import AgeCalculatorIsland from '../islands/AgeCalculatorIsland';
 import CountdownIsland from '../islands/CountdownIsland';
 import { getAllPages, type PageModel } from '../content/provider';
+import RelatedLinks from '../components/RelatedLinks.astro';
 
 export function getStaticPaths() {
   return getAllPages()
@@ -39,5 +40,6 @@ const url = `https://alshafra.com${page.path}`;
   {page.island === 'age-calculator' && <AgeCalculatorIsland client:load />}
   {page.island === 'countdown' && page.isoDate && <CountdownIsland client:visible iso={page.isoDate} />}
   <div class="prose-alshafra mt-6 space-y-4 text-sm leading-loose text-brand-800" set:html={page.html} />
+  <RelatedLinks links={page.related || []} />
   <ShareIsland client:visible url={url} title={page.title} />
 </SiteLayout>

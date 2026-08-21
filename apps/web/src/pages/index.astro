@@ -1,6 +1,7 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import ShareIsland from '../islands/ShareIsland';
+import RelatedLinks from '../components/RelatedLinks.astro';
 import { getPage } from '../content/provider';
 
 const page = getPage('/');
@@ -16,5 +17,6 @@ if (!page) throw new Error('Missing homepage model');
 >
   <h1 class="section-title">{page.h1}</h1>
   <div class="prose-alshafra mt-6 space-y-4 text-sm leading-loose text-brand-800" set:html={page.html} />
+  <RelatedLinks links={page.related || []} />
   <ShareIsland client:visible url="https://alshafra.com/" title={page.title} />
 </SiteLayout>

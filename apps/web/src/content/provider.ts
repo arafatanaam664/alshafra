@@ -9,8 +9,9 @@ import {
   weekdayName,
 } from '@alshafra/calendar';
 import { mergeLegacyAndSnapshot, type ContentSnapshot } from '@alshafra/content/snapshot';
+import { loadManualLinks, relatedMap, type LinkablePage } from '@alshafra/content/linking';
 import { DATA, contentSource, loadContentSnapshot, loadPublished, readJson } from './load';
-import { esc, faqHtml, h2, p, relatedHtml, sourcesHtml, ul } from './html';
+import { esc, faqHtml, h2, p, sourcesHtml, ul } from './html';
 import { FAQ_PAGE_ITEMS } from './faq-page';
 import type { PageModel } from './types';
 
@@ -96,9 +97,7 @@ function guideHtml(path: string): string {
 
 function articleHtml(a: Article): string {
   const sections = a.sections.map((s) => `<section>${h2(s.heading)}${p(s.body)}</section>`).join('');
-  return `${p(a.description)}${sections}${sourcesHtml(a.sources || [])}${faqHtml(a.faq || [])}${relatedHtml(
-    articles.filter((x) => x.slug !== a.slug).slice(0, 6).map((x) => ({ href: `/articles/${x.slug}`, title: x.title })),
-  )}`;
+  return `${p(a.description)}${sections}${sourcesHtml(a.sources || [])}${faqHtml(a.faq || [])}`;
 }
 
 function nextMonthly(dayOfMonth: number): { date: ReturnType<typeof todayGregorian>; text: string; hijri: string; days: number } {
@@ -156,23 +155,19 @@ function countdownHtml(def: CountdownDef): string {
     0,
     Math.round((Date.UTC(date.year, date.month - 1, date.day) - Date.UTC(from.year, from.month - 1, from.day)) / 86400000),
   );
-  const related = (def.related || [])
-    .map((slug) => countdownBy[slug])
-    .filter(Boolean)
-    .map((c) => ({ href: `/countdown/${c.slug}`, title: c.question }));
-  return `${p(def.summary)}<ul><li>الميلادي: ${esc(formatGregorian(date))}</li><li>الهجري: ${esc(formatHijri(h))}</li><li>اليوم: ${esc(weekdayName(date))}</li><li>المتبقي: ${days} يوماً</li></ul>${def.paragraphs.map(p).join('')}${h2('ملاحظات')}${ul(def.notes.map(esc))}${faqHtml(def.faq)}${relatedHtml(related)}`;
+  return `${p(def.summary)}<ul><li>الميلادي: ${esc(formatGregorian(date))}</li><li>الهجري: ${esc(formatHijri(h))}</li><li>اليوم: ${esc(weekdayName(date))}</li><li>المتبقي: ${days} يوماً</li></ul>${def.paragraphs.map(p).join('')}${h2('ملاحظات')}${ul(def.notes.map(esc))}${faqHtml(def.faq)}`;
 }
 
 function goldHtml(country: Country): string {
   const rate = prices.rates[country.cur] || 1;
   const oz = prices.xauUsd * rate;
   const g = (purity: number) => ((oz * purity) / 31.1034768).toFixed(2);
-  return `${p(`سعر الجرام التقريبي في ${country.ar || country.en} بتاريخ ${prices.updated}. الأسعار إرشادية.`)}<p class="text-xs text-brand-600">آخر تحديث: ${esc(prices.updated)}</p><table class="w-full text-sm my-4"><thead><tr><th>24K</th><th>22K</th><th>21K</th><th>18K</th></tr></thead><tbody><tr><td>${g(1)}</td><td>${g(0.9166)}</td><td>${g(0.875)}</td><td>${g(0.75)}</td></tr></tbody></table>${p('المصدر لقطة يومية من أسعار عالمية محوّلة للعملة المحلية. اطلب سعراً قابلاً للتنفيذ من متجر مرخص.')}${relatedHtml([{ href: `/usd-rate/${country.slug}`, title: `سعر الدولار في ${country.ar || country.en}` }, { href: '/gold-price', title: 'كل الدول — الذهب' }])}`;
+  return `${p(`سعر الجرام التقريبي في ${country.ar || country.en} بتاريخ ${prices.updated}. الأسعار إرشادية.`)}<p class="text-xs text-brand-600">آخر تحديث: ${esc(prices.updated)}</p><table class="w-full text-sm my-4"><thead><tr><th>24K</th><th>22K</th><th>21K</th><th>18K</th></tr></thead><tbody><tr><td>${g(1)}</td><td>${g(0.9166)}</td><td>${g(0.875)}</td><td>${g(0.75)}</td></tr></tbody></table>${p('المصدر لقطة يومية من أسعار عالمية محوّلة للعملة المحلية. اطلب سعراً قابلاً للتنفيذ من متجر مرخص.')}`;
 }
 
 function usdHtml(country: Country): string {
   const rate = prices.rates[country.cur] || 1;
-  return `${p(`سعر مرجعي: 1 دولار ≈ ${rate} ${country.cur} (${country.curName}). لقطة ${prices.updated}.`)}<table class="w-full text-sm my-4"><tbody><tr><th>1 USD</th><td>${esc(String(rate))} ${esc(country.cur)}</td></tr><tr><th>1 ${esc(country.cur)}</th><td>${(1 / rate).toFixed(4)} USD</td></tr></tbody></table>${p('السعر إرشادي ولا يشمل رسوم التحويل.')}${relatedHtml([{ href: `/gold-price/${country.slug}`, title: `الذهب في ${country.ar || country.en}` }, { href: '/usd-rate', title: 'كل الدول — الدولار' }])}`;
+  return `${p(`سعر مرجعي: 1 دولار ≈ ${rate} ${country.cur} (${country.curName}). لقطة ${prices.updated}.`)}<table class="w-full text-sm my-4"><tbody><tr><th>1 USD</th><td>${esc(String(rate))} ${esc(country.cur)}</td></tr><tr><th>1 ${esc(country.cur)}</th><td>${(1 / rate).toFixed(4)} USD</td></tr></tbody></table>${p('السعر إرشادي ولا يشمل رسوم التحويل.')}`;
 }
 
 function todayHtml(): string {
@@ -323,9 +318,7 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
       description: 'اهتمامات بحثية متغيرة في الخليج — ليست توصية.',
       h1: 'أكثر ما يبحث عنه الخليج اليوم',
       kind: 'trending-today',
-      html: `${p('الصفحة تعرض اهتماماً بحثياً وليس خبراً مؤكداً. تحقق من المصدر الرسمي قبل أي قرار.')}${relatedHtml(
-        trending.topics.slice(0, 8).map((t) => ({ href: `/trending/${t.slug}`, title: t.title })),
-      )}`,
+      html: `${p('الصفحة تعرض اهتماماً بحثياً وليس خبراً مؤكداً. تحقق من المصدر الرسمي قبل أي قرار.')}`,
     });
   }
 
@@ -353,7 +346,7 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
       t.facts?.length
         ? `<table class="w-full text-sm my-4">${t.facts.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>`
         : ''
-    }${faqHtml(t.faq || [])}${relatedHtml((t.related || []).filter((s) => topicBy[s]).map((s) => ({ href: `/trending/${s}`, title: topicBy[s].title })))}`;
+    }${faqHtml(t.faq || [])}`;
     return page({
       path,
       title: publishedTitle,
@@ -491,7 +484,8 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
         title: publishedTitle,
         description: 'أسئلة شائعة عن المواعيد والتقويم.',
         h1: 'الأسئلة الشائعة',
-        kind,
+        kind: 'faq_page',
+        faq: FAQ_PAGE_ITEMS,
         html: guideHtml('/faq'),
       }),
     '/about': () =>
@@ -566,9 +560,22 @@ function applySnapshot(pages: PageModel[]): PageModel[] {
   });
 }
 
+function attachRelated(pages: PageModel[]): PageModel[] {
+  const catalog: LinkablePage[] = pages.map((page) => ({
+    path: page.path,
+    title: page.title,
+    h1: page.h1,
+    kind: page.kind,
+    robots: page.robots,
+    description: page.description,
+  }));
+  const map = relatedMap(catalog, loadManualLinks());
+  return pages.map((page) => ({ ...page, related: map.get(page.path) || [] }));
+}
+
 export function getAllPages(): PageModel[] {
   if (cache) return cache;
-  cache = applySnapshot(loadPublished().map((row) => buildForPublished(row.path, row.title, row.kind)));
+  cache = attachRelated(applySnapshot(loadPublished().map((row) => buildForPublished(row.path, row.title, row.kind))));
   return cache;
 }
 

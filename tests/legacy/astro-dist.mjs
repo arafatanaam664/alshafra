@@ -44,6 +44,11 @@ if (article.includes('JobPosting')) seoFail.push('JobPosting leaked');
 
 const converter = readFileSync(join(dist, 'date-converter/index.html'), 'utf8');
 if (!converter.includes('WebApplication')) seoFail.push('date-converter missing WebApplication');
+if (!converter.includes('/articles/hijri-to-gregorian-conversion')) {
+  seoFail.push('date-converter missing internal link to conversion article');
+}
+const egyptGold = readFileSync(join(dist, 'gold-price/egypt/index.html'), 'utf8');
+if (!egyptGold.includes('/usd-rate/egypt')) seoFail.push('gold egypt missing usd pair link');
 
 const indexXml = readFileSync(join(dist, 'sitemap.xml'), 'utf8');
 if (!indexXml.includes('sitemapindex')) seoFail.push('sitemap.xml must be a sitemapindex');

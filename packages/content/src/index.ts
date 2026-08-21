@@ -19,3 +19,15 @@ export {
 export type { ContentSnapshot, SnapshotRoute, PublicPage } from './snapshot';
 export { contentSnapshotSchema, snapshotRouteSchema, mergeLegacyAndSnapshot, snapshotRouteToPage } from './snapshot';
 export { buildPublicSnapshot, writePublicSnapshot, refreshPublicSnapshot, defaultSnapshotPath } from './export-snapshot';
+export {
+  relatedFor,
+  relatedMap,
+  orphanPaths,
+  inboundCounts,
+  clusterMates,
+  countryPair,
+  MAX_AUTO_RELATED,
+  type RelatedLink,
+  type LinkablePage,
+} from './linking';
+export { loadManualLinks, writeManualLink } from './manual-links';
