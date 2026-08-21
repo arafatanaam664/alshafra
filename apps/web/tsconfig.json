@@ -1,0 +1,17 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "types": ["node"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@alshafra/calendar": ["../../packages/calendar/src/index.ts"],
+      "@alshafra/seo": ["../../packages/seo/src/index.ts"],
+      "@alshafra/ui": ["../../packages/ui/src/index.ts"],
+      "@alshafra/tools": ["../../packages/tools/src/index.ts"],
+      "@alshafra/config": ["../../packages/config/src/index.ts"]
+    }
+  },
+  "include": [".astro/types.d.ts", "src"]
+}

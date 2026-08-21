@@ -1,0 +1,13 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import ShareIsland from '../islands/ShareIsland';
+import { getPage } from '../content/provider';
+
+const page = getPage('/');
+if (!page) throw new Error('Missing homepage model');
+---
+<SiteLayout title={page.title} description={page.description} path="/" robots={page.robots}>
+  <h1 class="section-title">{page.h1}</h1>
+  <div class="prose-alshafra mt-6 space-y-4 text-sm leading-loose text-brand-800" set:html={page.html} />
+  <ShareIsland client:visible url="https://alshafra.com/" title={page.title} />
+</SiteLayout>

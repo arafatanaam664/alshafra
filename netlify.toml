@@ -1,6 +1,9 @@
+# Production origin is Vercel (owner 2026-08-21). Netlify is leftover config only.
+# Command and publish MUST stay on the Vite app until the Cloudflare cutover.
+# `npm run build` emits Astro to apps/web/dist — never pair that with this publish dir.
 [build]
-  command = "npm run build"
-  publish = "dist"
+  command = "npm run build:legacy"
+  publish = "apps/web-legacy/dist"
 
 # NOTE: every valid route is emitted as a real static file by
 # `scripts/prerender.mjs`, so there is deliberately NO catch-all

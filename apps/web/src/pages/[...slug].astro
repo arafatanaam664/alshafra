@@ -1,0 +1,29 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import ShareIsland from '../islands/ShareIsland';
+import DateConverterIsland from '../islands/DateConverterIsland';
+import AgeCalculatorIsland from '../islands/AgeCalculatorIsland';
+import CountdownIsland from '../islands/CountdownIsland';
+import { getAllPages, type PageModel } from '../content/provider';
+
+export function getStaticPaths() {
+  return getAllPages()
+    .filter((p) => p.path !== '/')
+    .map((p) => ({
+      params: { slug: p.path.replace(/^\//, '') },
+      props: p,
+    }));
+}
+
+type Props = PageModel;
+const page = Astro.props;
+const url = `https://alshafra.com${page.path}`;
+---
+<SiteLayout title={page.title} description={page.description} path={page.path} robots={page.robots} keywords={page.keywords}>
+  <h1 class="section-title">{page.h1}</h1>
+  {page.island === 'date-converter' && <DateConverterIsland client:load />}
+  {page.island === 'age-calculator' && <AgeCalculatorIsland client:load />}
+  {page.island === 'countdown' && page.isoDate && <CountdownIsland client:visible iso={page.isoDate} />}
+  <div class="prose-alshafra mt-6 space-y-4 text-sm leading-loose text-brand-800" set:html={page.html} />
+  <ShareIsland client:visible url={url} title={page.title} />
+</SiteLayout>

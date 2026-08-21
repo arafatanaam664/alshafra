@@ -21,3 +21,11 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.*
+!.env.example
+
+# Local / test database artifacts (never commit Postgres dumps with secrets)
+.data/
+*.pglite
+packages/database/data/
+!packages/database/data/.gitkeep

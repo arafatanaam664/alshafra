@@ -1,0 +1,13 @@
+# Old, unrelated pages from the site's previous incarnation (tech news +
+# programming lessons). 410 Gone tells Google to drop them immediately.
+/category/*   /410.html   410
+/languages/*  /410.html   410
+/news/*       /410.html   410
+
+/index.html   /           301!
+
+# NOTE: there is deliberately no `/* /index.html 200` SPA fallback.
+# Every real route is emitted as a static file by scripts/prerender.mjs, so an
+# unknown URL must return a genuine 404 (Netlify serves /404.html) instead of a
+# 200 with an empty shell — that "soft 404" behaviour is what let thousands of
+# ghost URLs stay in Google's index.

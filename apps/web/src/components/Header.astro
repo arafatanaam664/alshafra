@@ -1,0 +1,29 @@
+---
+interface Props { path: string }
+const { path } = Astro.props;
+const links = [
+  { href: '/', label: 'الرئيسية' },
+  { href: '/today', label: 'اليوم' },
+  { href: '/date-converter', label: 'تحويل التاريخ' },
+  { href: '/salaries', label: 'الرواتب' },
+  { href: '/countdown', label: 'كم باقي' },
+  { href: '/articles', label: 'مقالات' },
+  { href: '/gold-price', label: 'الذهب' },
+];
+---
+<header class="sticky top-0 z-40 border-b border-brand-900/5 bg-white/90 backdrop-blur">
+  <div class="container-page flex h-16 items-center justify-between gap-4">
+    <a href="/" class="font-display text-lg font-bold text-brand-900">Alshafra</a>
+    <nav class="hidden flex-wrap items-center gap-1 md:flex" aria-label="رئيسي">
+      {links.map((l) => (
+        <a href={l.href} class:list={['nav-link', path === l.href && 'nav-link-active']} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a>
+      ))}
+    </nav>
+    <details class="md:hidden">
+      <summary class="nav-link">القائمة</summary>
+      <div class="absolute left-4 right-4 mt-2 grid gap-1 rounded-xl bg-white p-3 shadow-card">
+        {links.map((l) => <a href={l.href} class="nav-link">{l.label}</a>)}
+      </div>
+    </details>
+  </div>
+</header>

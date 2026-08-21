@@ -1,9 +1,18 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build:legacy",
+  "outputDirectory": "apps/web-legacy/dist",
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
     { "source": "/index.html", "destination": "/", "permanent": true }
+  ],
+  "routes": [
+    { "src": "^/category(?:/.*)?$", "status": 410, "dest": "/410.html" },
+    { "src": "^/languages(?:/.*)?$", "status": 410, "dest": "/410.html" },
+    { "src": "^/news(?:/.*)?$", "status": 410, "dest": "/410.html" }
   ],
   "headers": [
     {
