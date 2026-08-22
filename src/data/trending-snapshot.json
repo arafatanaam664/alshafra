@@ -1,65 +1,65 @@
 {
-  "date": "2026-08-21",
+  "date": "2026-08-22",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-21",
+      "date": "2026-08-22",
       "titles": [
-        "سجن",
-        "تيجاني ريندرز",
-        "córdoba vs girona",
-        "جيسون ستاثام",
-        "laliga",
-        "discord",
-        "كووورة",
-        "مباريات الاتحاد",
-        "مسعود بزشكيان",
-        "ترتيب الدوري المصري"
+        "cricbuzz",
+        "live cricket",
+        "matt renshaw",
+        "موسم",
+        "shoriful islam",
+        "سلوى شاكر",
+        "سعود بن عبدالمحسن",
+        "الفنان حسن الزهراني ابو نجوى",
+        "iphone 18 pro",
+        "ياسمين عز"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-21",
+      "date": "2026-08-22",
       "titles": [
-        "laliga",
-        "la liga",
-        "sara bejlek",
-        "الدوري السعودي",
-        "tod",
-        "al qadsiah vs al-ittihad",
-        "betis vs real sociedad",
-        "آرسنال ضد كوفنتري سيتي",
-        "al-riyadh vs al-nassr standings",
-        "النصر ضد الوحدة"
+        "shoriful islam",
+        "matt renshaw",
+        "cricbuzz",
+        "apple iphone 18 pro max",
+        "icc",
+        "ban vs aus",
+        "bangladesh vs australia",
+        "aus vs ban",
+        "സ്വര്ണം",
+        "مطر"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-21",
+      "date": "2026-08-22",
       "titles": [
+        "cricbuzz",
+        "bangladesh vs australia",
+        "aus vs ban",
+        "emirates",
         "آرسنال ضد كوفنتري سيتي",
         "betis vs real sociedad",
         "al-riyadh vs al-nassr standings",
         "arsenal vs coventry",
-        "saudi pro league",
         "الزمالك ضد الاتحاد السكندري",
-        "epl",
-        "deportation",
-        "الرياض ضد النصر",
-        "al-riyadh vs al-nassr"
+        "epl"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-21",
+      "date": "2026-08-22",
       "titles": [
-        "القادسية ضد الاتحاد",
-        "arsenal",
+        "bangladesh vs australia",
+        "bangladesh national cricket team vs australia national cricket team match scorecard",
+        "ترتيبات نادى الزمالك – الاتحاد السكندرى",
         "tod",
         "آرسنال ضد كوفنتري سيتي",
-        "arsenal vs coventry",
+        "الدوري المصري",
         "zamalek vs al ittihad",
-        "الزمالك ضد الاتحاد السكندري",
         "مباريات اليوم",
         "al-riyadh vs al-nassr",
         "الرياض ضد النصر"
@@ -67,30 +67,32 @@
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-21",
+      "date": "2026-08-22",
       "titles": [
+        "bangladesh vs australia",
+        "bangladesh national cricket team vs australia national cricket team match scorecard",
         "انفجار",
         "arsenal vs coventry",
+        "premier league",
         "الرياض ضد النصر",
         "al-riyadh vs al-nassr",
-        "الكويت",
-        "aircraft pilot"
+        "الكويت"
       ]
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-21",
+      "date": "2026-08-22",
       "titles": [
+        "bangladesh vs australia",
+        "bangladesh national cricket team vs australia national cricket team match scorecard",
+        "betis vs real sociedad",
+        "الاتحاد",
         "deportation",
-        "الزمالك ضد الاتحاد السكندري",
         "آرسنال ضد كوفنتري سيتي",
         "arsenal vs coventry",
         "القادسية ضد الاتحاد",
         "الرياض ضد النصر",
-        "al-riyadh vs al-nassr",
-        "pakistan",
-        "لورا خليل",
-        "tax"
+        "al-riyadh vs al-nassr"
       ]
     }
   }
