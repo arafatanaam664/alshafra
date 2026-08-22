@@ -15,6 +15,7 @@ import {
   SimpleList,
 } from './pages/views';
 import { MediaView } from './pages/MediaView';
+import { CommunityView } from './pages/CommunityView';
 
 export function App() {
   const route = useRoute();
@@ -56,7 +57,8 @@ export function App() {
   else if (path === '/settings') page = <SettingsView />;
   else if (path === '/audit') page = <SimpleList title="سجل التدقيق" path="/api/v1/admin/audit" />;
   else if (path === '/health') page = <HealthView />;
-  else if (path === '/community' || path === '/social' || path === '/automation') page = <ComingSoon name={path} />;
+  else if (path === '/community') page = <CommunityView user={user} />;
+  else if (path === '/social' || path === '/automation') page = <ComingSoon name={path} />;
   else if (path === '/') page = <DashboardView />;
 
   return (

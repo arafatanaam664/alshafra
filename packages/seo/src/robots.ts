@@ -18,3 +18,7 @@ export function isIndexableRobots(robots: string | undefined): boolean {
   const value = (robots || 'index, follow').toLowerCase();
   return value.includes('index') && !value.includes('noindex');
 }
+
+export function isUgcPath(path: string): boolean {
+  return path === '/question' || path.startsWith('/question/');
+}

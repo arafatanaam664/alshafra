@@ -1,6 +1,6 @@
 export { SITE_URL, SITE_NAME, SITE_ALTERNATE_NAMES, DEFAULT_OG_IMAGE } from './site';
 export { selfCanonical, normalizePublicPath, documentTitle, neverAutoBrandSuffix } from './canonical';
-export { robotsContent, isIndexableRobots, type RobotsDirective } from './robots';
+export { robotsContent, isIndexableRobots, isUgcPath, type RobotsDirective } from './robots';
 export { breadcrumbsFor, breadcrumbListJsonLd, type Crumb } from './breadcrumbs';
 export { buildJsonLdGraph, schemaTypesFor, graphHasType, graphHasSearchAction, type SeoPageInput, type FaqItem } from './jsonld';
 export {

@@ -1,5 +1,5 @@
 {
-  "name": "@alshafra/cms",
+  "name": "@alshafra/community",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -10,13 +10,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@alshafra/content": "*",
     "@alshafra/database": "*",
-    "@alshafra/community": "*",
     "@alshafra/kernel": "*",
-    "@alshafra/media": "*",
-    "@alshafra/seo": "*",
-    "zod": "^3.24.2"
+    "@alshafra/search": "*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

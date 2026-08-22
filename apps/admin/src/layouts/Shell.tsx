@@ -14,7 +14,7 @@ const NAV: { href?: string; label: string; perm?: string; soon?: boolean; group:
   { group: 'الوسائط', href: '/media', label: 'مكتبة الوسائط', perm: 'media.read' },
   { group: 'SEO', href: '/seo', label: 'نظرة SEO', perm: 'documents.read' },
   { group: 'التحليلات', href: '/analytics', label: 'التحليلات', perm: 'analytics.read' },
-  { group: 'المجتمع', label: 'قريبًا', soon: true },
+  { group: 'المجتمع', href: '/community', label: 'إشراف المجتمع', perm: 'moderation.handle' },
   { group: 'اجتماعي', label: 'قريبًا', soon: true },
   { group: 'أتمتة', label: 'قريبًا', soon: true },
   { group: 'الوصول', href: '/users', label: 'المستخدمون', perm: 'users.read' },

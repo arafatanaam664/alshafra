@@ -1,5 +1,6 @@
 import type { SqlClient } from '@alshafra/database';
 import type { DocumentStatus, DocumentType } from '@alshafra/content';
+import { handleModerationApi } from '@alshafra/community';
 import {
   createStorageFromEnv,
   decodeBase64Upload,
@@ -95,6 +96,7 @@ const DEV_ROLES: Record<string, string> = {
   'analyst@local.test': 'analyst',
   'admin@local.test': 'admin',
   'super@local.test': 'super_admin',
+  'moderator@local.test': 'moderator',
 };
 
 function qs(search: string): URLSearchParams {
@@ -305,6 +307,11 @@ export async function handleAdminApi(input: HttpInput, db: SqlClient): Promise<H
         await softDeleteMedia(db, id);
         return json(200, { ok: true });
       }
+    }
+    if (path.startsWith('/api/v1/admin/community')) {
+      requirePermission(actor, 'moderation.handle');
+      const out = await handleModerationApi({ ...input, actorId: actor.userId }, db);
+      return out;
     }
     if (method === 'GET' && path === '/api/v1/admin/redirects') return json(200, await listRedirects(db, actor));
     if (method === 'GET' && path === '/api/v1/admin/flags') return json(200, await listFlags(db, actor));

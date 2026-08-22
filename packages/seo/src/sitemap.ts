@@ -1,5 +1,5 @@
 import { selfCanonical } from './canonical';
-import { isIndexableRobots } from './robots';
+import { isIndexableRobots, isUgcPath } from './robots';
 import { SITE_URL } from './site';
 
 export type SitemapBucket = 'core' | 'articles' | 'guides' | 'tools' | 'calendar';
@@ -27,7 +27,7 @@ export function sitemapLoc(path: string): string {
 }
 
 export function filterIndexable(entries: SitemapEntry[]): SitemapEntry[] {
-  return entries.filter((entry) => isIndexableRobots(entry.robots));
+  return entries.filter((entry) => isIndexableRobots(entry.robots) && !isUgcPath(entry.path));
 }
 
 export function entriesForBucket(entries: SitemapEntry[], bucket: SitemapBucket): SitemapEntry[] {
