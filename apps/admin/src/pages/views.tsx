@@ -223,7 +223,7 @@ export function ContentEditor({ id, isNew, user }: { id?: string; isNew?: boolea
           <div className="card">
             <div className="field"><label>النوع</label>
               <select value={type} onChange={(e) => setType(e.target.value)} disabled={!isNew}>
-                {['article', 'guide', 'solution', 'news', 'trend', 'faq_page', 'comparison', 'opportunity'].map((t) => <option key={t}>{t}</option>)}
+                {['article', 'guide', 'solution', 'news', 'trend', 'faq_page', 'comparison', 'opportunity', 'job', 'scholarship'].map((t) => <option key={t}>{t}</option>)}
               </select>
             </div>
             <div className="field"><label>العنوان</label><input value={title} onChange={(e) => setTitle(e.target.value)} /></div>

@@ -22,7 +22,7 @@ export function adminApiPlugin(): Plugin {
       }
       server.middlewares.use(async (req, res, next) => {
         const url = req.url || '';
-        if (!url.startsWith('/api/v1/admin')) return next();
+        if (!url.startsWith('/api/v1/')) return next();
         try {
           const cms = await server.ssrLoadModule('@alshafra/cms');
           const dbs = await server.ssrLoadModule('/server/db.ts');
@@ -33,16 +33,27 @@ export function adminApiPlugin(): Plugin {
             const text = await readBody(req);
             body = text ? JSON.parse(text) : undefined;
           }
-          const out = await cms.handleAdminApi(
-            {
-              method: req.method || 'GET',
-              pathname: raw[0],
-              search: raw[1] ? `?${raw[1]}` : '',
-              headers: { cookie: String(req.headers.cookie || '') },
-              body,
-            },
-            db,
-          );
+          const out = url.startsWith('/api/v1/admin')
+            ? await cms.handleAdminApi(
+                {
+                  method: req.method || 'GET',
+                  pathname: raw[0],
+                  search: raw[1] ? `?${raw[1]}` : '',
+                  headers: { cookie: String(req.headers.cookie || '') },
+                  body,
+                },
+                db,
+              )
+            : await cms.handlePublicApi(
+                {
+                  method: req.method || 'GET',
+                  pathname: raw[0],
+                  search: raw[1] ? `?${raw[1]}` : '',
+                  body,
+                  memberId: null,
+                },
+                db,
+              );
           res.statusCode = out.status;
           res.setHeader('x-robots-tag', 'noindex, nofollow');
           if (out.headers) {

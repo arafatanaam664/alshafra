@@ -15,3 +15,13 @@ export interface SocialProvider {
 export function socialIdempotencyKey(provider: SocialProviderName, documentId: string, templateVersion: string): string {
   return `social:${provider}:${documentId}:${templateVersion}`;
 }
+
+export {
+  StubSocialProvider,
+  UnconfiguredSocialProvider,
+  enqueueSocialPublish,
+  listSocialJobs,
+  processSocialJobs,
+  providerFor,
+} from './queue';
+

@@ -2,6 +2,11 @@ import type { SqlClient } from '@alshafra/database';
 import { writeAudit } from './audit';
 import { requirePermission, type Actor } from './permissions';
 
+export async function flagMap(db: SqlClient): Promise<Record<string, boolean>> {
+  const rows = await db.query<{ key: string; is_enabled: boolean }>(`SELECT key, is_enabled FROM feature_flags`);
+  return Object.fromEntries(rows.rows.map((row) => [row.key, row.is_enabled]));
+}
+
 export async function listFlags(db: SqlClient, actor: Actor | null) {
   requirePermission(actor, 'flags.read');
   return (

@@ -8,6 +8,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@alshafra/database": "*",
+    "@alshafra/kernel": "*",
     "zod": "^3.24.2"
   },
   "devDependencies": {

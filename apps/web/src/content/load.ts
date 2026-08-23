@@ -28,7 +28,24 @@ export interface RouteSnapshot {
   indexable: boolean;
 }
 
-export function loadContentSnapshot(): { routes: RouteSnapshot[]; sections?: unknown[] } | null {
+export function loadContentSnapshot(): {
+  routes: RouteSnapshot[];
+  sections?: unknown[];
+  flags?: Record<string, boolean>;
+  opportunities?: {
+    path: string;
+    title: string;
+    description: string;
+    html: string;
+    kind: string;
+    sourceName: string;
+    country?: string;
+    deadline?: string;
+    applyUrl?: string;
+  }[];
+  questions?: { path: string; title: string; body: string; robots: 'index, follow' | 'noindex, follow' }[];
+  ads?: { enabled: boolean; client?: string; slots: { key: string; slotId: string }[] };
+} | null {
   const candidates = [
     join(here, '../data/cms-snapshot.json'),
     join(here, '../../../../packages/database/data/content-snapshot.json'),

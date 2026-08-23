@@ -11,6 +11,8 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import AdSlot from '../components/AdSlot.astro';
+import AnalyticsBeacon from '../islands/AnalyticsBeacon';
 
 interface Props {
   title: string;
@@ -115,7 +117,9 @@ const paging = relNextPrev({ path });
     <main id="main" class:list={[!fullBleed && 'container-page py-10']}>
       {!fullBleed && <Breadcrumbs path={path} h1={h1} />}
       <slot />
+      <AdSlot name="in_article" />
     </main>
+    <AnalyticsBeacon client:idle path={path} />
     <Footer />
   </body>
 </html>

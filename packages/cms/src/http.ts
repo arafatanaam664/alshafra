@@ -68,6 +68,18 @@ import {
   patchSection,
   reorderSections,
 } from './sections';
+import { createOpportunity, listOpportunityAdmin, updateOpportunityListing } from './opportunities';
+import { getSitePublishStatus, publishSite } from './site-publish';
+import {
+  listAutomationRules,
+  listAutomationRuns,
+  setAutomationEnabled,
+  upsertAutomationRule,
+} from './automation';
+import { listNotifications } from '@alshafra/notifications';
+import { listSocialJobs } from '@alshafra/social';
+import { runWorkers } from './worker';
+import { getPublicAds } from './public-http';
 
 export interface HttpInput {
   method: string;
@@ -356,6 +368,39 @@ export async function handleAdminApi(input: HttpInput, db: SqlClient): Promise<H
     if (method === 'GET' && path === '/api/v1/admin/audit') return json(200, await listAudit(db, actor));
     if (method === 'GET' && path === '/api/v1/admin/users') return json(200, await listUsers(db, actor));
     if (method === 'GET' && path === '/api/v1/admin/analytics') return json(200, await getAnalyticsOverview(db, actor));
+    if (method === 'GET' && path === '/api/v1/admin/site-publish') return json(200, await getSitePublishStatus(db, actor));
+    if (method === 'POST' && path === '/api/v1/admin/site-publish') return json(200, await publishSite(db, actor));
+    if (method === 'GET' && path === '/api/v1/admin/opportunities') return json(200, await listOpportunityAdmin(db, actor));
+    if (method === 'POST' && path === '/api/v1/admin/opportunities') {
+      return json(201, await createOpportunity(db, actor, input.body as never));
+    }
+    const oppMatch = path.match(/^\/api\/v1\/admin\/opportunities\/([^/]+)$/);
+    if (oppMatch && method === 'PATCH') {
+      return json(200, await updateOpportunityListing(db, actor, oppMatch[1], input.body as never));
+    }
+    if (method === 'GET' && path === '/api/v1/admin/social/jobs') {
+      requirePermission(actor, 'social.publish');
+      return json(200, await listSocialJobs(db));
+    }
+    if (method === 'POST' && path === '/api/v1/admin/jobs/run') {
+      return json(200, await runWorkers(db, actor));
+    }
+    if (method === 'GET' && path === '/api/v1/admin/automation/rules') return json(200, await listAutomationRules(db, actor));
+    if (method === 'POST' && path === '/api/v1/admin/automation/rules') {
+      return json(201, await upsertAutomationRule(db, actor, input.body as never));
+    }
+    const autoMatch = path.match(/^\/api\/v1\/admin\/automation\/rules\/([^/]+)$/);
+    if (autoMatch && method === 'PATCH') {
+      await setAutomationEnabled(db, actor, autoMatch[1], Boolean((input.body as { enabled?: boolean }).enabled));
+      return json(200, { ok: true });
+    }
+    if (method === 'GET' && path === '/api/v1/admin/automation/runs') return json(200, await listAutomationRuns(db, actor));
+    if (method === 'GET' && path === '/api/v1/admin/notifications') {
+      return json(200, await listNotifications(db));
+    }
+    if (method === 'GET' && path === '/api/v1/admin/ads') {
+      return json(200, await getPublicAds(db));
+    }
 
     return json(404, { error: 'not_found' });
   } catch (err) {

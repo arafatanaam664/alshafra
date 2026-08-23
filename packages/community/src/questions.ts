@@ -139,6 +139,28 @@ export async function getQuestion(db: SqlClient, id: string, requestedSlug?: str
   return { question, redirect: null };
 }
 
+export async function listPublicQuestions(db: SqlClient, limit = 50) {
+  const rows = await db.query<{
+    id: string;
+    author_id: string | null;
+    title: string;
+    slug: string;
+    path: string;
+    body: string;
+    status: string;
+    indexable: boolean;
+    created_at: string;
+  }>(
+    `SELECT id, author_id, title, slug, path, body, status, indexable, created_at::text
+     FROM questions
+     WHERE deleted_at IS NULL AND status <> 'hidden'
+     ORDER BY created_at DESC
+     LIMIT $1`,
+    [Math.min(limit, 200)],
+  );
+  return rows.rows.map(mapQuestion);
+}
+
 export async function listQuestions(db: SqlClient, limit = 50) {
   const rows = await db.query<{
     id: string;

@@ -9,3 +9,6 @@ export interface Notification {
   channel: NotificationChannel;
   readAt?: string;
 }
+
+export { createNotification, listNotifications, markNotificationRead } from './store';
+

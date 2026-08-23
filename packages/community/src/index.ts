@@ -18,7 +18,7 @@ export {
 export { MemoryRateLimiter, defaultRateLimiter, postLimit } from './rate-limit';
 export { verifyTurnstile, turnstileConfigured } from './turnstile';
 export { loadMember, provisionMember, requireMember } from './members';
-export { createQuestion, getQuestion, listQuestions, findDuplicateQuestion } from './questions';
+export { createQuestion, getQuestion, listQuestions, listPublicQuestions, findDuplicateQuestion } from './questions';
 export { createAnswer, listAnswers } from './answers';
 export { castVote } from './votes';
 export { createReport, listOpenReports, resolveReport } from './reports';

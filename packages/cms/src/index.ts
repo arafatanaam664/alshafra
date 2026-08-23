@@ -74,6 +74,11 @@ export {
   SECTIONS_CONTRACT,
 } from './sections';
 export { handleAdminApi, type HttpInput, type HttpOutput } from './http';
+export { handlePublicApi, getPublicAds, type PublicHttpInput, type PublicHttpOutput } from './public-http';
+export { publishSite, getSitePublishStatus } from './site-publish';
+export { runWorkers } from './worker';
+export { dispatchAutomation } from './automation';
+export { createOpportunity, listPublicOpportunities } from './opportunities';
 export {
   sessionSecret,
   signSession,

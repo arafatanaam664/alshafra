@@ -54,9 +54,10 @@ export async function buildPublicSnapshot(db: SqlClient, legacyPaths: Set<string
     h1_override: string | null;
     featured_key: string | null;
     og_key: string | null;
+    type_data_json: unknown;
   }>(
     `SELECT d.id, d.path, d.slug, d.title, d.excerpt, d.body_json, d.type::text AS type, d.status::text AS status,
-            d.indexable, d.unique_text_word_count, d.legacy_path,
+            d.indexable, d.unique_text_word_count, d.legacy_path, d.type_data_json,
             s.seo_title, s.meta_description, s.canonical_url, s.robots::text AS robots, s.h1_override,
             fm.object_key AS featured_key, om.object_key AS og_key
      FROM documents d
@@ -127,6 +128,47 @@ export async function buildPublicSnapshot(db: SqlClient, legacyPaths: Set<string
   );
   const sections = applySectionOverrides(PLATFORM_SECTIONS, parseSectionOverrides(setting.rows[0]?.value_json));
 
+  const flagRows = await db.query<{ key: string; is_enabled: boolean }>(`SELECT key, is_enabled FROM feature_flags`);
+  const flags = Object.fromEntries(flagRows.rows.map((row) => [row.key, row.is_enabled]));
+
+  const { listingCanAppearPublic, parseListingData } = await import('./opportunities');
+  const opportunityDocs = docs.rows.filter((doc) => ['job', 'scholarship', 'opportunity'].includes(doc.type));
+  const opportunities = opportunityDocs
+    .map((doc) => {
+      const listing = parseListingData((doc as { type_data_json?: unknown }).type_data_json);
+      return { doc, listing };
+    })
+    .filter((row) => listingCanAppearPublic({ published: row.doc.status === 'published', data: row.listing, flags }))
+    .map((row) => ({
+      path: row.doc.path,
+      title: row.doc.seo_title || row.doc.title,
+      description: row.doc.meta_description || row.doc.excerpt || '',
+      html: blocksToHtml(asBlocks(row.doc.body_json)),
+      kind: row.listing?.kind || 'other',
+      sourceName: row.listing?.sourceName || '',
+      country: row.listing?.country,
+      deadline: row.listing?.deadline,
+      applyUrl: row.listing?.applyUrl || undefined,
+    }));
+
+  let questions: { path: string; title: string; body: string; robots: 'noindex, follow' }[] = [];
+  if (flags.community_enabled && flags.questions_enabled) {
+    const q = await db.query<{ path: string; title: string; body: string }>(
+      `SELECT path, title, body FROM questions WHERE deleted_at IS NULL AND status <> 'hidden' ORDER BY created_at DESC LIMIT 100`,
+    );
+    questions = q.rows.map((row) => ({ ...row, robots: 'noindex, follow' as const }));
+  }
+
+  const adsEnabled = Boolean(flags.ads_enabled);
+  const adsClient = await db.query<{ value_json: unknown }>(`SELECT value_json FROM site_settings WHERE key = 'ads.client'`);
+  const slots = adsEnabled
+    ? (
+        await db.query<{ key: string; adsense_slot_id: string | null }>(
+          `SELECT key, adsense_slot_id FROM ad_slots WHERE adsense_slot_id IS NOT NULL AND adsense_slot_id <> ''`,
+        )
+      ).rows.map((row) => ({ key: row.key, slotId: String(row.adsense_slot_id) }))
+    : [];
+
   return contentSnapshotSchema.parse({
     generatedAt: new Date().toISOString(),
     siteUrl: SITE,
@@ -135,8 +177,18 @@ export async function buildPublicSnapshot(db: SqlClient, legacyPaths: Set<string
       published: routes.length,
       qualityPass: qualityPassCount,
       newRoutes,
+      opportunities: opportunities.length,
+      questions: questions.length,
     },
     sections,
+    flags,
+    opportunities,
+    questions,
+    ads: {
+      enabled: adsEnabled && Boolean(adsClient.rows[0]?.value_json) && slots.length > 0,
+      client: typeof adsClient.rows[0]?.value_json === 'string' ? adsClient.rows[0]?.value_json : undefined,
+      slots,
+    },
   });
 }
 

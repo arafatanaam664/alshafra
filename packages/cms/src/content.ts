@@ -337,9 +337,29 @@ export async function transitionDocument(db: SqlClient, actor: Actor, id: string
   await writeAudit(db, actor, `documents.${to}`, 'document', id, { status: from }, { status: to });
   if (to === 'published' || to === 'unpublished' || to === 'archived') {
     try {
-      await refreshPublicSnapshot(db);
+      const { publishSite } = await import('./site-publish');
+      await publishSite(db, actor);
     } catch {
-      /* snapshot write is best-effort; publish must not fail */
+      try {
+        await refreshPublicSnapshot(db);
+      } catch {
+        /* snapshot write is best-effort; publish must not fail */
+      }
+    }
+  }
+  if (to === 'published') {
+    try {
+      const { dispatchAutomation } = await import('./automation');
+      await dispatchAutomation(db, {
+        name: 'document.published',
+        documentId: id,
+        title: current.title,
+        path: current.path,
+        url: `https://alshafra.com${current.path}`,
+        actorId: actor.userId,
+      });
+    } catch {
+      /* automation is best-effort */
     }
   }
   return { id, from, to, path: current.path };

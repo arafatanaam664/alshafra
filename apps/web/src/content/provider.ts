@@ -497,7 +497,7 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
         description: 'عن Alshafra.',
         h1: 'عن Alshafra',
         kind,
-        html: legalHtml('/about', 'Alshafra منصة عربية مستقلة للمعلومات العملية والأدوات. التقويم والمواعيد قسم فيها وليست جهة حكومية.'),
+        html: legalHtml('/about', 'Alshafra منصة عربية مستقلة للمعلومات العملية والأدوات. المواعيد المعروضة استرشادية، والمنصة ليست جهة حكومية.'),
       }),
     '/contact': () =>
       page({
@@ -599,6 +599,74 @@ function extraSectionPages(): PageModel[] {
   ];
 }
 
+function extraPlatformPages(): PageModel[] {
+  const snap = loadContentSnapshot();
+  const pages: PageModel[] = [];
+  const opportunities = snap?.opportunities || [];
+  if (opportunities.length) {
+    pages.push(
+      page({
+        path: '/opportunity',
+        title: 'الفرص',
+        description: 'وظائف ومنح وفرص من مصادر معلنة.',
+        h1: 'الفرص',
+        kind: 'collection',
+        robots: 'noindex, follow',
+        itemList: opportunities.map((item) => ({ name: item.title, path: item.path })),
+        html: `${p('فرص تحققنا من مصدرها. راجع الجهة الأصلية قبل التقديم.')}${ul(
+          opportunities.map((item) => `<a href="${item.path}">${esc(item.title)}</a>`),
+        )}`,
+      }),
+    );
+    for (const item of opportunities) {
+      pages.push(
+        page({
+          path: item.path,
+          title: item.title,
+          description: item.description,
+          h1: item.title,
+          kind: item.kind,
+          robots: 'noindex, follow',
+          html: `${p(item.description)}${item.sourceName ? p(`المصدر: ${item.sourceName}`) : ''}${
+            item.deadline ? p(`آخر موعد: ${item.deadline}`) : ''
+          }${item.applyUrl ? `<p><a href="${esc(item.applyUrl)}">رابط التقديم</a></p>` : ''}${item.html}`,
+        }),
+      );
+    }
+  }
+  const questions = snap?.questions || [];
+  if (questions.length) {
+    pages.push(
+      page({
+        path: '/question',
+        title: 'الأسئلة',
+        description: 'أسئلة المجتمع.',
+        h1: 'الأسئلة',
+        kind: 'collection',
+        robots: 'noindex, follow',
+        itemList: questions.map((item) => ({ name: item.title, path: item.path })),
+        html: `${p('أسئلة من المجتمع. ليست استشارة رسمية.')}${ul(
+          questions.map((item) => `<a href="${item.path}">${esc(item.title)}</a>`),
+        )}`,
+      }),
+    );
+    for (const item of questions) {
+      pages.push(
+        page({
+          path: item.path,
+          title: item.title,
+          description: item.title,
+          h1: item.title,
+          kind: 'question',
+          robots: 'noindex, follow',
+          html: p(item.body),
+        }),
+      );
+    }
+  }
+  return pages;
+}
+
 function extraToolPages(): PageModel[] {
   const pages = NEW_TOOLS.map((tool) =>
     page({
@@ -678,6 +746,7 @@ export function getAllPages(): PageModel[] {
       ...loadPublished().map((row) => buildForPublished(row.path, row.title, row.kind)),
       ...extraSectionPages(),
       ...extraToolPages(),
+      ...extraPlatformPages(),
     ]),
   );
   return cache;

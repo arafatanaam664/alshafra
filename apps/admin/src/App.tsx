@@ -4,7 +4,6 @@ import { api, type SessionUser } from './lib/api';
 import { match, navigate, useRoute } from './lib/hash';
 import {
   AnalyticsView,
-  ComingSoon,
   ContentEditor,
   ContentList,
   DashboardView,
@@ -17,6 +16,14 @@ import {
 import { MediaView } from './pages/MediaView';
 import { CommunityView } from './pages/CommunityView';
 import { NavigationView, SectionsView } from './pages/SectionsView';
+import {
+  AdsView,
+  AutomationView,
+  NotificationsAdminView,
+  OpportunitiesView,
+  SitePublishBar,
+  SocialQueueView,
+} from './pages/EnginesView';
 
 export function App() {
   const route = useRoute();
@@ -49,7 +56,9 @@ export function App() {
     page = <ContentEditor id={match(path, '/content/:id')!.id} user={user} />;
   } else if (path === '/content') page = <ContentList route={route} />;
   else if (path === '/taxonomy') page = <SimpleList title="التصنيفات" path="/api/v1/admin/categories" />;
-  else if (path === '/sections') page = <SimpleList title="أقسام المنصة" path="/api/v1/admin/sections" />;
+  else if (path === '/sections') page = <SectionsView user={user} />;
+  else if (path === '/navigation') page = <NavigationView user={user} />;
+  else if (path === '/opportunities') page = <OpportunitiesView user={user} />;
   else if (path === '/tools') page = <SimpleList title="الأدوات" path="/api/v1/admin/tools" />;
   else if (path === '/media') page = <MediaView user={user} />;
   else if (path === '/seo') page = <SimpleList title="التحويلات و410" path="/api/v1/admin/redirects" />;
@@ -60,8 +69,16 @@ export function App() {
   else if (path === '/audit') page = <SimpleList title="سجل التدقيق" path="/api/v1/admin/audit" />;
   else if (path === '/health') page = <HealthView />;
   else if (path === '/community') page = <CommunityView user={user} />;
-  else if (path === '/social' || path === '/automation') page = <ComingSoon name={path} />;
-  else if (path === '/') page = <DashboardView />;
+  else if (path === '/social') page = <SocialQueueView user={user} />;
+  else if (path === '/automation') page = <AutomationView user={user} />;
+  else if (path === '/notifications') page = <NotificationsAdminView />;
+  else if (path === '/ads') page = <AdsView />;
+  else if (path === '/') page = (
+    <>
+      <SitePublishBar user={user} />
+      <DashboardView />
+    </>
+  );
 
   return (
     <Shell

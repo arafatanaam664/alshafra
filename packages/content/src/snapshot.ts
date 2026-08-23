@@ -58,6 +58,39 @@ export const contentSnapshotSchema = z.object({
   routes: z.array(snapshotRouteSchema),
   counts: z.record(z.number()),
   sections: z.array(snapshotSectionSchema).optional(),
+  flags: z.record(z.boolean()).optional(),
+  opportunities: z
+    .array(
+      z.object({
+        path: z.string(),
+        title: z.string(),
+        description: z.string(),
+        html: z.string(),
+        kind: z.string(),
+        sourceName: z.string(),
+        country: z.string().optional(),
+        deadline: z.string().optional(),
+        applyUrl: z.string().optional(),
+      }),
+    )
+    .optional(),
+  questions: z
+    .array(
+      z.object({
+        path: z.string(),
+        title: z.string(),
+        body: z.string(),
+        robots: z.enum(['index, follow', 'noindex, follow']),
+      }),
+    )
+    .optional(),
+  ads: z
+    .object({
+      enabled: z.boolean(),
+      client: z.string().optional(),
+      slots: z.array(z.object({ key: z.string(), slotId: z.string() })),
+    })
+    .optional(),
 });
 
 export type SnapshotRoute = z.infer<typeof snapshotRouteSchema>;

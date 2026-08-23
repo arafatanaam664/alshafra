@@ -12,6 +12,7 @@ const NAV: { href?: string; label: string; perm?: string; soon?: boolean; group:
   { group: 'المنصة', href: '/sections', label: 'الأقسام' },
   { group: 'المنصة', href: '/navigation', label: 'التنقل' },
   { group: 'المنصة', href: '/taxonomy', label: 'التصنيفات والوسوم', perm: 'taxonomy.read' },
+  { group: 'الفرص', href: '/opportunities', label: 'وظائف ومنح' },
   { group: 'الأدوات', href: '/tools', label: 'الأدوات' },
   { group: 'الوسائط', href: '/media', label: 'مكتبة الوسائط', perm: 'media.read' },
   { group: 'SEO', href: '/seo', label: 'التحويلات و410', perm: 'documents.read' },

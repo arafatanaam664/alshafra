@@ -16,6 +16,9 @@
     "@alshafra/kernel": "*",
     "@alshafra/media": "*",
     "@alshafra/seo": "*",
+    "@alshafra/analytics": "*",
+    "@alshafra/social": "*",
+    "@alshafra/notifications": "*",
     "zod": "^3.24.2"
   },
   "devDependencies": {

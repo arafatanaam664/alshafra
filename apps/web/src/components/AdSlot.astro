@@ -1,0 +1,20 @@
+---
+import { loadContentSnapshot } from '../content/load';
+
+interface Props { name: string }
+const { name: slot } = Astro.props;
+const ads = loadContentSnapshot()?.ads;
+const enabled = Boolean(ads?.enabled && ads.client && ads.slots.some((item) => item.key === slot));
+const slotId = ads?.slots.find((item) => item.key === slot)?.slotId;
+---
+{enabled && ads?.client && slotId && (
+  <aside class="my-6 text-center" data-ad-slot={slot}>
+    <ins
+      class="adsbygoogle"
+      style="display:block"
+      data-ad-client={ads.client}
+      data-ad-slot={slotId}
+      data-ad-format="auto"
+    />
+  </aside>
+)}

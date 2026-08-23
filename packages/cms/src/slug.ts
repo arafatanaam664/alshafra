@@ -38,6 +38,8 @@ export function defaultPathForType(type: string, slug: string): string {
     case 'comparison':
       return `/compare/${s}`;
     case 'opportunity':
+    case 'job':
+    case 'scholarship':
       return `/opportunity/${s}`;
     case 'legal':
       return `/${s}`;

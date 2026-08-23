@@ -32,6 +32,17 @@ export {
 } from './linking';
 export { loadManualLinks, writeManualLink } from './manual-links';
 export {
+  OPPORTUNITY_HUB_PATH,
+  OPPORTUNITY_KINDS,
+  listingCanAppearPublic,
+  listingFlagFor,
+  listingIsExpired,
+  listingDataSchema,
+  parseListingData,
+  type ListingData,
+  type OpportunityKind,
+} from './opportunities';
+export {
   PLATFORM_SECTIONS,
   SECTIONS_CONTRACT,
   SECTIONS_SETTING_KEY,
