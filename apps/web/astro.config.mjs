@@ -7,6 +7,21 @@ export default defineConfig({
   trailingSlash: 'never',
   output: 'static',
   integrations: [react(), tailwind({ applyBaseStyles: false })],
+  server: {
+    host: true,
+    port: 4321,
+    allowedHosts: true,
+  },
+  vite: {
+    server: {
+      host: true,
+      allowedHosts: true,
+    },
+    preview: {
+      host: true,
+      allowedHosts: true,
+    },
+  },
   build: {
     format: 'directory',
     inlineStylesheets: 'auto',

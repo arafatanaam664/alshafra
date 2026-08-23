@@ -28,7 +28,7 @@ export interface RouteSnapshot {
   indexable: boolean;
 }
 
-export function loadContentSnapshot(): { routes: RouteSnapshot[] } | null {
+export function loadContentSnapshot(): { routes: RouteSnapshot[]; sections?: unknown[] } | null {
   const candidates = [
     join(here, '../data/cms-snapshot.json'),
     join(here, '../../../../packages/database/data/content-snapshot.json'),

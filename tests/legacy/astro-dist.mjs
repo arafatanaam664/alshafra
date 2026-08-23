@@ -48,6 +48,7 @@ else {
 }
 if (!existsSync(join(dist, 'search-index.json'))) seoFail.push('missing search-index.json');
 if (!existsSync(join(dist, 'tools/index.html'))) seoFail.push('missing /tools hub');
+if (!existsSync(join(dist, 'calendar/index.html'))) seoFail.push('missing /calendar section');
 const percentFile = join(dist, 'tool/percentage/index.html');
 if (!existsSync(percentFile)) seoFail.push('missing /tool/percentage');
 else if (!readFileSync(percentFile, 'utf8').includes('WebApplication')) {

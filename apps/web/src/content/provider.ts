@@ -200,7 +200,8 @@ function hijriCalHtml(): string {
 }
 
 function homeHtml(): string {
-  return `${p('Alshafra منصة عربية للمعلومات العملية والأدوات. التقويم والمواعيد قسم أساسي فيها وليس علامة منفصلة.')}${h2('التقويم والمواعيد')}${ul([
+  return `${p('Alshafra منصة عربية للمعلومات العملية والأدوات والخدمات.')}${h2('التقويم والمواعيد')}${ul([
+    `<a href="/calendar">قسم المواعيد والتقويم</a>`,
     `<a href="/today">التاريخ اليوم</a>`,
     `<a href="/date-converter">تحويل التاريخ (أم القرى)</a>`,
     `<a href="/hijri-calendar">التقويم الهجري</a>`,
@@ -223,10 +224,10 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
   if (path === '/') {
     return page({
       path,
-      title: 'Alshafra — معلومات عملية وأدوات والتقويم والمواعيد',
+      title: 'Alshafra — منصة عربية للمعلومات العملية',
       description:
         'منصة عربية للمعلومات العملية والأدوات: تحويل التاريخ وفق أم القرى، مواعيد الرواتب، التقويم الدراسي والإجازات.',
-      h1: 'Alshafra — معلومات عملية وأدوات',
+      h1: 'المعرفة والأدوات والخدمات في مكان واحد.',
       kind: 'home',
       html: homeHtml(),
     });
@@ -496,7 +497,7 @@ function buildForPublished(path: string, publishedTitle: string, kind: string): 
         description: 'عن Alshafra.',
         h1: 'عن Alshafra',
         kind,
-        html: legalHtml('/about', 'Alshafra منصة عربية مستقلة للمعلومات العملية والأدوات. التقويم والمواعيد قسم فيها.'),
+        html: legalHtml('/about', 'Alshafra منصة عربية مستقلة للمعلومات العملية والأدوات. التقويم والمواعيد قسم فيها وليست جهة حكومية.'),
       }),
     '/contact': () =>
       page({
@@ -562,6 +563,42 @@ function applySnapshot(pages: PageModel[]): PageModel[] {
   });
 }
 
+function extraSectionPages(): PageModel[] {
+  const calendarItems = [
+    ['/today', 'التاريخ اليوم'],
+    ['/date-converter', 'تحويل التاريخ (أم القرى)'],
+    ['/hijri-calendar', 'التقويم الهجري'],
+    ['/salaries', 'مواعيد الرواتب والدعم'],
+    ['/school-calendar', 'التقويم الدراسي'],
+    ['/holidays', 'الإجازات الرسمية'],
+    ['/countdown', 'كم باقي على…'],
+    ['/age-calculator', 'حاسبة العمر'],
+    ['/articles/hijri-to-gregorian-conversion', 'دليل تحويل التاريخ'],
+  ] as const;
+  return [
+    page({
+      path: '/calendar',
+      title: 'المواعيد والتقويم',
+      description:
+        'التاريخ الهجري والميلادي، تحويل التاريخ، مواعيد الرواتب، التقويم الدراسي والإجازات.',
+      h1: 'المواعيد والتقويم',
+      kind: 'collection',
+      itemList: calendarItems.map(([path, name]) => ({ name, path })),
+      html: `${p(
+        'تاريخ اليوم، تحويل الهجري والميلادي، مواعيد الرواتب والدعم، التقويم الدراسي والإجازات الرسمية.',
+      )}${p(
+        'نستخدم توقيت الرياض وتقويم أم القرى وقاعدة نهاية الأسبوع (الجمعة ← الخميس، السبت ← الأحد). المعلومات استرشادية وليست إعلاناً رسمياً.',
+      )}${h2('ابدأ من هنا')}${ul(calendarItems.map(([href, label]) => `<a href="${href}">${esc(label)}</a>`))}${h2(
+        'كيف تستخدم هذا القسم؟',
+      )}${p(
+        'ابدأ من التاريخ اليوم أو تحويل التاريخ، ثم انتقل إلى الرواتب أو التقويم الدراسي حسب حاجتك.',
+      )}${p(
+        'المعلومات استرشادية وفق أم القرى وتوقيت الرياض. راجع المصدر الرسمي قبل أي قرار.',
+      )}`,
+    }),
+  ];
+}
+
 function extraToolPages(): PageModel[] {
   const pages = NEW_TOOLS.map((tool) =>
     page({
@@ -577,7 +614,7 @@ function extraToolPages(): PageModel[] {
       html: `${tool.sections.map((section) => `<section>${h2(section.heading)}${p(section.body)}</section>`).join('')}${faqHtml(tool.faq)}`,
     }),
   );
-  const legacyLabels: Record<string, string> = {
+  const frozenToolLabels: Record<string, string> = {
     'date-converter': 'تحويل التاريخ',
     'hijri-calendar': 'التقويم الهجري',
     today: 'التاريخ اليوم',
@@ -591,7 +628,7 @@ function extraToolPages(): PageModel[] {
   };
   const listed = [
     ...LEGACY_TOOLS.filter((tool) => tool.path !== '/name-decoration').map((tool) => ({
-      name: legacyLabels[tool.key] || tool.key,
+      name: frozenToolLabels[tool.key] || tool.key,
       path: tool.path,
     })),
     ...NEW_TOOLS.map((tool) => ({ name: tool.h1, path: tool.path })),
@@ -600,11 +637,11 @@ function extraToolPages(): PageModel[] {
     page({
       path: '/tools',
       title: 'أدوات Alshafra',
-      description: 'حاسبات ومحوّلات عربية مع الإبقاء على أدوات التقويم والمواعيد في مساراتها القديمة.',
+      description: 'حاسبات ومحوّلات عربية للاستخدام اليومي.',
       h1: 'الأدوات',
       kind: 'collection',
       itemList: listed,
-      html: `${p('الأدوات الجديدة على /tool/... والحسابات القديمة مثل تحويل التاريخ بقيت على روابطها.')}${h2('جديدة')}${ul(
+      html: `${p('اختر الأداة التي تحتاجها. الحساب يتم في المتصفح.')}${h2('جديدة')}${ul(
         NEW_TOOLS.map((tool) => `<a href="${tool.path}">${esc(tool.h1)}</a>`),
       )}${h2('المواعيد والتقويم')}${ul(
         [
@@ -639,6 +676,7 @@ export function getAllPages(): PageModel[] {
   cache = attachRelated(
     applySnapshot([
       ...loadPublished().map((row) => buildForPublished(row.path, row.title, row.kind)),
+      ...extraSectionPages(),
       ...extraToolPages(),
     ]),
   );

@@ -9,16 +9,18 @@ const NAV: { href?: string; label: string; perm?: string; soon?: boolean; group:
   { group: 'المحتوى', href: '/content/new', label: 'محتوى جديد', perm: 'documents.create' },
   { group: 'المحتوى', href: '/content?status=draft', label: 'مسودات', perm: 'documents.read' },
   { group: 'المحتوى', href: '/content?status=review', label: 'قيد المراجعة', perm: 'documents.read' },
-  { group: 'التصنيف', href: '/taxonomy', label: 'التصنيفات والوسوم', perm: 'taxonomy.read' },
+  { group: 'المنصة', href: '/sections', label: 'الأقسام' },
+  { group: 'المنصة', href: '/navigation', label: 'التنقل' },
+  { group: 'المنصة', href: '/taxonomy', label: 'التصنيفات والوسوم', perm: 'taxonomy.read' },
   { group: 'الأدوات', href: '/tools', label: 'الأدوات' },
   { group: 'الوسائط', href: '/media', label: 'مكتبة الوسائط', perm: 'media.read' },
-  { group: 'SEO', href: '/seo', label: 'نظرة SEO', perm: 'documents.read' },
+  { group: 'SEO', href: '/seo', label: 'التحويلات و410', perm: 'documents.read' },
   { group: 'التحليلات', href: '/analytics', label: 'التحليلات', perm: 'analytics.read' },
   { group: 'المجتمع', href: '/community', label: 'إشراف المجتمع', perm: 'moderation.handle' },
-  { group: 'اجتماعي', label: 'قريبًا', soon: true },
-  { group: 'أتمتة', label: 'قريبًا', soon: true },
+  { group: 'اجتماعي', label: 'النشر الاجتماعي', soon: true },
+  { group: 'أتمتة', label: 'الأتمتة', soon: true },
   { group: 'الوصول', href: '/users', label: 'المستخدمون', perm: 'users.read' },
-  { group: 'النظام', href: '/flags', label: 'Feature Flags', perm: 'flags.read' },
+  { group: 'النظام', href: '/flags', label: 'مفاتيح التفعيل', perm: 'flags.read' },
   { group: 'النظام', href: '/settings', label: 'الإعدادات', perm: 'settings.read' },
   { group: 'النظام', href: '/audit', label: 'سجل التدقيق', perm: 'audit.read' },
   { group: 'النظام', href: '/health', label: 'صحة النظام', perm: 'health.read' },
@@ -45,7 +47,7 @@ export function Shell({
     <div className="shell">
       <aside className="sidebar">
         <div className="brand">
-          <small>ADMIN CMS</small>
+          <small>لوحة التحكم</small>
           <h1>{brand.name}</h1>
         </div>
         <nav className="nav">
@@ -53,7 +55,8 @@ export function Shell({
             const showGroup = item.group !== group;
             group = item.group;
             const allowed = !item.perm || can(user, item.perm);
-            const active = item.href && (item.href === '/' ? path === '/' : path === item.href.split('?')[0]);
+            const itemPath = item.href?.split('?')[0];
+            const active = item.href && (item.href === '/' ? path === '/' : path === itemPath);
             return (
               <div key={item.label + (item.href || '')}>
                 {showGroup && <div className="nav-group">{item.group}</div>}

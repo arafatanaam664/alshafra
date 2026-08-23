@@ -11,3 +11,7 @@ HMAC cookie + `ADMIN_DEV_LOGIN` only outside production. Supabase Auth remains t
 ## ADR-503 In-process Admin API
 
 `handleAdminApi` in `@alshafra/cms` is not a microservice. Vite middleware is a composition root.
+
+## ADR-504 Platform sections contract
+
+Sections are a catalog in `@alshafra/content` with overrides in `site_settings.platform.sections`. No new `sections` table in this correction. Locked paths cannot change. A section without `hasPublicPage` cannot be enabled for the public UI.

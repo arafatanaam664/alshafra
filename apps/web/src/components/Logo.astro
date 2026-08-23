@@ -1,0 +1,18 @@
+---
+interface Props { tone?: 'light' | 'dark' }
+const { tone = 'dark' } = Astro.props;
+const mark = tone === 'light' ? 'text-white' : 'text-ink-900';
+const mute = tone === 'light' ? 'text-white/55' : 'text-ink-800/45';
+---
+<a href="/" class={`group flex items-center gap-2.5 ${mark}`} aria-label="Alshafra">
+  <span class="relative grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-ink-900 ring-1 ring-white/10">
+    <svg viewBox="0 0 32 32" class="h-5 w-5" aria-hidden="true">
+      <path d="M8 24 L16 6 H18.2 L10.2 24 Z" fill="#7c5cff"/>
+      <path d="M14 24 L22 6 H24.2 L16.2 24 Z" fill="#2ee6d6"/>
+    </svg>
+  </span>
+  <span class="leading-none">
+    <span class="block font-latin text-[15px] font-extrabold tracking-tight">Alshafra</span>
+    <span class={`block text-[10px] font-medium ${mute}`}>المنصة العربية</span>
+  </span>
+</a>

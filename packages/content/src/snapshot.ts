@@ -20,11 +20,44 @@ export const snapshotRouteSchema = z.object({
   image: z.string().optional(),
 });
 
+const snapshotSectionChildSchema = z.object({
+  key: z.string(),
+  name: z.string(),
+  path: z.string(),
+  enabled: z.boolean(),
+  sort: z.number(),
+  lockedPath: z.boolean(),
+});
+
+const snapshotSectionSchema = z.object({
+  key: z.string(),
+  name: z.string(),
+  path: z.string(),
+  description: z.string(),
+  icon: z.string(),
+  enabled: z.boolean(),
+  showInNav: z.boolean(),
+  showInHome: z.boolean(),
+  showInFooter: z.boolean(),
+  showInMobile: z.boolean(),
+  featured: z.boolean(),
+  sort: z.number(),
+  children: z.array(snapshotSectionChildSchema),
+  featureFlag: z.string().nullable(),
+  hasPublicPage: z.boolean(),
+  lockedPath: z.boolean(),
+  system: z.boolean(),
+  seoTitle: z.string(),
+  seoDescription: z.string(),
+  parentKey: z.string().nullable(),
+});
+
 export const contentSnapshotSchema = z.object({
   generatedAt: z.string(),
   siteUrl: z.string(),
   routes: z.array(snapshotRouteSchema),
   counts: z.record(z.number()),
+  sections: z.array(snapshotSectionSchema).optional(),
 });
 
 export type SnapshotRoute = z.infer<typeof snapshotRouteSchema>;

@@ -31,3 +31,25 @@ export {
   type LinkablePage,
 } from './linking';
 export { loadManualLinks, writeManualLink } from './manual-links';
+export {
+  PLATFORM_SECTIONS,
+  SECTIONS_CONTRACT,
+  SECTIONS_SETTING_KEY,
+  FORBIDDEN_PUBLIC_PHRASES,
+  publicSections,
+  navSections,
+  homeSections,
+  footerSections,
+  mobileSections,
+  applySectionOverrides,
+  parseSectionOverrides,
+  findLeakedPublicPhrase,
+  assertNoPublicLeak,
+  assertSectionMutation,
+  validateSectionPath,
+  cloneSections,
+  type PlatformSection,
+  type PlatformNavChild,
+  type SectionOverride,
+  type SectionOverridesState,
+} from './sections';

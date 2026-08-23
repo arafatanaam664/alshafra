@@ -29,6 +29,8 @@ export const FEATURE_FLAG_SEEDS: readonly FlagSeed[] = [
   { key: 'calendar_enabled', isEnabled: true, description: 'Calendar section — must stay on' },
   { key: 'seo.ugc_auto_index', isEnabled: false, description: 'Never auto-index UGC in v1' },
   { key: 'email_enabled', isEnabled: false, description: 'Transactional email' },
+  { key: 'news_enabled', isEnabled: false, description: 'News section — no empty hub' },
+  { key: 'apps_enabled', isEnabled: false, description: 'Apps section — no empty hub' },
 ];
 
 export function flagDefault(key: string): boolean {

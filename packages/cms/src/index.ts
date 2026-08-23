@@ -62,6 +62,17 @@ export {
   getAnalyticsOverview,
   getDocumentAnalytics,
 } from './flags-settings';
+export {
+  getSectionsCatalog,
+  getNavigationCatalog,
+  patchSection,
+  createSection,
+  reorderSections,
+  patchNavigation,
+  listResolvedSections,
+  SECTIONS_SETTING_KEY,
+  SECTIONS_CONTRACT,
+} from './sections';
 export { handleAdminApi, type HttpInput, type HttpOutput } from './http';
 export {
   sessionSecret,

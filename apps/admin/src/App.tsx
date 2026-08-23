@@ -16,6 +16,7 @@ import {
 } from './pages/views';
 import { MediaView } from './pages/MediaView';
 import { CommunityView } from './pages/CommunityView';
+import { NavigationView, SectionsView } from './pages/SectionsView';
 
 export function App() {
   const route = useRoute();
@@ -48,6 +49,7 @@ export function App() {
     page = <ContentEditor id={match(path, '/content/:id')!.id} user={user} />;
   } else if (path === '/content') page = <ContentList route={route} />;
   else if (path === '/taxonomy') page = <SimpleList title="التصنيفات" path="/api/v1/admin/categories" />;
+  else if (path === '/sections') page = <SimpleList title="أقسام المنصة" path="/api/v1/admin/sections" />;
   else if (path === '/tools') page = <SimpleList title="الأدوات" path="/api/v1/admin/tools" />;
   else if (path === '/media') page = <MediaView user={user} />;
   else if (path === '/seo') page = <SimpleList title="التحويلات و410" path="/api/v1/admin/redirects" />;

@@ -72,11 +72,12 @@ This matches the chat strategy the owner already chose: full technical foundatio
 
 ## Homepage
 
-`/` may TRANSFORM to say Alshafra and show the eight-pillar story.
+`/` may TRANSFORM to say Alshafra. It must speak to users, not to the internal eight-pillar plan.
 
-- Calendar module stays **unmissable**.
-- Unlaunched pillars are omitted or not indexed. No thin cards that 404.
+- Calendar stays **unmissable** as a normal section, not as “the old site”.
+- Unlaunched pillars are omitted. No “قريباً” engineering cards. No thin indexed hubs.
 - Inner HIGH URLs do not move.
+- Public copy never mentions phases, migration, Bing, or architecture.
 
 See `54-homepage-migration.md`.
 

@@ -35,7 +35,8 @@ export function breadcrumbsFor(path: string, h1: string): Crumb[] {
   if (p.startsWith('/compare/')) return [home, { name: 'المقارنات' }, { name: h1 }];
   if (p === '/tools') return [home, { name: 'الأدوات' }];
   if (p.startsWith('/tool/')) return [home, { name: 'الأدوات', path: '/tools' }, { name: h1 }];
-  if (CALENDAR.has(p)) return [home, { name: 'المواعيد والتقويم' }, { name: h1 }];
+  if (p === '/calendar') return [home, { name: 'المواعيد والتقويم' }];
+  if (CALENDAR.has(p)) return [home, { name: 'المواعيد والتقويم', path: '/calendar' }, { name: h1 }];
   if (p === '/search') return [home, { name: 'بحث' }];
   if (p === '/faq') return [home, { name: 'الأسئلة الشائعة' }];
   if (p === '/about') return [home, { name: 'عن المنصة' }];

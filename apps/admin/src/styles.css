@@ -1,13 +1,13 @@
 :root {
   --bg: #f4f1ea;
   --bg-elev: #fffdf8;
-  --bg-sidebar: #10231c;
+  --bg-sidebar: #0b1020;
   --text: #12201b;
   --muted: #5b6b64;
   --line: #e4ddd0;
-  --brand: #0b6e4f;
-  --brand-2: #0e8a64;
-  --gold: #c9aa7c;
+  --brand: #5b4dff;
+  --brand-2: #7c5cff;
+  --gold: #f97316;
   --danger: #b42318;
   --warn: #b54708;
   --ok: #027a48;
@@ -16,12 +16,12 @@
   --sidebar: 268px;
 }
 [data-theme='dark'] {
-  --bg: #0b1511;
-  --bg-elev: #13201b;
-  --bg-sidebar: #07110d;
+  --bg: #07080d;
+  --bg-elev: #12141c;
+  --bg-sidebar: #07080d;
   --text: #eef4f0;
   --muted: #9aaea5;
-  --line: #24352e;
+  --line: #243047;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 * { box-sizing: border-box; }

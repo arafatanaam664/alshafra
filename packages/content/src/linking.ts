@@ -81,7 +81,7 @@ export const HUBS: Record<string, (path: string) => boolean> = {
 };
 
 export const STRUCTURAL_OUTBOUND: Record<string, readonly string[]> = {
-  '/': ['/today', '/date-converter', '/salaries', '/countdown', '/articles', '/gold-price', '/tools'],
+  '/': ['/today', '/date-converter', '/salaries', '/countdown', '/articles', '/gold-price', '/tools', '/calendar'],
   '/today': ['/date-converter', '/hijri-calendar'],
   '/date-converter': ['/hijri-calendar', '/today'],
   '/salaries': ['/articles/salary-dates-saudi-arabia'],

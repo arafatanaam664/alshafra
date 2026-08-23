@@ -4,6 +4,7 @@ import type { SqlClient } from '@alshafra/database';
 import { publicObjectUrl } from '@alshafra/media';
 import { selfCanonical } from '@alshafra/seo';
 import { blocksToHtml, blocksToPlainText, escapeHtml, parseBlocks, passesQualityGate, wordCount } from './blocks';
+import { applySectionOverrides, parseSectionOverrides, PLATFORM_SECTIONS, SECTIONS_SETTING_KEY } from './sections';
 import { contentSnapshotSchema, type ContentSnapshot, type SnapshotRoute } from './snapshot';
 
 const SITE = 'https://alshafra.com';
@@ -120,6 +121,12 @@ export async function buildPublicSnapshot(db: SqlClient, legacyPaths: Set<string
     });
   }
 
+  const setting = await db.query<{ value_json: unknown }>(
+    `SELECT value_json FROM site_settings WHERE key = $1`,
+    [SECTIONS_SETTING_KEY],
+  );
+  const sections = applySectionOverrides(PLATFORM_SECTIONS, parseSectionOverrides(setting.rows[0]?.value_json));
+
   return contentSnapshotSchema.parse({
     generatedAt: new Date().toISOString(),
     siteUrl: SITE,
@@ -129,6 +136,7 @@ export async function buildPublicSnapshot(db: SqlClient, legacyPaths: Set<string
       qualityPass: qualityPassCount,
       newRoutes,
     },
+    sections,
   });
 }
 

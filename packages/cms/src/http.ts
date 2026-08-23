@@ -60,6 +60,14 @@ import {
   upsertTag,
   upsertTopic,
 } from './taxonomy';
+import {
+  createSection,
+  getNavigationCatalog,
+  getSectionsCatalog,
+  patchNavigation,
+  patchSection,
+  reorderSections,
+} from './sections';
 
 export interface HttpInput {
   method: string;
@@ -239,6 +247,25 @@ export async function handleAdminApi(input: HttpInput, db: SqlClient): Promise<H
     if (method === 'POST' && path === '/api/v1/admin/authors') return json(201, await upsertAuthor(db, actor, input.body as never));
 
     if (method === 'GET' && path === '/api/v1/admin/tools') return json(200, await listTools(db, actor));
+    if (method === 'GET' && path === '/api/v1/admin/sections') {
+      return json(200, await getSectionsCatalog(db, actor));
+    }
+    if (method === 'POST' && path === '/api/v1/admin/sections') {
+      return json(201, await createSection(db, actor, input.body as never));
+    }
+    if (method === 'PATCH' && path === '/api/v1/admin/sections/reorder') {
+      return json(200, await reorderSections(db, actor, (input.body as { keys?: string[] }).keys || []));
+    }
+    const sectionMatch = path.match(/^\/api\/v1\/admin\/sections\/([^/]+)$/);
+    if (sectionMatch && method === 'PATCH') {
+      return json(200, await patchSection(db, actor, decodeURIComponent(sectionMatch[1]), input.body as never));
+    }
+    if (method === 'GET' && path === '/api/v1/admin/navigation') {
+      return json(200, await getNavigationCatalog(db, actor));
+    }
+    if (method === 'PATCH' && path === '/api/v1/admin/navigation') {
+      return json(200, await patchNavigation(db, actor, (input.body as { items?: never[] }).items || []));
+    }
     if (method === 'GET' && path === '/api/v1/admin/media/status') {
       requirePermission(actor, 'media.read');
       return json(200, { ...mediaStatus(), r2Ready: isR2Configured() });

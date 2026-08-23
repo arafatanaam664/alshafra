@@ -28,6 +28,8 @@ interface Props {
   itemList?: { name: string; path: string }[];
   image?: string;
   imageAlt?: string;
+  fullBleed?: boolean;
+  headerTone?: 'light' | 'dark';
 }
 
 const {
@@ -46,6 +48,8 @@ const {
   itemList,
   image,
   imageAlt,
+  fullBleed = false,
+  headerTone = 'dark',
 } = Astro.props;
 
 const canonical = selfCanonical(path);
@@ -103,13 +107,13 @@ const paging = relNextPrev({ path });
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Reem+Kufi:wght@600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
   </head>
-  <body>
+  <body class:list={[fullBleed && 'bg-ink-950']}>
     <a class="sr-only focus:not-sr-only" href="#main">تخطي إلى المحتوى</a>
-    <Header path={path} />
-    <main id="main" class="container-page py-10">
-      <Breadcrumbs path={path} h1={h1} />
+    <Header path={path} tone={headerTone} />
+    <main id="main" class:list={[!fullBleed && 'container-page py-10']}>
+      {!fullBleed && <Breadcrumbs path={path} h1={h1} />}
       <slot />
     </main>
     <Footer />

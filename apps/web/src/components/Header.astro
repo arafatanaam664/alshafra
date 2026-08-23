@@ -1,34 +1,98 @@
 ---
-interface Props { path: string }
-const { path } = Astro.props;
-const links = [
-  { href: '/', label: 'الرئيسية' },
-  { href: '/today', label: 'اليوم' },
-  { href: '/date-converter', label: 'تحويل التاريخ' },
-  { href: '/salaries', label: 'الرواتب' },
-  { href: '/countdown', label: 'كم باقي' },
-  { href: '/articles', label: 'مقالات' },
-  { href: '/gold-price', label: 'الذهب' },
-  { href: '/tools', label: 'أدوات' },
-];
+import { publicMobile, publicNav } from '../content/sections-public';
+import Logo from './Logo.astro';
+
+interface Props { path: string; tone?: 'light' | 'dark' }
+const { path, tone = 'dark' } = Astro.props;
+const sections = publicNav();
+const mobile = publicMobile();
+const dark = tone === 'light';
+
+function active(href: string) {
+  if (href === '/') return path === '/';
+  return path === href || path.startsWith(`${href}/`);
+}
 ---
-<header class="sticky top-0 z-40 border-b border-brand-900/5 bg-white/90 backdrop-blur">
-  <div class="container-page flex h-16 items-center justify-between gap-4">
-    <a href="/" class="font-display text-lg font-bold text-brand-900">Alshafra</a>
-    <form action="/search" method="get" role="search" class="hidden items-center md:flex">
+<header class:list={[
+  'sticky top-0 z-40 backdrop-blur-xl',
+  dark ? 'border-b border-white/10 bg-ink-950/70' : 'border-b border-ink-900/8 bg-sand-50/80',
+]}>
+  <div class="container-page flex h-[4.25rem] items-center justify-between gap-3">
+    <Logo tone={tone} />
+    <form action="/search" method="get" role="search" class="hidden min-w-[10rem] flex-1 items-center md:flex lg:max-w-xs">
       <label class="sr-only" for="header-q">بحث</label>
-      <input id="header-q" name="q" class="w-40 rounded-lg bg-sand-50 px-2 py-1 text-xs ring-1 ring-brand-200" placeholder="بحث" maxlength="80" />
+      <input
+        id="header-q"
+        name="q"
+        class:list={[
+          'w-full rounded-full px-3 py-1.5 text-xs outline-none ring-1',
+          dark ? 'bg-white/5 text-white ring-white/15 placeholder:text-white/40' : 'bg-white text-ink-900 ring-ink-900/10',
+        ]}
+        placeholder="ابحث في Alshafra"
+        maxlength="80"
+      />
     </form>
-    <nav class="hidden flex-wrap items-center gap-1 md:flex" aria-label="رئيسي">
-      {links.map((l) => (
-        <a href={l.href} class:list={['nav-link', path === l.href && 'nav-link-active']} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a>
+    <nav class="hidden items-center gap-0.5 lg:flex" aria-label="رئيسي">
+      {sections.map((section) => (
+        <div class="relative flex items-center">
+          <a
+            href={section.path}
+            class:list={[
+              'rounded-r-full px-3 py-1.5 text-sm font-medium transition-colors',
+              dark
+                ? active(section.path) ? 'bg-white text-ink-950' : 'text-white/80 hover:bg-white/10 hover:text-white'
+                : active(section.path) ? 'nav-link-active' : 'nav-link',
+            ]}
+            aria-current={path === section.path ? 'page' : undefined}
+          >{section.name}</a>
+          {section.children.length > 0 && (
+            <details class="relative">
+              <summary
+                class:list={[
+                  'nav-arrow cursor-pointer list-none rounded-l-full px-1.5 py-1.5 text-xs',
+                  dark ? 'text-white/60 hover:text-white' : 'text-ink-800/50 hover:text-ink-900',
+                ]}
+                aria-label={`فروع ${section.name}`}
+              >▾</summary>
+              <div class="absolute left-0 top-full z-50 mt-2 min-w-[13rem] rounded-2xl bg-white p-2 text-ink-900 shadow-card ring-1 ring-ink-900/10">
+                {section.children.map((child) => (
+                  <a href={child.path} class="block rounded-xl px-3 py-2 text-sm hover:bg-sand-50">{child.name}</a>
+                ))}
+              </div>
+            </details>
+          )}
+        </div>
       ))}
     </nav>
-    <details class="md:hidden">
-      <summary class="nav-link">القائمة</summary>
-      <div class="absolute left-4 right-4 mt-2 grid gap-1 rounded-xl bg-white p-3 shadow-card">
-        {links.map((l) => <a href={l.href} class="nav-link">{l.label}</a>)}
+    <details class="relative lg:hidden">
+      <summary class:list={['cursor-pointer list-none rounded-full px-3 py-1.5 text-sm', dark ? 'text-white' : 'nav-link']}>القائمة</summary>
+      <div class="absolute left-0 right-auto mt-2 max-h-[70vh] w-[min(20rem,calc(100vw-2rem))] overflow-auto rounded-2xl bg-white p-3 text-ink-900 shadow-card">
+        <form action="/search" method="get" role="search" class="mb-3 md:hidden">
+          <label class="sr-only" for="mobile-q">بحث</label>
+          <input id="mobile-q" name="q" class="w-full rounded-full bg-sand-50 px-3 py-2 text-sm ring-1 ring-ink-900/10" placeholder="ابحث…" maxlength="80" />
+        </form>
+        {mobile.map((section) => (
+          <div class="border-b border-ink-900/5 py-2 last:border-0">
+            <div class="flex items-center justify-between gap-2">
+              <a href={section.path} class="flex-1 px-2 py-1 font-semibold">{section.name}</a>
+              {section.children.length > 0 && (
+                <details>
+                  <summary class="nav-arrow cursor-pointer list-none px-2 py-1 text-xs text-ink-800/50" aria-label={`فروع ${section.name}`}>▾</summary>
+                  <div class="pb-1">
+                    {section.children.map((child) => (
+                      <a href={child.path} class="block px-4 py-1 text-sm text-ink-800/70">{child.name}</a>
+                    ))}
+                  </div>
+                </details>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </details>
   </div>
 </header>
+<style>
+  .nav-arrow { list-style: none; }
+  .nav-arrow::-webkit-details-marker { display: none; }
+</style>
