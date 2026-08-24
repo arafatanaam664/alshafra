@@ -578,10 +578,10 @@ function extraSectionPages(): PageModel[] {
   return [
     page({
       path: '/calendar',
-      title: 'المواعيد والتقويم',
+      title: 'التقويم الهجري والميلادي والمواعيد | Alshafra',
       description:
         'التاريخ الهجري والميلادي، تحويل التاريخ، مواعيد الرواتب، التقويم الدراسي والإجازات.',
-      h1: 'المواعيد والتقويم',
+      h1: 'التقويم الهجري والميلادي والمواعيد',
       kind: 'collection',
       itemList: calendarItems.map(([path, name]) => ({ name, path })),
       html: `${p(
@@ -671,7 +671,7 @@ function extraToolPages(): PageModel[] {
   const pages = NEW_TOOLS.map((tool) =>
     page({
       path: tool.path,
-      title: tool.title,
+      title: tool.title.includes('|') ? tool.title : `${tool.title} | Alshafra`,
       description: tool.description,
       h1: tool.h1,
       kind: 'tool',
@@ -704,7 +704,7 @@ function extraToolPages(): PageModel[] {
   pages.unshift(
     page({
       path: '/tools',
-      title: 'أدوات Alshafra',
+      title: 'أدوات الحساب والتحويل | Alshafra',
       description: 'حاسبات ومحوّلات عربية للاستخدام اليومي.',
       h1: 'الأدوات',
       kind: 'collection',

@@ -9,7 +9,7 @@ Recorded from the product owner. Source of truth order is still: repo/tests → 
 | D3 | Commit Phases 0–5? | **Yes, on this branch** `arena/01a02128-alshafra`. Merge to `main` only when the owner says the whole project is ready. |
 | D4 | Supabase / R2 / Cloudflare Pages | **Later, not now.** Do not ask for keys in chat. Never commit secrets. |
 | D5 | Public name | **Alshafra.** Calendar is a section (pillar 8). «تقويم السعودية» is `alternateName`, not the company name. |
-| D6 | Title suffix on HIGH pages | **Not changed.** Keep `published.json` titles until a separate human decision. |
+| D6 | Title suffix on HIGH pages | **Superseded 2026-08-24.** Public titles use content-first search queries and the Alshafra name. «تقويم السعودية» and «شفرة تولز» stay out of visible titles. |
 | D7 | DNS | **Do not change.** |
 
 ## Consequences for engineering
@@ -22,6 +22,4 @@ Recorded from the product owner. Source of truth order is still: repo/tests → 
 
 ## Still open
 
-- Exact homepage copy (Arabic one-liner).
-- When to rewrite remaining HIGH titles.
 - First *new* editorial cluster after calendar (default: solutions + digital-service how-tos, after CMS→HTML).
