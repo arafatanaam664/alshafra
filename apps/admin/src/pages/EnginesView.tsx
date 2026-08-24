@@ -10,25 +10,46 @@ export function SitePublishBar({ user }: { user: SessionUser }) {
       .catch(() => setLast(null));
   }, []);
   if (!can(user, 'documents.publish')) return null;
+  const stages = (last?.stages || {}) as { snapshot?: string; upload?: string; deploy?: string };
   return (
     <div className="card" style={{ marginBottom: 16 }}>
-      <div className="check" style={{ border: 0 }}>
-        <div>
-          <strong>نشر الصفحات العامة</strong>
-          <div style={{ color: 'var(--muted)', fontSize: 12 }}>
-            {last?.at ? `آخر لقطة: ${String(last.at)} · ${String(last.routes || 0)} مسار` : 'لا توجد لقطة بعد'}
-          </div>
-        </div>
+      <strong>حفظ → نشر → لقطة → بناء</strong>
+      <p style={{ color: 'var(--muted)', fontSize: 13, margin: '8px 0' }}>
+        الحفظ يبقي المسودة. النشر يغيّر حالة المستند. اللقطة تجهّز الملفات العامة. البناء هو ما يراه الزائر.
+      </p>
+      <div style={{ color: 'var(--muted)', fontSize: 12, marginBottom: 12 }}>
+        {last?.at
+          ? `آخر لقطة: ${String(last.at)} · ${String(last.routes || 0)} مسار · رفع: ${stages.upload || '—'} · بناء: ${stages.deploy || '—'}`
+          : 'لا توجد لقطة بعد'}
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <button
+          className="btn secondary"
+          type="button"
+          onClick={async () => {
+            const out = await api<{ routes: number; note?: string; live?: boolean; stages?: Record<string, string> }>(
+              '/api/v1/admin/site-publish',
+              { method: 'POST', body: JSON.stringify({ deploy: false }) },
+            );
+            setMsg(out.note || 'تم تجهيز اللقطة. الموقع الحي لم يُحدَّث.');
+            setLast({ at: new Date().toISOString(), routes: out.routes, stages: out.stages, live: false });
+          }}
+        >
+          تحديث اللقطة
+        </button>
         <button
           className="btn"
           type="button"
           onClick={async () => {
-            const out = await api<{ routes: number; note?: string }>('/api/v1/admin/site-publish', { method: 'POST' });
-            setMsg(out.note || 'تم');
-            setLast({ at: new Date().toISOString(), routes: out.routes });
+            const out = await api<{ routes: number; note?: string; live?: boolean; stages?: Record<string, string> }>(
+              '/api/v1/admin/site-publish',
+              { method: 'POST', body: JSON.stringify({ deploy: true }) },
+            );
+            setMsg(out.note || 'طُلب البناء. الزائر لا يرى التغيير قبل اكتمال البناء.');
+            setLast({ at: new Date().toISOString(), routes: out.routes, stages: out.stages, live: Boolean(out.live) });
           }}
         >
-          تحديث لقطة الموقع
+          إطلاق بناء الإنتاج
         </button>
       </div>
       {msg && <p style={{ margin: '8px 0 0' }}>{msg}</p>}

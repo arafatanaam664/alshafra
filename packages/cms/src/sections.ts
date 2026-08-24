@@ -1,16 +1,19 @@
 import type { SqlClient } from '@alshafra/database';
 import {
   PLATFORM_SECTIONS,
+  SECTION_VISIBILITY_CONTRACT,
   SECTIONS_CONTRACT,
   SECTIONS_SETTING_KEY,
   applySectionOverrides,
   assertSectionMutation,
   parseSectionOverrides,
+  sectionVisibility,
   type PlatformSection,
   type SectionOverride,
   type SectionOverridesState,
 } from '@alshafra/content';
 import { writeAudit } from './audit';
+import { flagMap } from './flags-settings';
 import { hasPermission, requirePermission, type Actor } from './permissions';
 
 function requireSectionsRead(actor: Actor | null) {
@@ -58,31 +61,37 @@ export async function getSectionsCatalog(db: SqlClient, actor: Actor | null) {
 export async function getNavigationCatalog(db: SqlClient, actor: Actor | null) {
   requireSectionsRead(actor);
   const sections = await listResolvedSections(db);
+  const flags = await flagMap(db);
   return {
     contract: {
       nameOpensHub: true,
       arrowOpensChildren: true,
+      visibility: SECTION_VISIBILITY_CONTRACT,
     },
-    items: sections.map((section) => ({
-      key: section.key,
-      name: section.name,
-      path: section.path,
-      enabled: section.enabled,
-      showInNav: section.showInNav,
-      showInHome: section.showInHome,
-      showInFooter: section.showInFooter,
-      showInMobile: section.showInMobile,
-      hasPublicPage: section.hasPublicPage,
-      sort: section.sort,
-      visibleToUsers: section.enabled && section.hasPublicPage && section.showInNav,
-      children: section.children.map((child) => ({
-        key: child.key,
-        name: child.name,
-        path: child.path,
-        enabled: child.enabled,
-        sort: child.sort,
-      })),
-    })),
+    items: sections.map((section) => {
+      const visibility = sectionVisibility(section, flags);
+      return {
+        key: section.key,
+        name: section.name,
+        path: section.path,
+        enabled: section.enabled,
+        showInNav: section.showInNav,
+        showInHome: section.showInHome,
+        showInFooter: section.showInFooter,
+        showInMobile: section.showInMobile,
+        hasPublicPage: section.hasPublicPage,
+        sort: section.sort,
+        visibleToUsers: visibility.navigationVisible,
+        visibility,
+        children: section.children.map((child) => ({
+          key: child.key,
+          name: child.name,
+          path: child.path,
+          enabled: child.enabled,
+          sort: child.sort,
+        })),
+      };
+    }),
   };
 }
 

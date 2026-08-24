@@ -15,6 +15,7 @@ export {
   readDatabaseEnv,
   type DatabaseEnv,
 } from './client';
+export { createSqlClientFromEnv } from './remote';
 export { FEATURE_FLAG_SEEDS, flagDefault, type FlagSeed } from './flags';
 export {
   documentTypeSchema,

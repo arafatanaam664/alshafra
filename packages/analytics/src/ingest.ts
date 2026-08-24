@@ -31,11 +31,23 @@ export async function recordAnalyticsEvent(db: SqlClient, raw: unknown): Promise
   if (event.name === 'page_view' || event.name === 'content_view' || event.name === 'article_view') {
     if (event.path) {
       const day = occurred.slice(0, 10);
+      let uniqueInc = 0;
+      if (event.sessionHash) {
+        const seen = await db.query<{ n: number }>(
+          `SELECT 1 AS n FROM analytics_events
+           WHERE session_hash = $1 AND path = $2 AND occurred_at::date = $3::date AND id <> $4
+           LIMIT 1`,
+          [event.sessionHash, event.path, day, id],
+        );
+        if (!seen.rows[0]) uniqueInc = 1;
+      }
       await db.query(
         `INSERT INTO page_view_daily (day, path, views, unique_sessions)
-         VALUES ($1::date,$2,1,1)
-         ON CONFLICT (day, path) DO UPDATE SET views = page_view_daily.views + 1`,
-        [day, event.path],
+         VALUES ($1::date,$2,1,$3)
+         ON CONFLICT (day, path) DO UPDATE SET
+           views = page_view_daily.views + 1,
+           unique_sessions = page_view_daily.unique_sessions + $3`,
+        [day, event.path, uniqueInc],
       );
     }
     if (event.documentId) {

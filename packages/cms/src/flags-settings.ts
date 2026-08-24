@@ -106,6 +106,9 @@ export async function getAnalyticsOverview(db: SqlClient, actor: Actor | null) {
   return {
     hasData: n > 0,
     events: n,
+    uniqueSessions: null,
+    uniqueSessionsAvailable: false,
+    uniqueSessionsLabel: 'غير متاح بعد',
     searches: searches.rows,
     zeroResultSearches: zero.rows[0]?.n ?? 0,
     pages: pages.rows,

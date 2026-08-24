@@ -1,5 +1,6 @@
 import {
   PLATFORM_SECTIONS,
+  applyFeatureFlags,
   applySectionOverrides,
   footerSections,
   homeSections,
@@ -10,9 +11,11 @@ import {
 import { loadContentSnapshot } from './load';
 
 export function resolvedSections(): PlatformSection[] {
-  const snap = loadContentSnapshot() as { sections?: PlatformSection[] } | null;
-  if (snap?.sections?.length) return applySectionOverrides(snap.sections, null);
-  return applySectionOverrides(PLATFORM_SECTIONS, null);
+  const snap = loadContentSnapshot() as { sections?: PlatformSection[]; flags?: Record<string, boolean> } | null;
+  const catalog = snap?.sections?.length
+    ? applySectionOverrides(snap.sections, null)
+    : applySectionOverrides(PLATFORM_SECTIONS, null);
+  return applyFeatureFlags(catalog, snap?.flags ?? null);
 }
 
 export function publicNav() {

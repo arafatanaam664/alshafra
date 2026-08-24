@@ -66,7 +66,13 @@ export const SECTIONS_SETTING_KEY = 'platform.sections';
 export const FORBIDDEN_PUBLIC_PHRASES = [
   'شركة عالمية',
   'الموقع السابق',
+  'الموقع القديم',
   'الهوية القديمة',
+  'تم تحويل الموقع',
+  'لا مواقع متفرقة',
+  'قسم داخلها',
+  'التقويم كان موقعاً سابقاً',
+  'التقويم كان موقعًا سابقًا',
   'صار قسماً',
   'صار قسمًا',
   'ليست هوية منفصلة',
@@ -416,6 +422,63 @@ export const SECTIONS_CONTRACT = {
   systemSectionsCannotBeDeleted: true,
   settingKey: SECTIONS_SETTING_KEY,
 } as const;
+
+/**
+ * Four independent facts. Do not store a single collapsed boolean.
+ * Missing flag keys do not hide beachhead sections (calendar/tools/guides).
+ */
+export const SECTION_VISIBILITY_CONTRACT = {
+  sectionEnabled: 'CMS/catalog enabled',
+  flagEnabled: 'feature_flags[section.featureFlag]; missing key = allow',
+  publicPageAvailable: 'hasPublicPage in code',
+  navigationVisible: 'sectionEnabled && flagEnabled && publicPageAvailable && showInNav',
+  legacyUrlsImmune: true,
+} as const;
+
+export function flagAllowsSection(
+  section: Pick<PlatformSection, 'featureFlag'>,
+  flags: Record<string, boolean> | null | undefined,
+): boolean {
+  if (!section.featureFlag) return true;
+  if (!flags || !(section.featureFlag in flags)) return true;
+  return flags[section.featureFlag] === true;
+}
+
+export function sectionVisibility(
+  section: PlatformSection,
+  flags: Record<string, boolean> | null | undefined,
+): {
+  sectionEnabled: boolean;
+  flagEnabled: boolean;
+  publicPageAvailable: boolean;
+  navigationVisible: boolean;
+  homeVisible: boolean;
+  footerVisible: boolean;
+} {
+  const flagEnabled = flagAllowsSection(section, flags);
+  const sectionEnabled = section.enabled;
+  const publicPageAvailable = section.hasPublicPage;
+  const publiclyOn = sectionEnabled && flagEnabled && publicPageAvailable;
+  return {
+    sectionEnabled,
+    flagEnabled,
+    publicPageAvailable,
+    navigationVisible: publiclyOn && section.showInNav,
+    homeVisible: publiclyOn && section.showInHome,
+    footerVisible: publiclyOn && section.showInFooter,
+  };
+}
+
+/** Public surfaces only. Does not rewrite CMS catalog enabled. */
+export function applyFeatureFlags(
+  list: readonly PlatformSection[],
+  flags: Record<string, boolean> | null | undefined,
+): PlatformSection[] {
+  return cloneSections(list).map((section) => ({
+    ...section,
+    enabled: section.enabled && flagAllowsSection(section, flags),
+  }));
+}
 
 const RESERVED_SECTION_PATHS = ['/category', '/languages', '/news', '/admin', '/api', '/preview'];
 

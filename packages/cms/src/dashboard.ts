@@ -57,6 +57,7 @@ export async function getDashboardOverview(db: SqlClient, actor: Actor | null) {
     traffic: {
       pageViews: totalViews,
       uniqueVisitors: null as number | null,
+      uniqueVisitorsLabel: 'غير متاح بعد',
       sessions: null as number | null,
       events: eventCount,
       hasData: totalViews > 0 || eventCount > 0,

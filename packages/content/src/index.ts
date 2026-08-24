@@ -45,6 +45,7 @@ export {
 export {
   PLATFORM_SECTIONS,
   SECTIONS_CONTRACT,
+  SECTION_VISIBILITY_CONTRACT,
   SECTIONS_SETTING_KEY,
   FORBIDDEN_PUBLIC_PHRASES,
   publicSections,
@@ -53,6 +54,9 @@ export {
   footerSections,
   mobileSections,
   applySectionOverrides,
+  applyFeatureFlags,
+  flagAllowsSection,
+  sectionVisibility,
   parseSectionOverrides,
   findLeakedPublicPhrase,
   assertNoPublicLeak,
