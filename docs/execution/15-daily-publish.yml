@@ -1,0 +1,80 @@
+# نسخ هذا الملف إلى .github/workflows/daily-publish.yml عند الدمج إلى main.
+# هذا التطبيق لا يستطيع تعديل ملفات workflow.
+# تحديث بيانات الأسعار والترندات ثم بناء موقع Astro ثلاث مرات يومياً.
+name: Daily auto-publish
+
+on:
+  schedule:
+    - cron: '30 4 * * *'
+    - cron: '30 12 * * *'
+    - cron: '30 20 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-auto-publish-main
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch live gold and FX prices
+        run: node apps/web-legacy/scripts/fetch-prices.mjs
+
+      - name: Refresh optional GCC trends snapshot
+        run: node apps/web-legacy/scripts/fetch-trending.mjs
+
+      - name: Build Astro public site and run quality checks
+        run: npm run build
+
+      - name: Commit generated data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "shafra-bot"
+          git config user.email "bot@alshafra.com"
+
+          generated_files=(
+            apps/web-legacy/src/data/prices.json
+            apps/web-legacy/src/data/trending-snapshot.json
+          )
+
+          for file in "${generated_files[@]}"; do
+            if [[ -e "$file" ]]; then
+              git add -- "$file"
+            else
+              echo "Optional generated file is absent: $file"
+            fi
+          done
+
+          if git diff --cached --quiet; then
+            echo "No generated data changed."
+          else
+            git commit -m "chore: refresh prices and published pages $(date -u +%F)"
+            git push origin HEAD:main
+            echo "Generated data committed; the hosting service can rebuild."
+          fi
+
+      - name: Submit newly published pages to IndexNow
+        run: node apps/web-legacy/scripts/indexnow.mjs
