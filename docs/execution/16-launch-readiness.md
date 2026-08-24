@@ -33,7 +33,7 @@ Public renderer: Astro `apps/web` → `apps/web/dist`
 - `pull-snapshot.mjs` refuses to overwrite the repo snapshot unless `routes` is an array.
 - Launch tests: preview auth policy, beachhead flags, no secret leak in `auth/status`.
 - Public-page verifier beyond the 127.
-- Local workflow file updated to monorepo paths (see External if GitHub rejects the file).
+- Attempted to update `.github/workflows/daily-publish.yml`. GitHub refused the App (`workflows` permission). The monorepo YAML remains in `docs/execution/15-daily-publish.yml`.
 
 ## C — REMAINING
 
