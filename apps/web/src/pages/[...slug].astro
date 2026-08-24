@@ -7,6 +7,8 @@ import CountdownIsland from '../islands/CountdownIsland';
 import ToolIsland from '../islands/ToolIsland';
 import { getAllPages, type PageModel } from '../content/provider';
 import RelatedLinks from '../components/RelatedLinks.astro';
+import ExploreShelf from '../components/ExploreShelf.astro';
+import { pageKindLabel } from '@alshafra/content/explore';
 
 export function getStaticPaths() {
   return getAllPages()
@@ -20,6 +22,9 @@ export function getStaticPaths() {
 type Props = PageModel;
 const page = Astro.props;
 const url = `https://alshafra.com${page.path}`;
+const kindLabel = pageKindLabel(page.path);
+const sidebar = (page.explore || []).filter((group) => group.key === 'next' || group.key === 'tools');
+const rest = (page.explore || []).filter((group) => group.key === 'related' || group.key === 'hub');
 ---
 <SiteLayout
   title={page.title}
@@ -38,12 +43,22 @@ const url = `https://alshafra.com${page.path}`;
   image={page.image}
   imageAlt={page.imageAlt}
 >
-  <h1 class="section-title">{page.h1}</h1>
-  {page.island === 'date-converter' && <DateConverterIsland client:load />}
-  {page.island === 'age-calculator' && <AgeCalculatorIsland client:load />}
-  {page.island === 'countdown' && page.isoDate && <CountdownIsland client:visible iso={page.isoDate} />}
-  {page.island === 'tool' && page.engineKey && <ToolIsland client:load engineKey={page.engineKey} />}
-  <div class="prose-alshafra mt-6 space-y-4 text-sm leading-loose text-brand-800" set:html={page.html} />
-  <RelatedLinks links={page.related || []} />
-  <ShareIsland client:visible url={url} title={page.title} />
+  <div class="page-grid">
+    <article>
+      <p class="eyebrow">{kindLabel}</p>
+      <h1 class="section-title mt-2">{page.h1}</h1>
+      {page.description && <p class="lede mt-4">{page.description}</p>}
+      {page.island === 'date-converter' && <DateConverterIsland client:load />}
+      {page.island === 'age-calculator' && <AgeCalculatorIsland client:load />}
+      {page.island === 'countdown' && page.isoDate && <CountdownIsland client:visible iso={page.isoDate} />}
+      {page.island === 'tool' && page.engineKey && <ToolIsland client:load engineKey={page.engineKey} />}
+      <div class="prose-alshafra mt-8 space-y-4" set:html={page.html} />
+      <ShareIsland client:visible url={url} title={page.title} />
+    </article>
+    <aside class="lg:pt-8">
+      <ExploreShelf groups={sidebar} compact />
+    </aside>
+  </div>
+  <ExploreShelf groups={rest} />
+  {!rest.some((group) => group.key === 'related') && <RelatedLinks links={page.related || []} />}
 </SiteLayout>

@@ -1,3 +1,4 @@
+import type { ExploreGroup } from '@alshafra/content/explore';
 import type { RelatedLink } from '@alshafra/content/linking';
 import type { FaqItem } from '@alshafra/seo';
 
@@ -21,6 +22,7 @@ export interface PageModel {
   image?: string;
   imageAlt?: string;
   related?: RelatedLink[];
+  explore?: ExploreGroup[];
 }
 
 export interface ContentProvider {

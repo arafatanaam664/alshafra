@@ -9,6 +9,7 @@ import {
   weekdayName,
 } from '@alshafra/calendar';
 import { mergeLegacyAndSnapshot, type ContentSnapshot } from '@alshafra/content/snapshot';
+import { exploreGroups } from '@alshafra/content/explore';
 import { loadManualLinks, relatedMap, type LinkablePage } from '@alshafra/content/linking';
 import { DATA, contentSource, loadContentSnapshot, loadPublished, readJson } from './load';
 import { esc, faqHtml, h2, p, sourcesHtml, ul } from './html';
@@ -736,7 +737,10 @@ function attachRelated(pages: PageModel[]): PageModel[] {
     description: page.description,
   }));
   const map = relatedMap(catalog, loadManualLinks());
-  return pages.map((page) => ({ ...page, related: map.get(page.path) || [] }));
+  return pages.map((page) => {
+    const related = map.get(page.path) || [];
+    return { ...page, related, explore: exploreGroups(page, catalog, related) };
+  });
 }
 
 export function getAllPages(): PageModel[] {

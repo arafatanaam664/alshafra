@@ -30,6 +30,7 @@ export {
   type RelatedLink,
   type LinkablePage,
 } from './linking';
+export { exploreGroups, pageKindLabel, hubFor, type ExploreGroup } from './explore';
 export { loadManualLinks, writeManualLink } from './manual-links';
 export {
   OPPORTUNITY_HUB_PATH,

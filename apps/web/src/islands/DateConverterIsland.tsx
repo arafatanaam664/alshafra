@@ -33,7 +33,7 @@ export default function DateConverterIsland() {
     <div className="card my-6 p-6">
       <div className="flex justify-between">
         <h2 className="font-display text-lg font-bold">{mode === 'g2h' ? 'من ميلادي' : 'من هجري'}</h2>
-        <button type="button" className="btn-ghost" onClick={() => setMode((m) => (m === 'g2h' ? 'h2g' : 'g2h'))}>
+        <button type="button" className="btn-light" onClick={() => setMode((m) => (m === 'g2h' ? 'h2g' : 'g2h'))}>
           تبديل
         </button>
       </div>

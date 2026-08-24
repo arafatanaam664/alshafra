@@ -3,14 +3,15 @@ import SiteLayout from '../layouts/SiteLayout.astro';
 import SearchIsland from '../islands/SearchIsland';
 ---
 <SiteLayout
-  title="بحث Alshafra"
+  title="بحث في Alshafra"
   description="ابحث في أدوات ومقالات المواعيد والتقويم والمعلومات العملية."
   path="/search"
   h1="بحث"
   robots="noindex, follow"
   kind="search"
 >
-  <h1 class="section-title">بحث</h1>
-  <p class="mt-2 text-sm text-brand-700/80">نتائج البحث لا تُفهرس. استخدم كلمات مثل أم القرى أو الرواتب.</p>
+  <p class="eyebrow">Alshafra</p>
+  <h1 class="section-title mt-2">ابحث عما تحتاجه</h1>
+  <p class="lede mt-3">جرّب كلمات مثل أم القرى أو الرواتب أو سعر الذهب.</p>
   <SearchIsland client:load />
 </SiteLayout>

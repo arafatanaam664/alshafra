@@ -21,8 +21,10 @@ const files = [
   'apps/web/src/components/HomePlatform.astro',
   'apps/web/src/components/Header.astro',
   'apps/web/src/components/Footer.astro',
+  'apps/web/src/components/ExploreShelf.astro',
   'apps/web/src/content/provider.ts',
   'apps/web/src/pages/index.astro',
+  'apps/web/src/pages/[...slug].astro',
 ];
 
 function publicFacingText(file: string, source: string): string {

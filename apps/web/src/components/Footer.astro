@@ -5,17 +5,18 @@ import { publicFooter } from '../content/sections-public';
 const year = new Date().getFullYear();
 const sections = publicFooter();
 const calendar = sections.find((section) => section.key === 'calendar');
+const tools = sections.find((section) => section.key === 'tools');
 ---
-<footer class="mt-0 border-t border-white/10 bg-ink-950 text-white">
+<footer class="mt-16 border-t border-ink-900/10 bg-ink-900 text-sand-50">
   <div class="container-page grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-4">
     <div>
       <Logo tone="light" />
-      <p class="mt-4 max-w-xs text-sm leading-7 text-white/60">
-        منصة عربية للمعلومات العملية والأدوات والخدمات.
+      <p class="mt-4 max-w-xs text-sm leading-7 text-white/65">
+        Alshafra تجمع المواعيد والأدوات والأدلة في مكان واحد، بصياغة واضحة ومصادر معلنة.
       </p>
     </div>
     <div>
-      <p class="text-xs font-semibold uppercase tracking-brand text-white/40">الأقسام</p>
+      <p class="text-xs font-semibold text-white/40">الأقسام</p>
       <ul class="mt-4 space-y-2 text-sm text-white/75">
         {sections.map((section) => (
           <li><a class="hover:text-white" href={section.path}>{section.name}</a></li>
@@ -25,7 +26,7 @@ const calendar = sections.find((section) => section.key === 'calendar');
     </div>
     {calendar && (
       <div>
-        <p class="text-xs font-semibold uppercase tracking-brand text-white/40">{calendar.name}</p>
+        <p class="text-xs font-semibold text-white/40">{calendar.name}</p>
         <ul class="mt-4 space-y-2 text-sm text-white/75">
           {calendar.children.slice(0, 6).map((child) => (
             <li><a class="hover:text-white" href={child.path}>{child.name}</a></li>
@@ -34,8 +35,11 @@ const calendar = sections.find((section) => section.key === 'calendar');
       </div>
     )}
     <div>
-      <p class="text-xs font-semibold uppercase tracking-brand text-white/40">المنصة</p>
+      <p class="text-xs font-semibold text-white/40">{tools ? tools.name : 'روابط سريعة'}</p>
       <ul class="mt-4 space-y-2 text-sm text-white/75">
+        {tools?.children.slice(0, 4).map((child) => (
+          <li><a class="hover:text-white" href={child.path}>{child.name}</a></li>
+        ))}
         <li><a class="hover:text-white" href="/about">عن Alshafra</a></li>
         <li><a class="hover:text-white" href="/contact">اتصل بنا</a></li>
         <li><a class="hover:text-white" href="/privacy">الخصوصية</a></li>

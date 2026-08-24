@@ -57,7 +57,9 @@ export const CLUSTERS: Record<string, readonly string[]> = {
     '/tool/loan',
     '/tool/unit-converter',
     '/age-calculator',
+    '/date-converter',
   ],
+  prices: ['/gold-price', '/usd-rate', '/trending/gold-price-gulf', '/trending/dollar-exchange-rate-gulf'],
   holidays: [
     '/holidays',
     '/articles/official-holidays-saudi-arabia',
@@ -82,9 +84,26 @@ export const HUBS: Record<string, (path: string) => boolean> = {
 
 export const STRUCTURAL_OUTBOUND: Record<string, readonly string[]> = {
   '/': ['/today', '/date-converter', '/salaries', '/countdown', '/articles', '/gold-price', '/tools', '/calendar'],
-  '/today': ['/date-converter', '/hijri-calendar'],
-  '/date-converter': ['/hijri-calendar', '/today'],
-  '/salaries': ['/articles/salary-dates-saudi-arabia'],
+  '/today': ['/date-converter', '/hijri-calendar', '/salaries'],
+  '/date-converter': ['/hijri-calendar', '/today', '/articles/hijri-to-gregorian-conversion', '/age-calculator'],
+  '/hijri-calendar': ['/today', '/date-converter', '/articles/hijri-calendar-1448'],
+  '/salaries': [
+    '/articles/salary-dates-saudi-arabia',
+    '/articles/citizen-account-payment-dates',
+    '/countdown/employee-salaries',
+    '/countdown/citizen-account',
+  ],
+  '/school-calendar': ['/articles/school-calendar-1448', '/countdown/school-start', '/holidays'],
+  '/holidays': ['/articles/official-holidays-saudi-arabia', '/countdown/ramadan', '/countdown/national-day'],
+  '/age-calculator': ['/date-converter', '/today', '/tools'],
+  '/articles': ['/salaries', '/date-converter', '/holidays', '/articles/hijri-to-gregorian-conversion'],
+  '/trending': ['/gold-price', '/usd-rate', '/tools', '/articles'],
+  '/tools': ['/date-converter', '/age-calculator', '/gold-price', '/tool/percentage'],
+  '/calendar': ['/today', '/date-converter', '/salaries', '/hijri-calendar'],
+  '/gold-price': ['/usd-rate', '/trending/gold-price-gulf', '/tools'],
+  '/usd-rate': ['/gold-price', '/trending/dollar-exchange-rate-gulf'],
+  '/countdown': ['/holidays', '/salaries', '/school-calendar'],
+  '/faq': ['/date-converter', '/salaries', '/today'],
 };
 
 const COUNTDOWN_LINKS: Record<string, readonly string[]> = {

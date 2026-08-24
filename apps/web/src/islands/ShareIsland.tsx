@@ -8,9 +8,9 @@ export default function ShareIsland({ url, title }: { url: string; title: string
   };
   return (
     <div className="mt-8 flex flex-wrap gap-2 text-sm">
-      <button type="button" className="btn-ghost" onClick={copy}>نسخ الرابط</button>
-      <a className="btn-ghost" href={`https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`}>واتساب</a>
-      <a className="btn-ghost" href={`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`}>تيليغرام</a>
+      <button type="button" className="btn-light" onClick={copy}>نسخ الرابط</button>
+      <a className="btn-light" href={`https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`}>واتساب</a>
+      <a className="btn-light" href={`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`}>تيليغرام</a>
     </div>
   );
 }

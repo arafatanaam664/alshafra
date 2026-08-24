@@ -10,10 +10,10 @@ const unique = links.filter((link, index, all) => all.findIndex((item) => item.p
 ---
 {unique.length > 0 && (
   <section class="related-links mt-10" aria-labelledby="related-heading">
-    <h2 id="related-heading" class="font-display text-lg font-bold text-brand-900">مواضيع ذات صلة</h2>
+    <h2 id="related-heading" class="text-lg font-bold">مواضيع ذات صلة</h2>
     <div class="mt-3 grid gap-2 sm:grid-cols-2">
       {unique.map((link) => (
-        <a class="card p-3 text-sm font-medium text-brand-800" href={link.path} data-link-reason={link.reason}>
+        <a class="card p-3 text-sm font-medium text-ink-800" href={link.path} data-link-reason={link.reason}>
           {link.title}
         </a>
       ))}

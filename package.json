@@ -30,7 +30,7 @@
     "test:engines": "tsx tests/platform/phase13-engines.test.ts",
     "test:phase15": "tsx tests/cms/phase15-cutover.test.ts",
     "test:127": "node tools/verify-127-dist.mjs",
-    "test:linking": "tsx tests/content/phase8.test.ts",
+    "test:linking": "tsx tests/content/phase8.test.ts && tsx tests/content/explore.test.ts",
     "test:search": "tsx tests/search/phase9.test.ts",
     "test:cms": "tsx tests/cms/phase5.test.ts",
     "test:phase6": "tsx tests/cms/phase6.test.ts",

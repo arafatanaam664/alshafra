@@ -51,7 +51,6 @@ const {
   image,
   imageAlt,
   fullBleed = false,
-  headerTone = 'dark',
 } = Astro.props;
 
 const canonical = selfCanonical(path);
@@ -109,11 +108,11 @@ const paging = relNextPrev({ path });
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
-  <body class:list={[fullBleed && 'bg-ink-950']}>
+  <body>
     <a class="sr-only focus:not-sr-only" href="#main">تخطي إلى المحتوى</a>
-    <Header path={path} tone={headerTone} />
+    <Header path={path} tone="dark" />
     <main id="main" class:list={[!fullBleed && 'container-page py-10']}>
       {!fullBleed && <Breadcrumbs path={path} h1={h1} />}
       <slot />
