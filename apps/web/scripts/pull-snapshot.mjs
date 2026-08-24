@@ -29,7 +29,11 @@ try {
     process.exit(0);
   }
   const text = await response.text();
-  JSON.parse(text);
+  const parsed = JSON.parse(text);
+  if (!parsed || !Array.isArray(parsed.routes)) {
+    console.log('[snapshot] remote snapshot missing routes; keeping repository file');
+    process.exit(0);
+  }
   writeFileSync(dest, text.endsWith('\n') ? text : `${text}\n`);
   console.log('[snapshot] remote snapshot written for this build');
 } catch {
