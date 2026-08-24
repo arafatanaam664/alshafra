@@ -40,10 +40,13 @@ import {
 import { listAudit, writeAudit } from './audit';
 import { canAccessAdmin, hasPermission, requirePermission, type Actor } from './permissions';
 import { auditSeo } from './seo-audit';
+import { verifySupabaseAccessToken } from '@alshafra/auth';
+import { authStatus, isDevLoginAllowed, isProductionEnv, isSupabaseAuthConfigured } from './env';
 import {
   actorFromCookie,
   clearCookie,
   encodeCookie,
+  loadActorByEmail,
   provisionStaff,
   sessionSecret,
 } from './session';
@@ -127,16 +130,37 @@ export async function handleAdminApi(input: HttpInput, db: SqlClient): Promise<H
   const method = input.method.toUpperCase();
   const path = input.pathname.replace(/\/+$/, '') || '/';
   const secret = sessionSecret();
-  const env = process.env.ALSHAFRA_ENV || 'development';
-  const devLogin = process.env.ADMIN_DEV_LOGIN === 'true' && env !== 'production';
+
+  if (method === 'GET' && path === '/api/v1/admin/auth/status') {
+    return json(200, authStatus());
+  }
 
   if (method === 'POST' && path === '/api/v1/admin/auth/login') {
-    const email = String((input.body as { email?: string })?.email || '')
+    if (!secret) return json(500, { error: 'ADMIN_SESSION_SECRET missing' });
+    const body = (input.body || {}) as { email?: string; accessToken?: string; access_token?: string };
+
+    if (isProductionEnv()) {
+      const token = String(body.accessToken || body.access_token || '').trim();
+      if (!token || !isSupabaseAuthConfigured()) {
+        return json(501, {
+          error: 'production_auth_not_configured',
+          message: 'Dev login is disabled in production. Configure Supabase staff auth.',
+        });
+      }
+      const identity = await verifySupabaseAccessToken(token);
+      if (!identity?.email) return json(401, { error: 'unauthorized' });
+      const staff = await loadActorByEmail(db, identity.email);
+      if (!staff) return json(403, { error: 'not_staff' });
+      return json(200, { user: staff }, { 'Set-Cookie': encodeCookie(staff.userId, secret) });
+    }
+
+    if (!isDevLoginAllowed()) {
+      return json(501, { error: 'dev_login_disabled' });
+    }
+    const email = String(body.email || '')
       .trim()
       .toLowerCase();
     if (!email || !email.includes('@')) return json(400, { error: 'invalid_email' });
-    if (!devLogin) return json(501, { error: 'supabase_auth_not_configured' });
-    if (!secret) return json(500, { error: 'ADMIN_SESSION_SECRET missing' });
     const role = DEV_ROLES[email] || 'editor';
     const actor = await provisionStaff(db, email, role);
     return json(200, { user: actor }, { 'Set-Cookie': encodeCookie(actor.userId, secret) });
@@ -369,7 +393,10 @@ export async function handleAdminApi(input: HttpInput, db: SqlClient): Promise<H
     if (method === 'GET' && path === '/api/v1/admin/users') return json(200, await listUsers(db, actor));
     if (method === 'GET' && path === '/api/v1/admin/analytics') return json(200, await getAnalyticsOverview(db, actor));
     if (method === 'GET' && path === '/api/v1/admin/site-publish') return json(200, await getSitePublishStatus(db, actor));
-    if (method === 'POST' && path === '/api/v1/admin/site-publish') return json(200, await publishSite(db, actor));
+    if (method === 'POST' && path === '/api/v1/admin/site-publish') {
+      const deploy = Boolean((input.body as { deploy?: boolean } | undefined)?.deploy);
+      return json(200, await publishSite(db, actor, { triggerDeploy: deploy }));
+    }
     if (method === 'GET' && path === '/api/v1/admin/opportunities') return json(200, await listOpportunityAdmin(db, actor));
     if (method === 'POST' && path === '/api/v1/admin/opportunities') {
       return json(201, await createOpportunity(db, actor, input.body as never));

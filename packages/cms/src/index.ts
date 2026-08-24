@@ -84,10 +84,14 @@ export {
   signSession,
   verifySession,
   loadActor,
+  loadActorByEmail,
   provisionStaff,
   encodeCookie,
   clearCookie,
+  cookieSecurityFlags,
   readCookie,
   actorFromCookie,
   ADMIN_COOKIE,
 } from './session';
+export { isProductionEnv, isDevLoginAllowed, isSupabaseAuthConfigured, authStatus, authMode } from './env';
+export { triggerProductionDeploy, uploadPublicSnapshot, publishHonestyNote } from './deploy';

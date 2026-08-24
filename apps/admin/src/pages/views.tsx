@@ -27,7 +27,7 @@ export function DashboardView() {
   if (err || !data) return <div className="empty crit">{err || 'empty'}</div>;
   const d = data as unknown as {
     content: Record<string, number>;
-    traffic: { pageViews: number; hasData: boolean; events: number };
+    traffic: { pageViews: number; hasData: boolean; events: number; uniqueVisitorsLabel?: string };
     system: { routes: number; missingSeo: number };
     topPages: { path: string; title: string; views: number }[];
   };
@@ -43,7 +43,13 @@ export function DashboardView() {
       <div className="grid grid-2" style={{ marginTop: 16 }}>
         <div className="card">
           <h3>الزيارات</h3>
-          {d.traffic.hasData ? <p>{d.traffic.pageViews} مشاهدة · {d.traffic.events} حدث</p> : <p className="empty">No data yet — لا توجد بيانات تحليلات بعد.</p>}
+          {d.traffic.hasData ? (
+            <p>
+              {d.traffic.pageViews} مشاهدة · {d.traffic.events} حدث · الزوار الفريدون: {d.traffic.uniqueVisitorsLabel || 'غير متاح بعد'}
+            </p>
+          ) : (
+            <p className="empty">لا توجد بيانات تحليلات بعد.</p>
+          )}
         </div>
         <div className="card">
           <h3>أعلى الصفحات</h3>
@@ -392,15 +398,16 @@ export function HealthView() {
 }
 
 export function AnalyticsView() {
-  const { data, err, loading } = useLoad(() => api<{ hasData: boolean; events: number; social: { hasData: boolean }; pages: unknown[] }>('/api/v1/admin/analytics'), []);
+  const { data, err, loading } = useLoad(() => api<{ hasData: boolean; events: number; uniqueSessionsLabel?: string; social: { hasData: boolean }; pages: unknown[] }>('/api/v1/admin/analytics'), []);
   if (loading) return <div className="empty">جارٍ التحميل…</div>;
   if (err) return <div className="empty crit">{err}</div>;
   return (
     <>
       <div className="page-h"><h2>التحليلات</h2></div>
       <div className="card">
-        {data?.hasData ? <p>{data.events} حدثًا</p> : <p className="empty">No data yet</p>}
-        <p>Social: {data?.social.hasData ? 'available' : 'No data yet'}</p>
+        {data?.hasData ? <p>{data.events} حدثًا</p> : <p className="empty">لا توجد بيانات بعد</p>}
+        <p>الجلسات الفريدة: {data?.uniqueSessionsLabel || 'غير متاح بعد'}</p>
+        <p>النشر الاجتماعي: {data?.social.hasData ? 'متوفر' : 'غير متاح بعد'}</p>
       </div>
     </>
   );
@@ -408,13 +415,23 @@ export function AnalyticsView() {
 
 export function LoginView({ onDone }: { onDone: (u: SessionUser) => void }) {
   const [email, setEmail] = useState('editor@local.test');
+  const [accessToken, setAccessToken] = useState('');
   const [err, setErr] = useState('');
+  const { data: status } = useLoad(
+    () => api<{ mode: string; production: boolean; supabaseConfigured: boolean }>('/api/v1/admin/auth/status'),
+    [],
+  );
+  const production = Boolean(status?.production);
+  const supabase = Boolean(status?.supabaseConfigured);
   return (
     <div className="login">
       <form className="card" onSubmit={async (e) => {
         e.preventDefault();
         try {
-          const r = await api<{ user: SessionUser }>('/api/v1/admin/auth/login', { method: 'POST', body: JSON.stringify({ email }) });
+          const r = await api<{ user: SessionUser }>('/api/v1/admin/auth/login', {
+            method: 'POST',
+            body: JSON.stringify(production ? { accessToken } : { email }),
+          });
           onDone(r.user);
           navigate('/');
         } catch (ex) {
@@ -422,10 +439,22 @@ export function LoginView({ onDone }: { onDone: (u: SessionUser) => void }) {
         }
       }}>
         <h2>دخول الإدارة</h2>
-        <p style={{ color: 'var(--muted)' }}>تطوير محلي فقط عندما ADMIN_DEV_LOGIN=true. الإنتاج = Supabase Auth.</p>
-        <div className="field"><label>البريد</label><input value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+        {production ? (
+          <p style={{ color: 'var(--muted)' }}>
+            {supabase
+              ? 'الإنتاج يستخدم جلسة المصادقة الآمنة. الصق رمز الوصول الخاص بحساب الطاقم فقط.'
+              : 'تسجيل الدخول التطويري معطّل في الإنتاج. أعدّ مصادقة الطاقم قبل استخدام اللوحة على الخادم الحي.'}
+          </p>
+        ) : (
+          <p style={{ color: 'var(--muted)' }}>دخول التطوير بالبريد متاح في البيئة المحلية فقط.</p>
+        )}
+        {production ? (
+          <div className="field"><label>رمز الوصول</label><input value={accessToken} onChange={(e) => setAccessToken(e.target.value)} disabled={!supabase} /></div>
+        ) : (
+          <div className="field"><label>البريد</label><input value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+        )}
         {err && <p className="crit">{err}</p>}
-        <button className="btn" type="submit">دخول</button>
+        <button className="btn" type="submit" disabled={production && !supabase}>دخول</button>
       </form>
     </div>
   );

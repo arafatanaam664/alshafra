@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@alshafra/auth": "*",
     "@alshafra/content": "*",
     "@alshafra/database": "*",
     "@alshafra/community": "*",

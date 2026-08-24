@@ -1,3 +1,5 @@
+export { supabaseAuthReady, verifySupabaseAccessToken, type VerifiedStaffIdentity } from './supabase';
+
 export interface UserIdentity {
   authUserId: string;
   email?: string;

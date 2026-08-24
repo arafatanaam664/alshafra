@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { newId } from '@alshafra/kernel';
 import type { SqlClient } from '@alshafra/database';
+import { isProductionEnv } from './env';
 import { canAccessAdmin, type Actor } from './permissions';
 
 const COOKIE = 'alshafra_admin_session';
@@ -77,14 +78,20 @@ export async function provisionStaff(
   return actor;
 }
 
-export function encodeCookie(userId: string, secret: string): string {
-  const payload = Buffer.from(JSON.stringify({ sub: userId, exp: Date.now() + 7 * 86400000 })).toString('base64url');
-  const token = signSession(payload, secret);
-  return `${COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800`;
+export function cookieSecurityFlags(env: NodeJS.ProcessEnv = process.env): string {
+  const parts = ['Path=/', 'HttpOnly', 'SameSite=Lax'];
+  if (isProductionEnv(env)) parts.push('Secure');
+  return parts.join('; ');
 }
 
-export function clearCookie(): string {
-  return `${COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
+export function encodeCookie(userId: string, secret: string, env: NodeJS.ProcessEnv = process.env): string {
+  const payload = Buffer.from(JSON.stringify({ sub: userId, exp: Date.now() + 7 * 86400000 })).toString('base64url');
+  const token = signSession(payload, secret);
+  return `${COOKIE}=${token}; ${cookieSecurityFlags(env)}; Max-Age=604800`;
+}
+
+export function clearCookie(env: NodeJS.ProcessEnv = process.env): string {
+  return `${COOKIE}=; ${cookieSecurityFlags(env)}; Max-Age=0`;
 }
 
 export function readCookie(header: string | null): string | null {
@@ -95,6 +102,18 @@ export function readCookie(header: string | null): string | null {
     if (k === COOKIE) return rest.join('=');
   }
   return null;
+}
+
+export async function loadActorByEmail(db: SqlClient, email: string): Promise<Actor | null> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized || !normalized.includes('@')) return null;
+  const user = await db.query<{ id: string }>(
+    `SELECT id FROM users WHERE lower(email) = $1 AND deleted_at IS NULL AND status = 'active'`,
+    [normalized],
+  );
+  const id = user.rows[0]?.id;
+  if (!id) return null;
+  return loadActor(db, id);
 }
 
 export async function actorFromCookie(db: SqlClient, cookieHeader: string | null, secret: string): Promise<Actor | null> {
