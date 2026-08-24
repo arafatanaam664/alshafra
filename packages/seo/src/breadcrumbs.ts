@@ -40,6 +40,9 @@ export function breadcrumbsFor(path: string, h1: string): Crumb[] {
   if (p === '/search') return [home, { name: 'بحث' }];
   if (p === '/faq') return [home, { name: 'الأسئلة الشائعة' }];
   if (p === '/about') return [home, { name: 'عن المنصة' }];
+  if (p === '/contact') return [home, { name: 'اتصل بنا' }];
+  if (p === '/privacy') return [home, { name: 'الخصوصية' }];
+  if (p === '/terms') return [home, { name: 'الشروط' }];
   return [home, { name: h1 }];
 }
 

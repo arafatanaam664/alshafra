@@ -1,8 +1,21 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
+
+const recover = [
+  ['/', 'الرئيسية'],
+  ['/tools', 'الأدوات'],
+  ['/calendar', 'التقويم'],
+  ['/articles', 'المقالات'],
+  ['/search', 'البحث'],
+];
 ---
-<SiteLayout title="الصفحة غير موجودة — 404 | Alshafra" description="الصفحة غير موجودة." path="/404" robots="noindex, follow">
-  <h1 class="section-title">الصفحة غير موجودة</h1>
-  <p class="mt-4">عذراً، لا توجد صفحة على هذا العنوان.</p>
-  <p class="mt-4"><a class="btn-primary" href="/">العودة للرئيسية</a></p>
+<SiteLayout title="الصفحة غير موجودة — 404 | Alshafra" description="هذا العنوان غير موجود في Alshafra." path="/404" robots="noindex, follow">
+  <p class="eyebrow">404</p>
+  <h1 class="section-title mt-2">الصفحة غير موجودة</h1>
+  <p class="lede mt-4">العنوان الذي طلبته غير موجود. يمكنك المتابعة من هنا:</p>
+  <div class="mt-6 flex flex-wrap gap-2">
+    {recover.map(([href, label]) => (
+      <a class="btn-light" href={href}>{label}</a>
+    ))}
+  </div>
 </SiteLayout>

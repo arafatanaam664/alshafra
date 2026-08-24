@@ -9,6 +9,7 @@ import { getAllPages, type PageModel } from '../content/provider';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import ExploreShelf from '../components/ExploreShelf.astro';
 import { pageKindLabel } from '@alshafra/content/explore';
+import { resolveMetadata } from '@alshafra/seo';
 
 export function getStaticPaths() {
   return getAllPages()
@@ -21,8 +22,12 @@ export function getStaticPaths() {
 
 type Props = PageModel;
 const page = Astro.props;
+const seo = resolveMetadata(page);
 const url = `https://alshafra.com${page.path}`;
 const kindLabel = pageKindLabel(page.path);
+const headings = [...page.html.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi)].map((match) =>
+  match[1].replace(/<[^>]+>/g, '').trim(),
+).filter(Boolean);
 const sidebar = (page.explore || []).filter((group) => group.key === 'next' || group.key === 'tools');
 const rest = (page.explore || []).filter((group) => group.key === 'related' || group.key === 'hub');
 ---
@@ -46,8 +51,18 @@ const rest = (page.explore || []).filter((group) => group.key === 'related' || g
   <div class="page-grid">
     <article>
       <p class="eyebrow">{kindLabel}</p>
-      <h1 class="section-title mt-2">{page.h1}</h1>
-      {page.description && <p class="lede mt-4">{page.description}</p>}
+      <h1 class="section-title mt-2">{seo.h1}</h1>
+      {seo.description && <p class="lede mt-4">{seo.description}</p>}
+      {headings.length >= 3 && (
+        <nav class="card mt-6 p-4 text-sm" aria-label="محتويات الصفحة">
+          <p class="font-bold">في هذه الصفحة</p>
+          <ul class="mt-2 space-y-1 text-ink-700">
+            {headings.slice(0, 8).map((heading) => (
+              <li>{heading}</li>
+            ))}
+          </ul>
+        </nav>
+      )}
       {page.island === 'date-converter' && <DateConverterIsland client:load />}
       {page.island === 'age-calculator' && <AgeCalculatorIsland client:load />}
       {page.island === 'countdown' && page.isoDate && <CountdownIsland client:visible iso={page.isoDate} />}

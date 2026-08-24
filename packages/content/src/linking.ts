@@ -168,6 +168,36 @@ export function clusterMates(path: string): string[] {
   return [...out];
 }
 
+export function pageTopic(path: string): string {
+  if (path.startsWith('/gold-price')) return 'gold';
+  if (path.startsWith('/usd-rate')) return 'usd';
+  if (path.startsWith('/countdown')) return 'countdown';
+  if (path.startsWith('/articles') || path === '/salaries' || path.includes('salary') || path.includes('citizen')) {
+    return path.includes('hijri') || path.includes('convert') ? 'hijri' : 'salaries';
+  }
+  if (path === '/date-converter' || path === '/today' || path === '/hijri-calendar' || path.includes('hijri')) return 'hijri';
+  if (path.startsWith('/school') || path.includes('school')) return 'school';
+  if (path.startsWith('/holidays') || path.includes('eid') || path.includes('national') || path.includes('ramadan')) {
+    return 'holidays';
+  }
+  if (path.startsWith('/tool') || path === '/tools' || path === '/age-calculator') return 'tools';
+  if (path.startsWith('/trending')) return 'guides';
+  return 'general';
+}
+
+export function scoreRelated(from: string, to: string): number {
+  if (from === to) return 0;
+  let score = 0;
+  if (pageTopic(from) === pageTopic(to)) score += 4;
+  if (clusterMates(from).includes(to)) score += 5;
+  if (countryPair(from) === to) score += 6;
+  if ((STRUCTURAL_OUTBOUND[from] || []).includes(to)) score += 3;
+  const fromHub = from.split('/').slice(0, 2).join('/') || from;
+  const toHub = to.split('/').slice(0, 2).join('/') || to;
+  if (fromHub === toHub && fromHub !== '') score += 2;
+  return score;
+}
+
 export function countryPair(path: string): string | null {
   const gold = path.match(/^\/gold-price\/([^/]+)$/);
   if (gold) return `/usd-rate/${gold[1]}`;
@@ -236,7 +266,10 @@ export function relatedFor(
     const selfTokens = tokensOf(page);
     const scored = catalog
       .filter((item) => item.path !== page.path && isIndexablePage(item) && !seen.has(item.path))
-      .map((item) => ({ item, score: overlapScore(selfTokens, tokensOf(item)) }))
+      .map((item) => ({
+        item,
+        score: overlapScore(selfTokens, tokensOf(item)) + scoreRelated(page.path, item.path),
+      }))
       .filter((row) => row.score >= 2)
       .sort((a, b) => b.score - a.score);
 

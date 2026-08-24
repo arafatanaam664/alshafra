@@ -26,6 +26,8 @@ export {
   inboundCounts,
   clusterMates,
   countryPair,
+  pageTopic,
+  scoreRelated,
   MAX_AUTO_RELATED,
   type RelatedLink,
   type LinkablePage,

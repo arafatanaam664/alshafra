@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-bg: #f6f1e7;
+  --color-surface: #ffffff;
+  --color-text: #1b1814;
+  --color-muted: #5c534a;
+  --color-accent: #9a3412;
+  --color-accent-hover: #7c2d12;
+  --color-border: rgba(27, 24, 20, 0.1);
+  --color-success: #166534;
+  --color-warning: #b45309;
+  --color-error: #991b1b;
+  --color-info: #1d4e52;
+  --font-sans: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --text-body: 1.0625rem;
+  --leading-body: 1.8;
+  --space-page: 2.5rem;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
