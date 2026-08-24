@@ -1,11 +1,8 @@
 User-agent: *
 Allow: /
 
-# IMPORTANT: /category/*, /languages/* and /news/* are NOT disallowed on
-# purpose. They are leftovers from the site's previous incarnation and now
-# return 410/404 — Googlebot must be able to crawl them to see that status and
-# drop them from the index. Blocking them in robots.txt would freeze them in
-# the index as "indexed, though blocked by robots.txt".
+# /category/*, /languages/* and /news/* return 410.
+# They are not listed as Disallow so crawlers can see 410 and drop the URLs.
 
 # Duplicate entry point
 Disallow: /index.html
