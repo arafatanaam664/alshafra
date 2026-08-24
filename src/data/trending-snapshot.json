@@ -1,74 +1,76 @@
 {
-  "date": "2026-08-23",
+  "date": "2026-08-24",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-23",
+      "date": "2026-08-24",
       "titles": [
-        "ليغ 1",
-        "psg",
-        "مكة",
-        "karim adeyemi",
-        "حمزة عبد الكريم",
-        "barca",
-        "ligue 1",
-        "إلتشيه ضد برشلونة",
-        "আর্জেন্টিনা জাতীয় ফুটবল দল",
-        "elche vs barcelona"
+        "حضوري",
+        "americano",
+        "سعر الريال السعودي",
+        "سعر الذهب",
+        "الشروق",
+        "منصه",
+        "منصة",
+        "القوات المسلحة السودانية",
+        "neymar",
+        "المرشد الأعلى في إيران"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-23",
+      "date": "2026-08-24",
       "titles": [
-        "psg",
-        "elche – barcelone",
-        "fcb",
-        "karim adeyemi",
-        "مباريات اليوم",
-        "إلتشيه ضد برشلونة",
-        "barca",
-        "elche vs barcelona",
-        "iranian hackers shut down uk power plant",
-        "torino vs milan"
+        "air arabia",
+        "وزارة التربية والتعليم",
+        "ta",
+        "jessica pegula",
+        "neymar",
+        "elche cf vs fc barcelona standings",
+        "santos vs mirassol",
+        "ferran torres",
+        "apple iphone 18 pro max release date",
+        "ترتيبات النادي الأهلي – نادى انبى"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-23",
+      "date": "2026-08-24",
       "titles": [
+        "elche cf vs fc barcelona standings",
+        "santos vs mirassol",
+        "ترتيبات النادي الأهلي – نادى انبى",
+        "torino vs milan",
         "psg",
         "إلتشيه ضد برشلونة",
         "elche vs barcelona",
         "മനോരമ ന്യൂസ്",
         "rennes vs psg",
-        "al ahly vs eastern enppi",
-        "الأهلي ضد الشرقية إنبي",
-        "frosinone vs juventus",
-        "university",
-        "نيوكاسل يونايتد ضد ليفربول"
+        "al ahly vs eastern enppi"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-23",
+      "date": "2026-08-24",
       "titles": [
+        "india vs sri lanka",
+        "santos vs mirassol",
+        "elche cf vs fc barcelona standings",
+        "torino vs milan",
         "ترتيبات النادي الأهلي – نادى انبى",
         "elche vs barcelona",
         "إلتشيه ضد برشلونة",
         "حادث",
         "rennes vs psg",
-        "مباريات اليوم",
-        "al ahly vs eastern enppi",
-        "الأهلي ضد الشرقية إنبي",
-        "يلا كورة",
-        "أتلتيكو مدريد ضد فياريال"
+        "مباريات اليوم"
       ]
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-23",
+      "date": "2026-08-24",
       "titles": [
+        "india vs sri lanka",
+        "la liga",
         "إلتشيه ضد برشلونة",
         "elche vs barcelona",
         "rennes vs psg",
@@ -76,25 +78,23 @@
         "newcastle vs liverpool",
         "مان سيتي ضد بورنموث",
         "اليمين الدستورية",
-        "man city vs bournemouth",
-        "f1",
-        "saransh jain"
+        "man city vs bournemouth"
       ]
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-23",
+      "date": "2026-08-24",
       "titles": [
+        "santos vs mirassol",
+        "elche cf vs fc barcelona standings",
+        "طرابزون سبور",
+        "باريس سان جيرمان",
+        "torino vs milan",
         "بث مباريات",
         "بث مباشر",
         "يلا كورة",
         "إلتشيه ضد برشلونة",
-        "elche vs barcelona",
-        "rennes vs psg",
-        "الأهلي ضد الشرقية إنبي",
-        "newcastle vs liverpool",
-        "أتلتيكو مدريد ضد فياريال",
-        "atlético madrid vs villarreal"
+        "elche vs barcelona"
       ]
     }
   }
