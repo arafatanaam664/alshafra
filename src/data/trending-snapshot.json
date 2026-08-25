@@ -5,87 +5,89 @@
       "country": "السعودية",
       "date": "2026-08-25",
       "titles": [
-        "قناة الجزيرة",
-        "الثلاثاء",
-        "ഷാര്ജ",
-        "منتخب السعودية لكرة القدم",
-        "حسين فهمي",
-        "صراف آلي",
-        "متهم",
-        "صحة",
-        "ecinet",
-        "sonal dinusha"
+        "مباريات دوري روشن",
+        "ساوثهامبتون ضد وست هام",
+        "كوره",
+        "المرشد الأعلى في إيران",
+        "ترتيب الدوري السعودي",
+        "ipswich town vs leicester city",
+        "plymouth vs coventry",
+        "فالنسيا ضد ريال بتيس",
+        "southampton vs west ham",
+        "nottm forest vs leeds"
       ]
     },
     "AE": {
       "country": "الإمارات",
       "date": "2026-08-25",
       "titles": [
-        "غيث",
-        "عبد الفتاح السيسي",
-        "fine",
-        "دبي",
-        "toxic movie",
-        "خبر",
-        "abu dhabi f1",
-        "foreign exchange reserves",
-        "sonal dinusha",
-        "us iran war"
+        "ipswich town vs leicester city",
+        "birmingham vs brentford",
+        "نادي الزمالك",
+        "southampton vs west ham",
+        "nottm forest vs leeds",
+        "plymouth vs coventry",
+        "valencia vs betis",
+        "avengers endgame encore",
+        "dolly parton",
+        "الاتفاق ضد النصر"
       ]
     },
     "QA": {
       "country": "قطر",
       "date": "2026-08-25",
       "titles": [
+        "birmingham vs brentford",
+        "dolly parton",
+        "الاتفاق ضد النصر",
+        "al-ettifaq vs al-nassr",
+        "اقتصاد",
         "sonal dinusha",
         "وزارة التربية والتعليم",
-        "roma vs fiorentina",
-        "epl",
-        "apple iphone 18 pro max",
-        "fulham vs chelsea",
-        "الدول العربية في الخليج العربي",
-        "تعليم",
-        "qatar"
+        "fulham f.c. vs chelsea f.c. standings"
       ]
     },
     "KW": {
       "country": "الكويت",
       "date": "2026-08-25",
       "titles": [
-        "مطار الكويت الدولي",
+        "dolly parton",
+        "مطار",
+        "al-ettifaq vs al-nassr",
+        "الاتفاق ضد النصر",
+        "متهم",
         "prison",
         "sonal dinusha",
         "وزارة العدل",
         "المولد النبوي 2026",
-        "chelsea",
-        "الاتحاد ضد الحزم",
-        "فولهام ضد تشيلسي",
-        "fulham vs chelsea"
+        "fulham f.c. vs chelsea f.c. standings"
       ]
     },
     "BH": {
       "country": "البحرين",
       "date": "2026-08-25",
       "titles": [
+        "dolly parton",
+        "al-ettifaq vs al-nassr",
+        "الاتفاق ضد النصر",
         "خبر",
-        "india vs sri lanka",
-        "fulham vs chelsea"
+        "india vs sri lanka"
       ]
     },
     "OM": {
       "country": "عُمان",
       "date": "2026-08-25",
       "titles": [
+        "dolly parton",
+        "al-ettifaq vs al-nassr",
+        "رانيا العبد الله",
+        "الاتفاق ضد النصر",
+        "sultan haitham royal pardon 459 prisoners",
         "sonal dinusha",
         "نفط",
         "وزارة العمل",
         "المولد النبوي الشريف 2026",
-        "المولد النبوي",
-        "فولهام ضد تشيلسي",
-        "fulham vs chelsea",
-        "الاتحاد ضد الحزم",
-        "نيوم ضد القادسية",
-        "جافي"
+        "المولد النبوي"
       ]
     }
   }
