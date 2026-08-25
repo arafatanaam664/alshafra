@@ -1,83 +1,80 @@
 {
-  "date": "2026-08-24",
+  "date": "2026-08-25",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-24",
+      "date": "2026-08-25",
       "titles": [
-        "سيارة",
-        "gonzalo garcía",
-        "arrest",
-        "ترتيب الدوري",
-        "ترتيب الدوري السعودي",
-        "روما ضد فيورنتينا",
-        "يوسف النصيري",
-        "hallescher vs schalke",
-        "دمشق",
-        "يحيى شكرى سرحان"
+        "فارس نظام",
+        "متى اليوم الوطني",
+        "منصه",
+        "منصة",
+        "الشروق",
+        "ان",
+        "ماتش",
+        "samsung galaxy s27 ultra",
+        "gta 6",
+        "آيفون"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-24",
+      "date": "2026-08-25",
       "titles": [
+        "سلمان بن عبد العزيز آل سعود",
+        "ভিসা",
+        "الشارقة",
         "gonzalo garcía",
+        "hallescher vs schalke",
         "فولهام ضد تشيلسي",
         "suhail star uae",
-        "lunar eclipses",
         "ഇറാന്",
-        "roma vs fiorentina",
-        "الاتحاد ضد الحزم",
-        "osasuna vs levante",
-        "lalithaa jewellery mart",
-        "fulham vs chelsea"
+        "lunar eclipses",
+        "roma vs fiorentina"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-24",
+      "date": "2026-08-25",
       "titles": [
+        "وزارة التربية والتعليم",
+        "roma vs fiorentina",
+        "epl",
+        "chelsea",
         "apple iphone 18 pro max",
         "fulham vs chelsea",
         "qatar",
         "ഇറാന്",
         "علاء مبارك",
-        "dhruv jurel",
-        "india vs sri lanka",
-        "elche cf vs fc barcelona standings",
-        "santos vs mirassol",
-        "stade rennais f.c. vs paris saint-germain f.c. standings"
+        "dhruv jurel"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-24",
+      "date": "2026-08-25",
       "titles": [
-        "chelsea",
         "الاتحاد ضد الحزم",
         "فولهام ضد تشيلسي",
         "fulham vs chelsea",
         "وفيات",
         "فراس الخطيب",
         "علاء مبارك",
-        "dhruv jurel",
-        "santos vs mirassol",
-        "elche cf vs fc barcelona standings"
+        "المرسوم الرئاسي",
+        "dhruv jurel"
       ]
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-24",
+      "date": "2026-08-25",
       "titles": [
         "fulham vs chelsea",
-        "india vs sri lanka"
+        "dhruv jurel"
       ]
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-24",
+      "date": "2026-08-25",
       "titles": [
-        "premier league",
         "فولهام ضد تشيلسي",
         "fulham vs chelsea",
         "الاتحاد ضد الحزم",
@@ -85,8 +82,7 @@
         "جافي",
         "اقتصاد",
         "oman",
-        "dhruv jurel",
-        "santos vs mirassol"
+        "dhruv jurel"
       ]
     }
   }
