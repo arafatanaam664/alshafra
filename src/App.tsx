@@ -1,6 +1,7 @@
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo } from 'react';
 import { useRoute, parseRoute } from './lib/router';
 import { useSeo } from './lib/seo';
+import { trackPageView } from './lib/analytics';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
@@ -66,6 +67,14 @@ export default function App() {
   const [path] = useRoute();
   const info = useMemo(() => parseRoute(path), [path]);
   const { lang, kind, param } = info;
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      trackPageView(path);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [path]);
 
   // الصفحات العالمية (غير العربية) تُعرض عبر GlobalPage:
   //  - أي صفحة بلغة غير العربية
