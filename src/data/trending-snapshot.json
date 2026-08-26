@@ -1,71 +1,73 @@
 {
-  "date": "2026-08-25",
+  "date": "2026-08-26",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-25",
+      "date": "2026-08-26",
       "titles": [
-        "مباريات دوري روشن",
-        "ساوثهامبتون ضد وست هام",
-        "كوره",
-        "المرشد الأعلى في إيران",
-        "ترتيب الدوري السعودي",
-        "ipswich town vs leicester city",
-        "plymouth vs coventry",
-        "فالنسيا ضد ريال بتيس",
-        "southampton vs west ham",
-        "nottm forest vs leeds"
+        "toxic movie",
+        "sonal dinusha",
+        "حضوري",
+        "weather today",
+        "منصه",
+        "منصة",
+        "اليوم الوطني السعودي",
+        "fifa intercontinental cup",
+        "بنج كلي",
+        "قوات سوريا الديمقراطية"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-25",
+      "date": "2026-08-26",
       "titles": [
+        "sonal dinusha",
+        "onam festival",
+        "وزارة التربية والتعليم",
+        "വിമാനം",
+        "monterrey vs chicago",
+        "binance",
+        "lask vs celtic",
+        "stoke city vs hull",
         "ipswich town vs leicester city",
-        "birmingham vs brentford",
-        "نادي الزمالك",
-        "southampton vs west ham",
-        "nottm forest vs leeds",
-        "plymouth vs coventry",
-        "valencia vs betis",
-        "avengers endgame encore",
-        "dolly parton",
-        "الاتفاق ضد النصر"
+        "al-shabab vs al-riyadh"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-25",
+      "date": "2026-08-26",
       "titles": [
+        "sonal dinusha",
+        "southampton vs west ham",
         "birmingham vs brentford",
+        "nottm forest vs leeds",
+        "plymouth vs coventry",
+        "valencia vs betis",
+        "onam",
         "dolly parton",
         "الاتفاق ضد النصر",
-        "al-ettifaq vs al-nassr",
-        "اقتصاد",
-        "sonal dinusha",
-        "وزارة التربية والتعليم",
-        "fulham f.c. vs chelsea f.c. standings"
+        "al-ettifaq vs al-nassr"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-25",
+      "date": "2026-08-26",
       "titles": [
+        "sonal dinusha",
+        "weather",
+        "الطقس",
+        "birmingham vs brentford",
         "dolly parton",
         "مطار",
         "al-ettifaq vs al-nassr",
         "الاتفاق ضد النصر",
         "متهم",
-        "prison",
-        "sonal dinusha",
-        "وزارة العدل",
-        "المولد النبوي 2026",
-        "fulham f.c. vs chelsea f.c. standings"
+        "prison"
       ]
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-25",
+      "date": "2026-08-26",
       "titles": [
         "dolly parton",
         "al-ettifaq vs al-nassr",
@@ -76,18 +78,18 @@
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-25",
+      "date": "2026-08-26",
       "titles": [
+        "birmingham vs brentford",
         "dolly parton",
         "al-ettifaq vs al-nassr",
         "رانيا العبد الله",
         "الاتفاق ضد النصر",
+        "وزارة التعليم",
         "sultan haitham royal pardon 459 prisoners",
         "sonal dinusha",
         "نفط",
-        "وزارة العمل",
-        "المولد النبوي الشريف 2026",
-        "المولد النبوي"
+        "وزارة العمل"
       ]
     }
   }
