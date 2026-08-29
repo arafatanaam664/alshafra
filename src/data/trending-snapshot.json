@@ -1,74 +1,75 @@
 {
-  "date": "2026-08-28",
+  "date": "2026-08-29",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "titles": [
+        "مواقيت الصلاة",
         "عام دراسي",
         "losc lille vs paris saint-germain f.c. standings",
         "علم الأرصاد الجوية",
-        "premier league",
         "bayern munich vs vfb stuttgart standings",
-        "مها الصغير",
+        "الدوري الإنجليزي الممتاز",
+        "باريس",
         "blood moon lunar eclipse tonight",
         "primera división",
-        "العقوبات المفروضة على إيران",
-        "حكمت الهجري"
+        "مها الصغير"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "titles": [
-        "ac milan vs venezia fc standings",
+        "binance trading",
+        "shein",
+        "cpl",
+        "binance exchange",
         "losc lille vs paris saint-germain f.c. standings",
         "bayern munich vs vfb stuttgart standings",
         "pl",
+        "al-nassr vs al-taawoun fc standings",
         "البايرن ضد شتوتغارت",
-        "رأس الخيمة",
-        "alavés vs villarreal",
-        "wrexham vs birmingham",
-        "الاتحاد السكندري ضد سيراميكا كليوباترا",
-        "ليل ضد بي اس جي"
+        "رأس الخيمة"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "titles": [
         "losc lille vs paris saint-germain f.c. standings",
+        "crystal palace f.c. vs man city standings",
+        "ليل ضد بي اس جي",
+        "epl",
         "al-nassr vs al-taawoun fc standings",
         "milan vs venezia",
         "كريستال بالاس ضد مان سيتي",
         "al-khaleej vs al-hilal",
         "losc vs psg",
-        "النصر ضد التعاون",
-        "zed vs al ahly",
-        "palace vs man city",
-        "bayern vs vfb stuttgart"
+        "النصر ضد التعاون"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "titles": [
         "losc lille vs paris saint-germain f.c. standings",
+        "crystal palace f.c. vs man city standings",
         "milan vs venezia",
-        "premier league",
         "ليل ضد بي اس جي",
         "كريستال بالاس ضد مان سيتي",
         "الاتحاد السكندري ضد سيراميكا كليوباترا",
         "losc vs psg",
-        "palace vs man city",
         "bayern vs vfb stuttgart",
-        "الخليج ضد الهلال"
+        "الخليج ضد الهلال",
+        "al-nassr vs al-taawoun"
       ]
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "titles": [
+        "السودان",
         "losc vs psg",
         "الهلال",
         "al-khaleej vs al-hilal",
@@ -81,18 +82,18 @@
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-28",
+      "date": "2026-08-29",
       "titles": [
+        "crystal palace f.c. vs man city standings",
+        "losc lille vs paris saint-germain f.c. standings",
+        "al-nassr vs al-taawoun fc standings",
         "al-khaleej vs al-hilal",
         "ليل ضد بي اس جي",
         "losc vs psg",
         "bayern vs vfb stuttgart",
-        "palace vs man city",
         "كريستال بالاس ضد مان سيتي",
         "البايرن ضد شتوتغارت",
-        "racing santander vs elche",
-        "الخليج ضد الهلال",
-        "al-nassr vs al-taawoun"
+        "racing santander vs elche"
       ]
     }
   }
