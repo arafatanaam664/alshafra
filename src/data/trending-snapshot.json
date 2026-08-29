@@ -5,70 +5,71 @@
       "country": "السعودية",
       "date": "2026-08-29",
       "titles": [
-        "مواقيت الصلاة",
-        "عام دراسي",
-        "losc lille vs paris saint-germain f.c. standings",
-        "علم الأرصاد الجوية",
-        "bayern munich vs vfb stuttgart standings",
-        "الدوري الإنجليزي الممتاز",
-        "باريس",
-        "blood moon lunar eclipse tonight",
-        "primera división",
-        "مها الصغير"
+        "حرائق الجزائر",
+        "ليفربول ضد نوتينغهام فورست",
+        "liverpool vs nottm forest",
+        "البيت الأبيض",
+        "aircraft hijacking",
+        "extra",
+        "رئيس نيبال",
+        "دولار",
+        "ملك",
+        "ذكاء اصطناعي"
       ]
     },
     "AE": {
       "country": "الإمارات",
       "date": "2026-08-29",
       "titles": [
-        "binance trading",
-        "shein",
-        "cpl",
-        "binance exchange",
-        "losc lille vs paris saint-germain f.c. standings",
-        "bayern munich vs vfb stuttgart standings",
-        "pl",
-        "al-nassr vs al-taawoun fc standings",
-        "البايرن ضد شتوتغارت",
-        "رأس الخيمة"
+        "sa vs zim",
+        "ليفربول ضد نوتينغهام فورست",
+        "liverpool vs nottm forest",
+        "عام دراسي",
+        "umar nurmagomedov",
+        "subhash chandra",
+        "the times of india",
+        "الأردن",
+        "singapore airlines",
+        "الولايات المتحدة"
       ]
     },
     "QA": {
       "country": "قطر",
       "date": "2026-08-29",
       "titles": [
+        "liverpool vs nottm forest",
+        "military aid",
         "losc lille vs paris saint-germain f.c. standings",
-        "crystal palace f.c. vs man city standings",
         "ليل ضد بي اس جي",
-        "epl",
         "al-nassr vs al-taawoun fc standings",
+        "psg",
+        "premier league",
         "milan vs venezia",
         "كريستال بالاس ضد مان سيتي",
-        "al-khaleej vs al-hilal",
-        "losc vs psg",
-        "النصر ضد التعاون"
+        "al-khaleej vs al-hilal"
       ]
     },
     "KW": {
       "country": "الكويت",
       "date": "2026-08-29",
       "titles": [
+        "ليفربول ضد نوتينغهام فورست",
+        "liverpool vs nottm forest",
+        "الولايات المتحدة",
+        "عبد الفتاح السيسي",
         "losc lille vs paris saint-germain f.c. standings",
+        "al-nassr vs al-taawoun fc standings",
         "crystal palace f.c. vs man city standings",
+        "psg",
         "milan vs venezia",
-        "ليل ضد بي اس جي",
-        "كريستال بالاس ضد مان سيتي",
-        "الاتحاد السكندري ضد سيراميكا كليوباترا",
-        "losc vs psg",
-        "bayern vs vfb stuttgart",
-        "الخليج ضد الهلال",
-        "al-nassr vs al-taawoun"
+        "ليل ضد بي اس جي"
       ]
     },
     "BH": {
       "country": "البحرين",
       "date": "2026-08-29",
       "titles": [
+        "خبر",
         "السودان",
         "losc vs psg",
         "الهلال",
@@ -76,24 +77,23 @@
         "palace vs man city",
         "النصر ضد التعاون",
         "al-nassr vs al-taawoun",
-        "namibia vs south africa",
-        "الكويت"
+        "namibia vs south africa"
       ]
     },
     "OM": {
       "country": "عُمان",
       "date": "2026-08-29",
       "titles": [
-        "crystal palace f.c. vs man city standings",
+        "ليفربول ضد نوتينغهام فورست",
+        "حادث",
+        "إصابة",
+        "الولايات المتحدة",
+        "instagram",
         "losc lille vs paris saint-germain f.c. standings",
         "al-nassr vs al-taawoun fc standings",
+        "psg",
         "al-khaleej vs al-hilal",
-        "ليل ضد بي اس جي",
-        "losc vs psg",
-        "bayern vs vfb stuttgart",
-        "كريستال بالاس ضد مان سيتي",
-        "البايرن ضد شتوتغارت",
-        "racing santander vs elche"
+        "ليل ضد بي اس جي"
       ]
     }
   }
