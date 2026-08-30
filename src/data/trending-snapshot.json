@@ -1,99 +1,100 @@
 {
-  "date": "2026-08-29",
+  "date": "2026-08-30",
   "countries": {
     "SA": {
       "country": "السعودية",
-      "date": "2026-08-29",
+      "date": "2026-08-30",
       "titles": [
-        "رياض محرز",
-        "álex baena",
-        "جدة",
-        "بنك مصر",
-        "إغماء",
-        "galatasaray vs göztepe",
-        "ittihad",
-        "الدرعية نادي",
-        "sports",
-        "gold"
+        "سعر الدولار اليوم في مصر",
+        "مواقف",
+        "എയര് ഇന്ത്യ",
+        "ؤاشف chatgpt",
+        "حرارة",
+        "games",
+        "americano",
+        "بنيامين نتنياهو",
+        "وزارة الدفاع",
+        "faisal khan"
       ]
     },
     "AE": {
       "country": "الإمارات",
-      "date": "2026-08-29",
+      "date": "2026-08-30",
       "titles": [
-        "mohammed bin rashid al maktoum",
-        "serie a",
-        "إشبيلية ضد أتلتيكو مدريد",
-        "banque misr",
-        "الفتح ضد الاتحاد",
-        "omar marmoush",
-        "sevilla vs atlético madrid",
-        "argentina vs australia",
-        "al fateh vs al-ittihad",
-        "galatasaray vs göztepe"
+        "flight",
+        "iron man game",
+        "مصارعة",
+        "ബാങ്ക്",
+        "faisal khan",
+        "americano",
+        "تعويض",
+        "oman vs singapore",
+        "cpl",
+        "binance exchange"
       ]
     },
     "QA": {
       "country": "قطر",
-      "date": "2026-08-29",
+      "date": "2026-08-30",
       "titles": [
+        "oman vs singapore",
+        "يوتيوب",
+        "mls",
+        "flight",
+        "inter miami vs montréal",
         "juventus vs parma",
         "argentina vs australia",
         "sevilla vs atlético madrid",
         "real sociedad vs espanyol",
-        "spurs vs newcastle",
-        "levante vs betis",
-        "uae vs sri lanka",
-        "umar nurmagomedov",
-        "school",
-        "coventry vs hull"
+        "spurs vs newcastle"
       ]
     },
     "KW": {
       "country": "الكويت",
-      "date": "2026-08-29",
+      "date": "2026-08-30",
       "titles": [
+        "مجتبى خامنئي",
+        "oman vs singapore",
+        "flight",
+        "work permit",
+        "inter miami vs montréal",
         "juventus vs parma",
         "إشبيلية ضد أتلتيكو مدريد",
         "argentina vs australia",
         "sevilla vs atlético madrid",
-        "ريال سوسيداد ضد إسبانيول",
-        "الخلود ضد الأهلي",
-        "real sociedad vs espanyol",
-        "umar nurmagomedov",
-        "levante vs betis",
-        "توتنهام ضد نيوكاسل يونايتد"
+        "ريال سوسيداد ضد إسبانيول"
       ]
     },
     "BH": {
       "country": "البحرين",
-      "date": "2026-08-29",
+      "date": "2026-08-30",
       "titles": [
+        "google",
+        "الطقس",
+        "inter miami vs montréal",
         "إشبيلية ضد أتلتيكو مدريد",
+        "جريدة البلاد",
         "sevilla vs atlético madrid",
+        "work permit",
         "spurs vs newcastle",
         "zimbabwe vs south africa",
-        "ليفربول ضد نوتينغهام فورست",
-        "liverpool vs nottm forest",
-        "الولايات المتحدة",
-        "خبر",
-        "السودان"
+        "ليفربول ضد نوتينغهام فورست"
       ]
     },
     "OM": {
       "country": "عُمان",
-      "date": "2026-08-29",
+      "date": "2026-08-30",
       "titles": [
+        "طالب",
+        "oman vs singapore",
+        "إنتر ميامي ضد نادي مونتريال لكرة القدم",
+        "inter miami vs montréal",
+        "قانون العمل",
         "juventus vs parma",
         "argentina vs australia",
-        "sevilla vs atlético madrid",
         "إشبيلية ضد أتلتيكو مدريد",
-        "العين ضد النصر",
-        "الفتح ضد الاتحاد",
-        "real sociedad vs espanyol",
-        "levante vs betis",
-        "ريال سوسيداد ضد إسبانيول",
-        "توتنهام ضد نيوكاسل يونايتد"
+        "sevilla vs atlético madrid",
+        "الاهلي السعودي"
       ]
     }
   }
