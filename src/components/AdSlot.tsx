@@ -15,12 +15,6 @@ interface AdSlotProps {
  */
 const VALID_SLOT = /^\d{8,}$/;
 const PLACEHOLDER_SLOT = '0000000000';
-const CONFIGURED_SLOTS = new Set(
-  (import.meta.env.VITE_ADSENSE_SLOTS || '')
-    .split(',')
-    .map((value: string) => value.trim())
-    .filter(Boolean),
-);
 
 export default function AdSlot({
   slot = PLACEHOLDER_SLOT,
@@ -29,14 +23,7 @@ export default function AdSlot({
   label = 'إعلان',
 }: AdSlotProps) {
   const insRef = useRef<HTMLModElement>(null);
-  // الرقم الرقمي وحده لا يثبت أن الوحدة موجودة؛ كانت الصفحات تمرر أرقامًا
-  // تجريبية مثل 1111111111. لا نطلب إعلانًا إلا عند تفعيل النشر وإدراج المعرّف
-  // صراحة في VITE_ADSENSE_SLOTS (قائمة مفصولة بفواصل).
-  const enabled =
-    import.meta.env.VITE_ADSENSE_ENABLED === 'true' &&
-    slot !== PLACEHOLDER_SLOT &&
-    VALID_SLOT.test(slot) &&
-    CONFIGURED_SLOTS.has(slot);
+  const enabled = slot !== PLACEHOLDER_SLOT && VALID_SLOT.test(slot);
 
   useEffect(() => {
     if (!enabled) return;
