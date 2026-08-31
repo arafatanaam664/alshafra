@@ -1,15 +1,11 @@
 import { Calendar, Mail, Github, Shield } from 'lucide-react';
 import Link from './Link';
-import { LANGS } from '../lib/i18n';
 
 const LINKS = [
   { to: '/', label: 'الرئيسية' },
   { to: '/countdown', label: 'كم باقي على…' },
   { to: '/today', label: 'التاريخ اليوم' },
   { to: '/salaries', label: 'مواعيد الرواتب' },
-  { to: '/gold-price', label: 'أسعار الذهب في الدول العربية' },
-  { to: '/usd-rate', label: 'أسعار الدولار في الدول العربية' },
-  { to: '/trending', label: 'المواضيع الرائجة' },
   { to: '/hijri-calendar', label: 'التقويم الهجري' },
   { to: '/school-calendar', label: 'التقويم الدراسي' },
   { to: '/holidays', label: 'الإجازات الرسمية' },
@@ -83,23 +79,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-6">
-          <h3 className="font-display text-sm font-bold text-white">🌍 لغات الموقع</h3>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {LANGS.map((l) => (
-              <li key={l.code}>
-                <a
-                  href={l.code === 'ar' ? '/' : `/${l.code}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 text-xs text-brand-100/80 transition-colors hover:border-white/40 hover:text-white"
-                >
-                  <span>{l.flag}</span>
-                  <span>{l.native}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-brand-200/70 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-brand-200/70 sm:flex-row">
           <p>© {new Date().getFullYear()} تقويم السعودية — جميع الحقوق محفوظة.</p>
           <p>صُمّم بشغف لخدمة المواطن والمقيم في المملكة العربية السعودية.</p>
         </div>
