@@ -378,7 +378,7 @@ export default function HomePage() {
 
       {/* Articles + FAQ */}
       <section className="container-page mt-14">
-        <AdSlot slot="1111111111" />
+        <AdSlot slot="home" />
         <div className="flex items-end justify-between">
           <div>
             <h2 className="section-title">مقالات ودلائل</h2>

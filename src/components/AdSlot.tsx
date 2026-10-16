@@ -1,40 +1,39 @@
 import { useEffect, useRef } from 'react';
+import { ADSENSE_CLIENT, AD_SLOTS, type AdSlotKey } from '../lib/ads';
 
 interface AdSlotProps {
-  slot?: string;
+  /** Which configured ad unit to render. */
+  slot: AdSlotKey;
   format?: 'auto' | 'fluid' | 'rectangle';
   className?: string;
   label?: string;
 }
 
-/**
- * Real ad unit ids, once they exist in your AdSense account.
- * An <ins> with a placeholder slot ("0000000000") never fills, and repeatedly
- * requesting an unknown slot is a policy/quality risk during AdSense review —
- * so we render nothing at all until a real id is configured here.
- */
+/** Real AdSense ad unit ids are long digit strings. */
 const VALID_SLOT = /^\d{8,}$/;
-const PLACEHOLDER_SLOT = '0000000000';
 
 export default function AdSlot({
-  slot = PLACEHOLDER_SLOT,
+  slot,
   format = 'auto',
   className = '',
   label = 'إعلان',
 }: AdSlotProps) {
   const insRef = useRef<HTMLModElement>(null);
-  const enabled = slot !== PLACEHOLDER_SLOT && VALID_SLOT.test(slot);
+  const slotId = AD_SLOTS[slot];
+  const enabled = VALID_SLOT.test(slotId);
 
   useEffect(() => {
     if (!enabled) return;
     try {
-      // @ts-expect-error adsbygoogle is injected by external script
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      window.adsbygoogle = window.adsbygoogle || [];
+      window.adsbygoogle.push({});
     } catch {
       // AdSense not loaded yet — silent fail
     }
   }, [enabled]);
 
+  // No configured ad unit means no <ins> element at all: requesting a slot
+  // that does not exist never fills and only wastes impressions.
   if (!enabled) return null;
 
   return (
@@ -45,8 +44,8 @@ export default function AdSlot({
           ref={insRef}
           className="adsbygoogle"
           style={{ display: 'block', minHeight: 100 }}
-          data-ad-client="ca-pub-9822552442964714"
-          data-ad-slot={slot}
+          data-ad-client={ADSENSE_CLIENT}
+          data-ad-slot={slotId}
           data-ad-format={format}
           data-full-width-responsive="true"
         />

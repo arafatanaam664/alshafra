@@ -168,7 +168,7 @@ export default function TodayPage() {
         </p>
       </section>
 
-      <AdSlot />
+      <AdSlot slot="today" />
 
       <section className="mt-8">
         <div className="flex items-center justify-between gap-3">

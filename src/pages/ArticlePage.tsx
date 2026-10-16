@@ -97,7 +97,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
             <section key={i}>
               <h2 className="font-display text-xl font-bold text-brand-900">{s.heading}</h2>
               <p className="mt-2 whitespace-pre-line text-[15px] leading-loose text-brand-800/90">{s.body}</p>
-              {i === 1 && <AdSlot slot="2222222222" className="my-6" />}
+              {i === 1 && <AdSlot slot="article" className="my-6" />}
             </section>
           ))}
         </div>
