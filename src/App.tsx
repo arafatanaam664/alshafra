@@ -1,5 +1,6 @@
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
 import { useRoute, parseRoute } from './lib/router';
+import { trackPageView } from './lib/analytics';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -40,6 +41,19 @@ function PageLoader() {
 export default function App() {
   const [path] = useRoute();
   const { name, param } = useMemo(() => parseRoute(path), [path]);
+  const trackedPath = useRef<string | null>(null);
+
+  useEffect(() => {
+    // The landing page view is already reported by gtag('config') in
+    // index.html — only navigations inside the app need to be reported.
+    if (trackedPath.current === null) {
+      trackedPath.current = path;
+      return;
+    }
+    if (trackedPath.current === path) return;
+    trackedPath.current = path;
+    trackPageView(path);
+  }, [path]);
 
   return (
     <div className="flex min-h-screen flex-col">

@@ -128,7 +128,7 @@ export function CountdownHubPage() {
         ))}
       </section>
 
-      <AdSlot />
+      <AdSlot slot="countdown" />
 
       <section className="mt-10 card p-6 sm:p-8">
         <h2 className="font-display text-lg font-bold text-brand-900">كيف تُحسب هذه العدّادات؟</h2>
@@ -322,7 +322,7 @@ function CountdownDetailView({
         </div>
       </section>
 
-      <AdSlot />
+      <AdSlot slot="countdown" />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         <section className="card p-6 lg:col-span-2">
