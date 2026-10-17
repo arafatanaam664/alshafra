@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ChevronRight, ChevronLeft, Download } from 'lucide-react';
 import { useSeo } from '../lib/seo';
+import SmartlinkCard from '../components/SmartlinkCard';
 import {
   HIJRI_MONTHS,
   ARABIC_WEEKDAYS,
@@ -202,6 +203,7 @@ export default function HijriCalendarPage() {
           </p>
         </div>
       </section>
+      <SmartlinkCard variant="inline" className="mt-10" />
     </div>
   );
 }

@@ -24,9 +24,9 @@ export function PrivacyPage() {
   useSeo({
     title: 'سياسة الخصوصية | تقويم السعودية',
     description:
-      'سياسة الخصوصية لموقع تقويم السعودية (alshafra.com) — كيفية جمع البيانات واستخدامها وحمايتها، بما في ذلك ملفات تعريف الارتباط وإعلانات Google AdSense.',
+      'سياسة الخصوصية لموقع تقويم السعودية (alshafra.com) — كيفية جمع البيانات واستخدامها وحمايتها، بما في ذلك ملفات تعريف الارتباط وإعلانات Google AdSense وشبكة Adsterra.',
     canonical: 'https://alshafra.com/privacy',
-    keywords: 'سياسة الخصوصية, الخصوصية, الكوكيز, AdSense, حماية البيانات',
+    keywords: 'سياسة الخصوصية, الخصوصية, الكوكيز, AdSense, Adsterra, حماية البيانات',
   });
   return (
     <LegalLayout title="سياسة الخصوصية">
@@ -60,31 +60,46 @@ export function PrivacyPage() {
         للإعلانات عبر <a href="https://policies.google.com/technologies/ads" className="text-brand-700 underline" target="_blank" rel="noopener noreferrer">هذه الصفحة</a>.
       </p>
 
-      <h2 className="font-display text-lg font-bold text-brand-900">4. خدمات التحليلات</h2>
+      <h2 className="font-display text-lg font-bold text-brand-900">4. إعلانات شبكة Adsterra</h2>
+      <p>
+        نستخدم إلى جانب Google AdSense شبكة <strong>Adsterra</strong> لعرض أنواع أخرى من الإعلانات
+        (شريط إعلاني اجتماعي، بانر أصلي داخل المحتوى، وروابط إعلانية مدعومة). تستخدم Adsterra ملفات
+        تعريف ارتباط ومعرّفات غير شخصية لقياس مرات الظهور والنقرات واختيار الإعلان الأنسب. يمكنك
+        الاطلاع على سياسة الخصوصية الخاصة بها عبر{' '}
+        <a href="https://adsterra.com/privacy-policy/" className="text-brand-700 underline" target="_blank" rel="noopener noreferrer">
+          هذه الصفحة
+        </a>.
+      </p>
+      <p>
+        كل إعلانات Adsterra على الموقع موسومة بكلمة «إعلان» أو «إعلان مدعوم» وتُفتح روابطها في نافذة
+        جديدة، وذلك لتمييزها بوضوح عن المحتوى التحريري.
+      </p>
+
+      <h2 className="font-display text-lg font-bold text-brand-900">5. خدمات التحليلات</h2>
       <p>
         قد نستخدم Google Analytics لفهم كيفية استخدام الزوار للموقع وتحسين محتواه. تجمع هذه الخدمة
         بيانات مجهولة الهوية ولا تكشف هويتك الشخصية.
       </p>
 
-      <h2 className="font-display text-lg font-bold text-brand-900">5. الروابط الخارجية</h2>
+      <h2 className="font-display text-lg font-bold text-brand-900">6. الروابط الخارجية</h2>
       <p>
         يحتوي موقعنا على روابط لمواقع خارجية (مثل البوابة الرسمية لحساب المواطن ووزارة التعليم).
         لسنا مسؤولين عن سياسات الخصوصية لتلك المواقع، وننصحك بقراءتها.
       </p>
 
-      <h2 className="font-display text-lg font-bold text-brand-900">6. أمن البيانات</h2>
+      <h2 className="font-display text-lg font-bold text-brand-900">7. أمن البيانات</h2>
       <p>
         نتخذ إجراءات معقولة لحماية البيانات من الوصول غير المصرّح به. ومع ذلك، لا يمكن ضمان أمن أي
         نقل عبر الإنترنت بنسبة 100%.
       </p>
 
-      <h2 className="font-display text-lg font-bold text-brand-900">7. حقوق المستخدم</h2>
+      <h2 className="font-display text-lg font-bold text-brand-900">8. حقوق المستخدم</h2>
       <p>
         يمكنك طلب الاطلاع على أي بيانات جمعناها عنك أو طلب حذفها عبر التواصل معنا على
         info@alshafra.com.
       </p>
 
-      <h2 className="font-display text-lg font-bold text-brand-900">8. تحديثات السياسة</h2>
+      <h2 className="font-display text-lg font-bold text-brand-900">9. تحديثات السياسة</h2>
       <p>
         قد نُحدّث سياسة الخصوصية من وقت لآخر. سيتم نشر أي تغييرات على هذه الصفحة مع تحديث التاريخ.
       </p>

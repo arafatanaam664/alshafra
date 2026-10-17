@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Flag, Calendar, Star } from 'lucide-react';
 import { useSeo } from '../lib/seo';
+import SmartlinkCard from '../components/SmartlinkCard';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
 import {
@@ -194,6 +195,8 @@ export default function HolidaysPage() {
           </p>
         </div>
       </section>
+
+      <SmartlinkCard variant="inline" className="mt-10" />
     </div>
   );
 }

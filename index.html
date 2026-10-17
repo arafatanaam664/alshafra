@@ -14,6 +14,11 @@
     <meta name="googlebot" content="index, follow" />
     <meta name="google-adsense-account" content="ca-pub-9822552442964714" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9822552442964714" crossorigin="anonymous"></script>
+    <!-- Adsterra — warm up the ad hosts so the banner and social bar start loading sooner -->
+    <link rel="preconnect" href="https://bauval.org" crossorigin />
+    <link rel="dns-prefetch" href="https://bauval.org" />
+    <link rel="preconnect" href="https://araplhn.org" crossorigin />
+    <link rel="dns-prefetch" href="https://araplhn.org" />
     <!-- Google tag (gtag.js) — GA4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TFRMD827FR"></script>
     <script>
@@ -72,5 +77,8 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Adsterra — Social Bar. Must stay immediately before the closing body tag (as issued).
+         `async` keeps the parser from waiting on the ad host; the unit still self-initialises. -->
+    <script async data-cfasync="false" src="https://bauval.org/14/961ffd111bc36294a203779592c29a58"></script>
   </body>
 </html>

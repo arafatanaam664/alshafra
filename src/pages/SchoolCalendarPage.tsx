@@ -1,5 +1,6 @@
 import { BookOpen, GraduationCap, CalendarCheck } from 'lucide-react';
 import { useSeo } from '../lib/seo';
+import SmartlinkCard from '../components/SmartlinkCard';
 import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
 import { eventsByCategory, daysUntilEvent, rawDaysUntilEvent,
   eventHijriText,
@@ -146,6 +147,8 @@ export default function SchoolCalendarPage() {
           </div>
         </div>
       </section>
+
+      <SmartlinkCard variant="inline" className="mt-10" />
     </div>
   );
 }

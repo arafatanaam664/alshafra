@@ -3,6 +3,8 @@ import { useSeo } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { articleBySlug, ARTICLES, CATEGORY_LABELS_ARTICLE, type Article } from '../lib/articles';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
+import SmartlinkCard from '../components/SmartlinkCard';
 
 export default function ArticlePage({ slug }: { slug: string }) {
   const article = articleBySlug(slug);
@@ -97,7 +99,12 @@ export default function ArticlePage({ slug }: { slug: string }) {
             <section key={i}>
               <h2 className="font-display text-xl font-bold text-brand-900">{s.heading}</h2>
               <p className="mt-2 whitespace-pre-line text-[15px] leading-loose text-brand-800/90">{s.body}</p>
-              {i === 1 && <AdSlot slot="article" className="my-6" />}
+              {i === 1 && (
+                <>
+                  <AdsterraBanner className="my-6" />
+                  <AdSlot slot="article" className="my-6" />
+                </>
+              )}
             </section>
           ))}
         </div>
@@ -115,6 +122,11 @@ export default function ArticlePage({ slug }: { slug: string }) {
             </div>
           </section>
         )}
+        <SmartlinkCard
+          className="mt-10"
+          title="هل تبحث عن عرض مناسب؟"
+          description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة ولا علاقة له بمحتوى المقال."
+        />
       </article>
 
       {related.length > 0 && (
@@ -167,6 +179,8 @@ export function ArticlesListPage() {
           الرسمية وتحويل التاريخ في المملكة العربية السعودية.
         </p>
       </header>
+
+      <AdsterraBanner className="my-8" />
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {ARTICLES.map((a) => (

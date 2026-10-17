@@ -4,6 +4,8 @@ import { useSeo, SITE_URL } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
 import Link from '../components/Link';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
+import SmartlinkCard from '../components/SmartlinkCard';
 import { useNow } from '../lib/useNow';
 import {
   todayGregorian,
@@ -169,6 +171,7 @@ export default function TodayPage() {
       </section>
 
       <AdSlot slot="today" />
+      <AdsterraBanner />
 
       <section className="mt-8">
         <div className="flex items-center justify-between gap-3">
@@ -223,6 +226,8 @@ export default function TodayPage() {
           </p>
         </div>
       </section>
+
+      <SmartlinkCard variant="inline" className="mt-8" />
     </div>
   );
 }
