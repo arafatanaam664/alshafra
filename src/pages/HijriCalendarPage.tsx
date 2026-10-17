@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ChevronRight, ChevronLeft, Download } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import AdsterraBanner from '../components/AdsterraBanner';
+import AdsterraDisplay from '../components/AdsterraDisplay';
 import SmartlinkCard from '../components/SmartlinkCard';
 import {
   HIJRI_MONTHS,
@@ -174,6 +175,10 @@ export default function HijriCalendarPage() {
                 })}
               </ul>
             )}
+          </div>
+
+          <div className="card flex justify-center p-4">
+            <AdsterraDisplay size="160x300" className="!my-0" />
           </div>
 
           <div className="card p-5">

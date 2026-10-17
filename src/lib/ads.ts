@@ -55,7 +55,23 @@ export const ADSTERRA = {
     scriptUrl: 'https://bauval.org/21/d5e873c07dd501e3cbc9f8f206d70c5e',
     containerId: 'container-d5e873c07dd501e3cbc9f8f206d70c5e',
   },
+  /**
+   * Classic `atOptions` + invoke.js display units. That snippet writes its
+   * <iframe> with document.write(), which would erase the document if it ran
+   * in the SPA, and `atOptions` is a single global so two units on one page
+   * would overwrite each other. <AdsterraDisplay /> therefore runs each unit
+   * inside its own same-origin iframe (srcdoc): own global scope, own
+   * document, one request per mount.
+   */
+  displayBanners: {
+    '160x300': { key: '2ebd57b62be1dcddaa8c73aa233b4b1f', width: 160, height: 300 },
+    '468x60': { key: 'bfe137bd902cdaebd4965eb32c53c811', width: 468, height: 60 },
+    '320x50': { key: '6d1301b116a81232f396b653e707475d', width: 320, height: 50 },
+    '300x250': { key: 'eed6aec13c50bebf5887b4ecfb47da7f', width: 300, height: 250 },
+  },
 } as const;
+
+export type AdsterraDisplaySize = keyof typeof ADSTERRA.displayBanners;
 
 declare global {
   interface Window {

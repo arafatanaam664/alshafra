@@ -4,6 +4,7 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import { articleBySlug, ARTICLES, CATEGORY_LABELS_ARTICLE, type Article } from '../lib/articles';
 import AdSlot from '../components/AdSlot';
 import AdsterraBanner from '../components/AdsterraBanner';
+import AdsterraDisplay from '../components/AdsterraDisplay';
 import SmartlinkCard from '../components/SmartlinkCard';
 
 export default function ArticlePage({ slug }: { slug: string }) {
@@ -122,6 +123,8 @@ export default function ArticlePage({ slug }: { slug: string }) {
             </div>
           </section>
         )}
+        <AdsterraDisplay size="300x250" className="mt-10" />
+
         <SmartlinkCard
           className="mt-10"
           title="هل تبحث عن عرض مناسب؟"
@@ -209,6 +212,8 @@ export function ArticlesListPage() {
           </a>
         ))}
       </div>
+
+      <AdsterraDisplay size="300x250" className="mt-10" />
     </div>
   );
 }

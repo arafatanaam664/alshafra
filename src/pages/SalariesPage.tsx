@@ -18,6 +18,7 @@ import {
 } from '../lib/events';
 import Countdown from '../components/Countdown';
 import AdsterraBanner from '../components/AdsterraBanner';
+import AdsterraDisplay from '../components/AdsterraDisplay';
 import SmartlinkCard from '../components/SmartlinkCard';
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -94,6 +95,8 @@ export default function SalariesPage() {
           })}
         </div>
       </section>
+
+      <AdsterraDisplay size="300x250" className="mt-10" />
 
       {/* Full schedule */}
       <section className="mt-10">
