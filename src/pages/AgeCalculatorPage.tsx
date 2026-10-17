@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Cake, CalendarDays, Sparkles } from 'lucide-react';
 import { useSeo } from '../lib/seo';
+import AdsterraBanner from '../components/AdsterraBanner';
 import {
   gregorianToHijri,
   formatGregorian,
@@ -185,6 +186,8 @@ export default function AgeCalculatorPage() {
           </div>
         </div>
       </div>
+
+      <AdsterraBanner className="mt-10" />
 
       <section className="mt-10 card p-6 sm:p-8">
         <h2 className="font-display text-lg font-bold text-brand-900">عن حاسبة العمر</h2>

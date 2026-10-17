@@ -34,7 +34,18 @@ const ContactPage = lazy(() => import('./pages/LegalPages').then((m) => ({ defau
 // Pages that render their own in-content Adsterra unit (see each page). Every
 // other route gets the site-wide unit below, so each page view makes exactly
 // one native ad request — never two competing for the same container id.
-const PAGES_WITH_OWN_BANNER = new Set(['home', 'salaries', 'today', 'countdown', 'articles']);
+const PAGES_WITH_OWN_BANNER = new Set([
+  'home',
+  'salaries',
+  'today',
+  'countdown',
+  'articles',
+  'hijri-calendar',
+  'school-calendar',
+  'holidays',
+  'date-converter',
+  'age-calculator',
+]);
 
 function PageLoader() {
   return (

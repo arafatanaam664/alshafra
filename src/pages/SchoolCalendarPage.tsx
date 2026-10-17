@@ -1,5 +1,6 @@
 import { BookOpen, GraduationCap, CalendarCheck } from 'lucide-react';
 import { useSeo } from '../lib/seo';
+import AdsterraBanner from '../components/AdsterraBanner';
 import SmartlinkCard from '../components/SmartlinkCard';
 import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
 import { eventsByCategory, daysUntilEvent, rawDaysUntilEvent,
@@ -130,6 +131,8 @@ export default function SchoolCalendarPage() {
           })}
         </div>
       </section>
+
+      <AdsterraBanner className="mt-10" />
 
       <section className="mt-10 card p-6 sm:p-8">
         <div className="flex items-start gap-3">

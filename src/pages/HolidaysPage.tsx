@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Flag, Calendar, Star } from 'lucide-react';
 import { useSeo } from '../lib/seo';
+import AdsterraBanner from '../components/AdsterraBanner';
 import SmartlinkCard from '../components/SmartlinkCard';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
@@ -180,6 +181,8 @@ export default function HolidaysPage() {
           );
         })}
       </section>
+
+      <AdsterraBanner className="mt-10" />
 
       <section className="mt-10 card p-6 sm:p-8">
         <h2 className="font-display text-lg font-bold text-brand-900">عن الإجازات الرسمية في السعودية</h2>
