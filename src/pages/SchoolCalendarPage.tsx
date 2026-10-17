@@ -1,5 +1,8 @@
 import { BookOpen, GraduationCap, CalendarCheck } from 'lucide-react';
 import { useSeo } from '../lib/seo';
+import AdsterraBanner from '../components/AdsterraBanner';
+import { AdsterraResponsiveDisplay } from '../components/AdsterraDisplay';
+import SmartlinkCard from '../components/SmartlinkCard';
 import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
 import { eventsByCategory, daysUntilEvent, rawDaysUntilEvent,
   eventHijriText,
@@ -130,6 +133,8 @@ export default function SchoolCalendarPage() {
         </div>
       </section>
 
+      <AdsterraResponsiveDisplay className="mt-10" />
+
       <section className="mt-10 card p-6 sm:p-8">
         <div className="flex items-start gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
@@ -146,6 +151,9 @@ export default function SchoolCalendarPage() {
           </div>
         </div>
       </section>
+
+      <AdsterraBanner className="mt-10" />
+      <SmartlinkCard variant="inline" className="mt-10" />
     </div>
   );
 }

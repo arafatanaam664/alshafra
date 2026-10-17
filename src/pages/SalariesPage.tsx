@@ -17,6 +17,9 @@ import {
   type SalarySchedule,
 } from '../lib/events';
 import Countdown from '../components/Countdown';
+import AdsterraBanner from '../components/AdsterraBanner';
+import AdsterraDisplay from '../components/AdsterraDisplay';
+import SmartlinkCard from '../components/SmartlinkCard';
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Briefcase,
@@ -58,6 +61,8 @@ export default function SalariesPage() {
         </p>
       </header>
 
+      <AdsterraBanner className="mt-8" />
+
       {/* Next-up highlight */}
       <section className="mt-8">
         <h2 className="font-display text-lg font-bold text-brand-900">أقرب موعد صرف</h2>
@@ -90,6 +95,8 @@ export default function SalariesPage() {
           })}
         </div>
       </section>
+
+      <AdsterraDisplay size="300x250" className="mt-10" />
 
       {/* Full schedule */}
       <section className="mt-10">
@@ -160,6 +167,12 @@ export default function SalariesPage() {
           </div>
         </div>
       </section>
+
+      <SmartlinkCard
+        className="mt-10"
+        title="عرض من شريكنا"
+        description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة."
+      />
     </div>
   );
 }

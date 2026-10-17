@@ -5,6 +5,8 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import Countdown from '../components/Countdown';
 import Link from '../components/Link';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
+import SmartlinkCard from '../components/SmartlinkCard';
 import type { GregorianDate } from '../lib/hijri';
 import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
 import {
@@ -129,6 +131,7 @@ export function CountdownHubPage() {
       </section>
 
       <AdSlot slot="countdown" />
+      <AdsterraBanner />
 
       <section className="mt-10 card p-6 sm:p-8">
         <h2 className="font-display text-lg font-bold text-brand-900">كيف تُحسب هذه العدّادات؟</h2>
@@ -323,6 +326,7 @@ function CountdownDetailView({
       </section>
 
       <AdSlot slot="countdown" />
+      <AdsterraBanner />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         <section className="card p-6 lg:col-span-2">
@@ -403,6 +407,8 @@ function CountdownDetailView({
           </div>
         </section>
       )}
+
+      <SmartlinkCard variant="inline" className="mt-8" />
 
       <div className="mt-8">
         <Link to="/countdown" className="btn btn-ghost">

@@ -1,5 +1,6 @@
 import { Calendar, Mail, Github, Shield } from 'lucide-react';
 import Link from './Link';
+import { SmartlinkFooterLink } from './SmartlinkCard';
 
 const LINKS = [
   { to: '/', label: 'الرئيسية' },
@@ -75,6 +76,7 @@ export default function Footer() {
               <li><Link to="/contact" className="hover:text-white">اتصل بنا</Link></li>
               <li><Link to="/privacy" className="hover:text-white">سياسة الخصوصية</Link></li>
               <li><Link to="/terms" className="hover:text-white">شروط الاستخدام</Link></li>
+              <li><SmartlinkFooterLink /></li>
             </ul>
           </div>
         </div>

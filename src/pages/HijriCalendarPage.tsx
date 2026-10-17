@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react';
 import { ChevronRight, ChevronLeft, Download } from 'lucide-react';
 import { useSeo } from '../lib/seo';
+import AdsterraBanner from '../components/AdsterraBanner';
+import AdsterraDisplay from '../components/AdsterraDisplay';
+import SmartlinkCard from '../components/SmartlinkCard';
 import {
   HIJRI_MONTHS,
   ARABIC_WEEKDAYS,
@@ -174,6 +177,10 @@ export default function HijriCalendarPage() {
             )}
           </div>
 
+          <div className="card flex justify-center p-4">
+            <AdsterraDisplay size="160x300" className="!my-0" />
+          </div>
+
           <div className="card p-5">
             <h2 className="font-display text-base font-bold text-brand-900">تحميل التقويم</h2>
             <p className="mt-2 text-xs text-brand-700/70">
@@ -186,6 +193,8 @@ export default function HijriCalendarPage() {
           </div>
         </div>
       </div>
+
+      <AdsterraBanner className="mt-10" />
 
       <section className="mt-10 card p-6 sm:p-8">
         <h2 className="font-display text-lg font-bold text-brand-900">عن التقويم الهجري وأم القرى</h2>
@@ -202,6 +211,7 @@ export default function HijriCalendarPage() {
           </p>
         </div>
       </section>
+      <SmartlinkCard variant="inline" className="mt-10" />
     </div>
   );
 }

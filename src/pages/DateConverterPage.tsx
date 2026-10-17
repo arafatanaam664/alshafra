@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ArrowLeftRight, Calendar, CalendarDays, Copy, Check } from 'lucide-react';
 import { useSeo } from '../lib/seo';
+import AdsterraBanner from '../components/AdsterraBanner';
 import {
   gregorianToHijri,
   hijriToGregorian,
@@ -149,6 +150,8 @@ export default function DateConverterPage() {
           </div>
         </div>
       </div>
+
+      <AdsterraBanner className="mt-10" />
 
       {/* SEO content */}
       <section className="mt-10 card p-6 sm:p-8">

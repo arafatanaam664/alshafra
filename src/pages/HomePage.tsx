@@ -45,6 +45,9 @@ import { ARTICLES, CATEGORY_LABELS_ARTICLE } from '../lib/articles';
 import Countdown from '../components/Countdown';
 import Link from '../components/Link';
 import AdSlot from '../components/AdSlot';
+import AdsterraBanner from '../components/AdsterraBanner';
+import { AdsterraResponsiveDisplay } from '../components/AdsterraDisplay';
+import SmartlinkCard from '../components/SmartlinkCard';
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Briefcase,
@@ -169,6 +172,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Adsterra native banner — prime spot right under the hero/stats bar */}
+      <div className="container-page mt-10">
+        <AdsterraBanner />
+      </div>
+
       {/* Next event countdown */}
       <section className="container-page mt-12">
         <div className="grid gap-6 lg:grid-cols-3">
@@ -224,6 +232,11 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Adsterra 468x60 / 320x50 — mid-page bar */}
+      <div className="container-page mt-10">
+        <AdsterraResponsiveDisplay />
+      </div>
 
       {/* Services grid */}
       <section className="container-page mt-14">
@@ -352,6 +365,11 @@ export default function HomePage() {
           })}
         </div>
       </section>
+
+      {/* Adsterra smartlink — high-intent partner offer */}
+      <div className="container-page mt-6">
+        <SmartlinkCard variant="inline" />
+      </div>
 
       {/* Download CTA */}
       <section className="container-page mt-14">

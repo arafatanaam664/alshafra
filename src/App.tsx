@@ -3,6 +3,7 @@ import { useRoute, parseRoute } from './lib/router';
 import { trackPageView } from './lib/analytics';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import AdsterraBanner from './components/AdsterraBanner';
 import HomePage from './pages/HomePage';
 
 const DateConverterPage = lazy(() => import('./pages/DateConverterPage'));
@@ -29,6 +30,22 @@ const PrivacyPage = lazy(() => import('./pages/LegalPages').then((m) => ({ defau
 const TermsPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.TermsPage })));
 const AboutPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.ContactPage })));
+
+// Pages that render their own in-content Adsterra unit (see each page). Every
+// other route gets the site-wide unit below, so each page view makes exactly
+// one native ad request — never two competing for the same container id.
+const PAGES_WITH_OWN_BANNER = new Set([
+  'home',
+  'salaries',
+  'today',
+  'countdown',
+  'articles',
+  'hijri-calendar',
+  'school-calendar',
+  'holidays',
+  'date-converter',
+  'age-calculator',
+]);
 
 function PageLoader() {
   return (
@@ -81,6 +98,11 @@ export default function App() {
           {name === 'home' && <HomePage />}
         </Suspense>
       </main>
+      {!PAGES_WITH_OWN_BANNER.has(name) && (
+        <div className="container-page">
+          <AdsterraBanner />
+        </div>
+      )}
       <Footer />
     </div>
   );
