@@ -4,7 +4,7 @@ import { useSeo, SITE_URL } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
 import Link from '../components/Link';
 import AdSlot from '../components/AdSlot';
-import AdsterraBanner from '../components/AdsterraBanner';
+import AdPlacement from '../components/AdPlacement';
 import SmartlinkCard from '../components/SmartlinkCard';
 import { useNow } from '../lib/useNow';
 import {
@@ -171,7 +171,7 @@ export default function TodayPage() {
       </section>
 
       <AdSlot slot="today" />
-      <AdsterraBanner />
+      <AdPlacement name="content" unit="native" />
 
       <section className="mt-8">
         <div className="flex items-center justify-between gap-3">

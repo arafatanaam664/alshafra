@@ -3,7 +3,8 @@ import { useRoute, parseRoute } from './lib/router';
 import { trackPageView } from './lib/analytics';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import AdsterraBanner from './components/AdsterraBanner';
+import AdPlacement from './components/AdPlacement';
+import { adDensityForRoute, PAGES_WITH_OWN_NATIVE } from './lib/ads';
 import HomePage from './pages/HomePage';
 
 const DateConverterPage = lazy(() => import('./pages/DateConverterPage'));
@@ -31,22 +32,6 @@ const TermsPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default
 const AboutPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.ContactPage })));
 
-// Pages that render their own in-content Adsterra unit (see each page). Every
-// other route gets the site-wide unit below, so each page view makes exactly
-// one native ad request — never two competing for the same container id.
-const PAGES_WITH_OWN_BANNER = new Set([
-  'home',
-  'salaries',
-  'today',
-  'countdown',
-  'articles',
-  'hijri-calendar',
-  'school-calendar',
-  'holidays',
-  'date-converter',
-  'age-calculator',
-]);
-
 function PageLoader() {
   return (
     <div className="container-page flex items-center justify-center py-20">
@@ -59,6 +44,8 @@ export default function App() {
   const [path] = useRoute();
   const { name, param } = useMemo(() => parseRoute(path), [path]);
   const trackedPath = useRef<string | null>(null);
+  const density = adDensityForRoute(name);
+  const hasOwnNative = PAGES_WITH_OWN_NATIVE.has(name);
 
   useEffect(() => {
     // The landing page view is already reported by gtag('config') in
@@ -75,6 +62,7 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
+      <AdPlacement name="header" />
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
           {name === 'salaries' && <SalariesPage />}
@@ -98,11 +86,12 @@ export default function App() {
           {name === 'home' && <HomePage />}
         </Suspense>
       </main>
-      {!PAGES_WITH_OWN_BANNER.has(name) && (
+      {!hasOwnNative && density !== 'minimal' && (
         <div className="container-page">
-          <AdsterraBanner />
+          <AdPlacement name="content" unit="native" />
         </div>
       )}
+      <AdPlacement name="footer" />
       <Footer />
     </div>
   );

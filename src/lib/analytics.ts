@@ -109,3 +109,23 @@ export function trackPageView(path: string): void {
     }
   }, AUTO_DETECT_WINDOW_MS);
 }
+
+export type AdMetricEvent = 'ad_request' | 'ad_detected' | 'ad_slot_view';
+
+/**
+ * First-party estimates for ad slots. `ad_request` is our decision to load a
+ * unit; `ad_detected` means the isolated frame produced some markup (not a
+ * paid impression); `ad_slot_view` means the slot crossed 50% visibility.
+ * These are not Adsterra dashboard numbers.
+ */
+export function trackAdMetric(
+  event: AdMetricEvent,
+  params: { placement: string; unit: string; size?: string }
+): void {
+  if (typeof window.gtag !== 'function') return;
+  window.gtag('event', event, {
+    ad_placement: params.placement,
+    ad_unit: params.unit,
+    ad_size: params.size ?? '',
+  });
+}

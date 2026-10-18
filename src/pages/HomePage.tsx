@@ -45,8 +45,7 @@ import { ARTICLES, CATEGORY_LABELS_ARTICLE } from '../lib/articles';
 import Countdown from '../components/Countdown';
 import Link from '../components/Link';
 import AdSlot from '../components/AdSlot';
-import AdsterraBanner from '../components/AdsterraBanner';
-import { AdsterraResponsiveDisplay } from '../components/AdsterraDisplay';
+import AdPlacement from '../components/AdPlacement';
 import SmartlinkCard from '../components/SmartlinkCard';
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -172,9 +171,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Adsterra native banner — prime spot right under the hero/stats bar */}
       <div className="container-page mt-10">
-        <AdsterraBanner />
+        <AdPlacement name="content" unit="native" lazy={false} />
       </div>
 
       {/* Next event countdown */}
@@ -232,11 +230,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Adsterra 468x60 / 320x50 — mid-page bar */}
-      <div className="container-page mt-10">
-        <AdsterraResponsiveDisplay />
-      </div>
 
       {/* Services grid */}
       <section className="container-page mt-14">
@@ -321,6 +314,7 @@ export default function HomePage() {
             <SalaryMiniCard key={s.schedule.id} instance={s} to="/salaries" />
           ))}
         </div>
+        <AdPlacement name="content" unit="rectangle" />
       </section>
 
       {/* Upcoming events */}
