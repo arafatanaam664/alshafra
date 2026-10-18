@@ -1,114 +1,190 @@
-import { useEffect, useRef, useState } from 'react';
-import { ADSTERRA, type AdsterraDisplaySize } from '../lib/ads';
+import { memo, useEffect, useRef, useState } from 'react';
+import {
+  ADSTERRA,
+  adsterraInvokeUrl,
+  claimDisplayKey,
+  ownerOfDisplayKey,
+  releaseDisplayKey,
+  subscribeAdInventory,
+  type AdPlacementName,
+  type AdsterraDisplaySize,
+} from '../lib/ads';
+import { trackAdMetric } from '../lib/analytics';
 
 /**
- * Adsterra fixed-size display banner (160x300, 468x60, 320x50, 300x250).
+ * Adsterra fixed-size display banner.
  *
- * These units ship as `atOptions = {...}` + invoke.js. Two properties of that
- * snippet make it impossible to paste straight into a React app:
+ * The issued snippet is `atOptions = {...}` + invoke.js. Two properties of
+ * that snippet make it impossible to paste into the SPA document:
  *   1. `atOptions` is a single global — two units on one page overwrite it;
  *   2. invoke.js writes its <iframe> with document.write(), and a write after
  *      the document has finished parsing replaces the whole page.
- * Running each unit inside its own same-origin `srcdoc` iframe solves both:
- * the unit gets a private window/document, a fresh request per mount, and a
- * document.write() can only ever affect that frame.
+ * Each unit therefore runs inside its own srcdoc iframe: private globals, a
+ * fresh request per mount, and document.write() can only affect that frame.
+ *
+ * srcdoc is same-origin with the parent. That is why atOptions isolation
+ * works; it is not a security sandbox. We do not add a sandbox attribute:
+ * allow-same-origin plus allow-scripts would still be same-origin, and a
+ * unique-origin sandbox often blocks the nested ad iframe from filling.
  */
-const SCRIPT_HOST = 'https://bauval.org/22/';
+const FAIL_MS = 12000;
+const SCRIPT_END = '<' + '/script>';
 
-const FRAME_DOC = (options: string, src: string) => `<!doctype html><html dir="rtl"><head>
+const FRAME_DOC = (options: string, src: string) =>
+  `<!doctype html><html dir="rtl"><head>
 <meta charset="utf-8">
-<style>html,body{margin:0;padding:0;background:transparent;overflow:hidden}iframe{border:0;display:block;margin:0 auto}img{max-width:100%}</style>
+<style>html,body{margin:0;padding:0;background:transparent;overflow:hidden}iframe{border:0;display:block;margin:0 auto}</style>
 </head><body>
-<script>atOptions = ${options};\x3c/script>
-<script src="${src}">\x3c/script>
+<script>atOptions = ${options};${SCRIPT_END}
+<script src="${src}">${SCRIPT_END}
 </body></html>`;
 
 interface AdsterraDisplayProps {
   size: AdsterraDisplaySize;
+  placement: AdPlacementName;
   className?: string;
-  /** Visible caption — ads must stay distinguishable from editorial content. */
   label?: string;
+  /** Above-the-fold slots skip IntersectionObserver. */
+  lazy?: boolean;
 }
 
-export default function AdsterraDisplay({
+function AdsterraDisplay({
   size,
+  placement,
   className = '',
   label = 'إعلان',
+  lazy = true,
 }: AdsterraDisplayProps) {
   const { key, width, height } = ADSTERRA.displayBanners[size];
+  const hostRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
-  const [filled, setFilled] = useState(false);
-
-  const options = JSON.stringify({ key, format: 'iframe', height, width, params: {} });
-  const srcDoc = FRAME_DOC(options, SCRIPT_HOST + key);
+  const loadedRef = useRef(false);
+  const viewedRef = useRef(false);
+  const [inView, setInView] = useState(!lazy);
+  const [status, setStatus] = useState<'pending' | 'live' | 'blocked'>('pending');
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    setFilled(false);
-    let attempts = 0;
-    const hasAd = () => {
-      const doc = frameRef.current?.contentDocument;
-      return Boolean(doc?.body?.querySelector('iframe, ins, img, a'));
+    if (!lazy) {
+      setInView(true);
+      return;
+    }
+    const host = hostRef.current;
+    if (!host) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '200px 0px', threshold: 0 }
+    );
+    io.observe(host);
+    return () => io.disconnect();
+  }, [lazy, size]);
+
+  useEffect(() => {
+    if (!inView) return;
+    const ok = claimDisplayKey(key, placement);
+    setStatus(ok ? 'live' : 'blocked');
+    if (!ok) return;
+    trackAdMetric('ad_request', { placement, unit: 'display', size });
+    return () => releaseDisplayKey(key, placement);
+  }, [inView, key, placement, size]);
+
+  useEffect(() => {
+    if (!inView || status !== 'live') return;
+    return subscribeAdInventory(() => {
+      if (ownerOfDisplayKey(key) !== placement) setStatus('blocked');
+    });
+  }, [inView, status, key, placement]);
+
+  useEffect(() => {
+    loadedRef.current = false;
+    if (!inView || status !== 'live') return;
+    const iframe = frameRef.current;
+    if (!iframe) return;
+
+    iframe.srcdoc = FRAME_DOC(
+      JSON.stringify({ key, format: 'iframe', height, width, params: {} }),
+      adsterraInvokeUrl(key)
+    );
+
+    const hasCreative = () => {
+      const doc = iframe.contentDocument;
+      if (!doc?.body) return false;
+      return Boolean(doc.body.querySelector('iframe, ins, img, a'));
     };
+
+    let attempts = 0;
     const timer = window.setInterval(() => {
       attempts += 1;
-      if (hasAd()) {
-        setFilled(true);
+      if (hasCreative()) {
+        if (!loadedRef.current) {
+          loadedRef.current = true;
+          trackAdMetric('ad_detected', { placement, unit: 'display', size });
+        }
         window.clearInterval(timer);
-      } else if (attempts >= 60) {
+      } else if (attempts >= FAIL_MS / 500) {
         window.clearInterval(timer);
+        if (!loadedRef.current) setFailed(true);
       }
     }, 500);
-    return () => window.clearInterval(timer);
-  }, [size]);
 
-  return (
-    <div className={filled ? `my-6 ${className}` : 'h-0 overflow-hidden'}>
-      {filled && (
-        <div className="mb-1 text-center text-[10px] uppercase tracking-wider text-brand-500/60">
-          {label}
-        </div>
-      )}
-      <div className="flex w-full justify-center overflow-hidden">
-        <iframe
-          ref={frameRef}
-          title={label}
-          srcDoc={srcDoc}
-          width={width}
-          height={height}
-          scrolling="no"
-          className="border-0"
-          style={{ maxWidth: '100%' }}
-        />
-      </div>
-    </div>
-  );
-}
-
-/**
- * Picks the 320x50 unit on phones and the 468x60 unit from 640px up, so a
- * fixed-size banner never overflows a narrow viewport. Only one of the two is
- * ever mounted, which keeps it to a single ad request per slot.
- */
-export function AdsterraResponsiveDisplay({
-  className = '',
-  label = 'إعلان',
-}: {
-  className?: string;
-  label?: string;
-}) {
-  const query = '(max-width: 639px)';
-  const [narrow, setNarrow] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia(query).matches
-  );
+    return () => {
+      window.clearInterval(timer);
+      loadedRef.current = false;
+      iframe.removeAttribute('srcdoc');
+    };
+  }, [inView, status, key, width, height, placement, size]);
 
   useEffect(() => {
-    const mq = window.matchMedia(query);
-    const onChange = () => setNarrow(mq.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
+    if (!inView || status !== 'live' || failed) return;
+    const host = hostRef.current;
+    if (!host) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !viewedRef.current) {
+          viewedRef.current = true;
+          trackAdMetric('ad_slot_view', { placement, unit: 'display', size });
+          io.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    io.observe(host);
+    return () => io.disconnect();
+  }, [inView, status, failed, placement, size]);
+
+  if (failed || status === 'blocked') return null;
 
   return (
-    <AdsterraDisplay size={narrow ? '320x50' : '468x60'} className={className} label={label} />
+    <aside className={`my-6 ${className}`} aria-label={label} ref={hostRef}>
+      <div className="mb-1 text-center text-[10px] uppercase tracking-wider text-brand-500/60">
+        {label}
+      </div>
+      <div className="flex w-full justify-center">
+        <div
+          className="bg-sand-50/80"
+          style={{ width, height }}
+        >
+          {inView && status === 'live' && (
+            <iframe
+              ref={frameRef}
+              title={label}
+              width={width}
+              height={height}
+              scrolling="no"
+              referrerPolicy="origin"
+              className="block border-0"
+              style={{ width, height }}
+            />
+          )}
+        </div>
+      </div>
+    </aside>
   );
 }
+
+export default memo(AdsterraDisplay);

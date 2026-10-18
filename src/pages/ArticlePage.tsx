@@ -3,8 +3,7 @@ import { useSeo } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { articleBySlug, ARTICLES, CATEGORY_LABELS_ARTICLE, type Article } from '../lib/articles';
 import AdSlot from '../components/AdSlot';
-import AdsterraBanner from '../components/AdsterraBanner';
-import AdsterraDisplay from '../components/AdsterraDisplay';
+import AdPlacement from '../components/AdPlacement';
 import SmartlinkCard from '../components/SmartlinkCard';
 
 export default function ArticlePage({ slug }: { slug: string }) {
@@ -76,7 +75,8 @@ export default function ArticlePage({ slug }: { slug: string }) {
           { name: article.title },
         ]}
       />
-      <article className="mt-4 max-w-3xl">
+      <div className="mt-4 grid items-start gap-8 lg:grid-cols-[minmax(0,48rem)_160px] lg:justify-center">
+      <article className="min-w-0">
         <div className="flex items-center gap-2">
           <span className="chip bg-brand-50 text-brand-700 ring-1 ring-brand-200">
             {CATEGORY_LABELS_ARTICLE[article.category]}
@@ -102,7 +102,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
               <p className="mt-2 whitespace-pre-line text-[15px] leading-loose text-brand-800/90">{s.body}</p>
               {i === 1 && (
                 <>
-                  <AdsterraBanner className="my-6" />
+                  <AdPlacement name="content" unit="native" className="my-6" />
                   <AdSlot slot="article" className="my-6" />
                 </>
               )}
@@ -123,7 +123,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
             </div>
           </section>
         )}
-        <AdsterraDisplay size="300x250" className="mt-10" />
+        <AdPlacement name="content" unit="rectangle" className="mt-10" />
 
         <SmartlinkCard
           className="mt-10"
@@ -131,6 +131,12 @@ export default function ArticlePage({ slug }: { slug: string }) {
           description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة ولا علاقة له بمحتوى المقال."
         />
       </article>
+      <aside className="hidden lg:block">
+        <div className="sticky top-24">
+          <AdPlacement name="sidebar" />
+        </div>
+      </aside>
+      </div>
 
       {related.length > 0 && (
         <section className="mt-12">
@@ -183,7 +189,7 @@ export function ArticlesListPage() {
         </p>
       </header>
 
-      <AdsterraBanner className="my-8" />
+      <AdPlacement name="content" unit="native" className="my-8" />
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {ARTICLES.map((a) => (
@@ -213,7 +219,7 @@ export function ArticlesListPage() {
         ))}
       </div>
 
-      <AdsterraDisplay size="300x250" className="mt-10" />
+      <AdPlacement name="content" unit="rectangle" className="mt-10" />
     </div>
   );
 }

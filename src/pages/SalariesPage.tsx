@@ -17,8 +17,7 @@ import {
   type SalarySchedule,
 } from '../lib/events';
 import Countdown from '../components/Countdown';
-import AdsterraBanner from '../components/AdsterraBanner';
-import AdsterraDisplay from '../components/AdsterraDisplay';
+import AdPlacement from '../components/AdPlacement';
 import SmartlinkCard from '../components/SmartlinkCard';
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -61,7 +60,7 @@ export default function SalariesPage() {
         </p>
       </header>
 
-      <AdsterraBanner className="mt-8" />
+      <AdPlacement name="content" unit="native" className="mt-8" />
 
       {/* Next-up highlight */}
       <section className="mt-8">
@@ -96,7 +95,7 @@ export default function SalariesPage() {
         </div>
       </section>
 
-      <AdsterraDisplay size="300x250" className="mt-10" />
+      <AdPlacement name="content" unit="rectangle" className="mt-10" />
 
       {/* Full schedule */}
       <section className="mt-10">
@@ -152,6 +151,12 @@ export default function SalariesPage() {
         </div>
       </section>
 
+      <SmartlinkCard
+        className="mt-10"
+        title="عرض من شريكنا"
+        description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة."
+      />
+
       <section className="mt-10 card p-6 sm:p-8">
         <div className="flex items-start gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold-50 text-gold-700">
@@ -167,12 +172,6 @@ export default function SalariesPage() {
           </div>
         </div>
       </section>
-
-      <SmartlinkCard
-        className="mt-10"
-        title="عرض من شريكنا"
-        description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة."
-      />
     </div>
   );
 }
