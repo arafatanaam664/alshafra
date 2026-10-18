@@ -57,13 +57,15 @@ export default function SchoolCalendarPage() {
 
   return (
     <div className="container-page py-10">
-      <header className="max-w-2xl">
-        <h1 className="section-title">التقويم الدراسي 1448-1449هـ</h1>
-        <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-          التقويم الدراسي الرسمي وفق وزارة التعليم السعودية وتقويم أم القرى — مواعيد بداية الدراسة
-          وإجازات المدارس لجميع مراحل التعليم العام في المملكة العربية السعودية.
-        </p>
-      </header>
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+        <div className="min-w-0">
+          <header className="max-w-2xl">
+            <h1 className="section-title">التقويم الدراسي 1448-1449هـ</h1>
+            <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
+              التقويم الدراسي الرسمي وفق وزارة التعليم السعودية وتقويم أم القرى — مواعيد بداية الدراسة
+              وإجازات المدارس لجميع مراحل التعليم العام في المملكة العربية السعودية.
+            </p>
+          </header>
 
       {next && (
         <section className="mt-8 card overflow-hidden">
@@ -133,25 +135,33 @@ export default function SchoolCalendarPage() {
       </section>
 
       <AdPlacement name="content" unit="native" className="mt-10" />
+          <AdPlacement name="content" unit="rectangle" className="mt-8" />
 
-      <section className="mt-10 card p-6 sm:p-8">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
-            <GraduationCap className="h-5 w-5" />
-          </span>
-          <div>
-            <h2 className="font-display text-lg font-bold text-brand-900">عن التقويم الدراسي</h2>
-            <p className="mt-2 text-sm leading-relaxed text-brand-700/85">
-              يُحدد التقويم الدراسي في المملكة العربية السعودية من قبل وزارة التعليم لجميع مراحل
-              التعليم العام (الابتدائي، المتوسط، الثانوي) في جميع المناطق الإدارية. يتضمن التقويم
-              مواعيد بداية ونهاية كل فصل دراسي، وإجازات منتصف الفصل، والإجازات الرسمية الدينية
-              والوطنية. التقويم المعروض هنا تقريبي ولأغراض معلوماتية.
-            </p>
-          </div>
+          <section className="mt-10 card p-6 sm:p-8">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
+                <GraduationCap className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="font-display text-lg font-bold text-brand-900">عن التقويم الدراسي</h2>
+                <p className="mt-2 text-sm leading-relaxed text-brand-700/85">
+                  يُحدد التقويم الدراسي في المملكة العربية السعودية من قبل وزارة التعليم لجميع مراحل
+                  التعليم العام (الابتدائي، المتوسط، الثانوي) في جميع المناطق الإدارية. يتضمن التقويم
+                  مواعيد بداية ونهاية كل فصل دراسي، وإجازات منتصف الفصل، والإجازات الرسمية الدينية
+                  والوطنية. التقويم المعروض هنا تقريبي ولأغراض معلوماتية.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <SmartlinkCard variant="inline" className="mt-10" />
         </div>
-      </section>
-
-      <SmartlinkCard variant="inline" className="mt-10" />
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <AdPlacement name="sidebar" />
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

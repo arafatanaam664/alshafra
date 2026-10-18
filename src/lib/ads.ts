@@ -88,6 +88,10 @@ export const PAGES_WITH_OWN_NATIVE = new Set([
   'holidays',
   'date-converter',
   'age-calculator',
+  'faq',
+  'about',
+  'contact',
+  'name-decoration',
 ]);
 
 export function adDensityForRoute(name: string): AdDensity {
@@ -104,11 +108,10 @@ export function adDensityForRoute(name: string): AdDensity {
     case 'date-converter':
     case 'age-calculator':
     case 'name-decoration':
-      return 'standard';
     case 'faq':
     case 'about':
     case 'contact':
-      return 'light';
+      return 'standard';
     case 'privacy':
     case 'terms':
       return 'minimal';
@@ -134,9 +137,8 @@ export function pickLeaderboardSize(containerWidth: number): AdsterraDisplaySize
 }
 
 export function pickSidebarSize(density: AdDensity): AdsterraDisplaySize | null {
-  if (density === 'high') return '160x600';
-  if (density === 'standard') return '160x300';
-  return null;
+  if (density === 'minimal') return null;
+  return '160x600';
 }
 
 /* -------------------------------------------------------------------------- */

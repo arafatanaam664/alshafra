@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ArrowLeftRight, Calendar, CalendarDays, Copy, Check } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import AdPlacement from '../components/AdPlacement';
+import SmartlinkCard from '../components/SmartlinkCard';
 import {
   gregorianToHijri,
   hijriToGregorian,
@@ -84,91 +85,108 @@ export default function DateConverterPage() {
 
   return (
     <div className="container-page py-10">
-      <header className="max-w-2xl">
-        <h1 className="section-title">تحويل التاريخ بين الهجري والميلادي</h1>
-        <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-          أداة دقيقة لتحويل التاريخ بين التقويم الهجري والميلادي وفق تقويم أم القرى الرسمي المعتمد في
-          المملكة العربية السعودية. اختر التاريخ ثم اضغط زر التبديل لعكس الاتجاه.
-        </p>
-      </header>
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+        <div className="min-w-0">
+          <header className="max-w-2xl">
+            <h1 className="section-title">تحويل التاريخ بين الهجري والميلادي</h1>
+            <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
+              أداة دقيقة لتحويل التاريخ بين التقويم الهجري والميلادي وفق تقويم أم القرى الرسمي المعتمد في
+              المملكة العربية السعودية. اختر التاريخ ثم اضغط زر التبديل لعكس الاتجاه.
+            </p>
+          </header>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        {/* Input */}
-        <div className="card p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold text-brand-900">
-              {mode === 'g2h' ? 'التاريخ الميلادي' : 'التاريخ الهجري'}
-            </h2>
-            <button
-              onClick={swap}
-              className="btn-ghost"
-              title="تبديل الاتجاه"
-            >
-              <ArrowLeftRight className="h-4 w-4" />
-              تبديل
-            </button>
-          </div>
+          <AdPlacement name="content" unit="native" className="mt-8" />
 
-          {mode === 'g2h' ? (
-            <GregorianPicker value={g} onChange={setG} />
-          ) : (
-            <HijriPicker value={h} onChange={setH} />
-          )}
-        </div>
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            {/* Input */}
+            <div className="card p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="font-display text-lg font-bold text-brand-900">
+                  {mode === 'g2h' ? 'التاريخ الميلادي' : 'التاريخ الهجري'}
+                </h2>
+                <button
+                  onClick={swap}
+                  className="btn-ghost"
+                  title="تبديل الاتجاه"
+                >
+                  <ArrowLeftRight className="h-4 w-4" />
+                  تبديل
+                </button>
+              </div>
 
-        {/* Result */}
-        <div className="card overflow-hidden">
-          <div className="border-b border-brand-900/5 bg-gradient-to-l from-brand-50 to-transparent px-6 py-4">
-            <h2 className="font-display text-lg font-bold text-brand-900">النتيجة</h2>
-          </div>
-          <div className="p-6">
-            <div className="flex items-start gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl gradient-brand text-white">
-                {mode === 'g2h' ? <CalendarDays className="h-6 w-6" /> : <Calendar className="h-6 w-6" />}
-              </span>
-              <div className="flex-1">
-                <div className="text-xs text-brand-600/70">الناتج المحوّل</div>
-                <div className="font-display text-2xl font-bold text-brand-900">{result.primary}</div>
-                <div className="mt-1 text-sm text-brand-700/70">{result.secondary}</div>
+              {mode === 'g2h' ? (
+                <GregorianPicker value={g} onChange={setG} />
+              ) : (
+                <HijriPicker value={h} onChange={setH} />
+              )}
+            </div>
+
+            {/* Result */}
+            <div className="card overflow-hidden">
+              <div className="border-b border-brand-900/5 bg-gradient-to-l from-brand-50 to-transparent px-6 py-4">
+                <h2 className="font-display text-lg font-bold text-brand-900">النتيجة</h2>
+              </div>
+              <div className="p-6">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-xl gradient-brand text-white">
+                    {mode === 'g2h' ? <CalendarDays className="h-6 w-6" /> : <Calendar className="h-6 w-6" />}
+                  </span>
+                  <div className="flex-1">
+                    <div className="text-xs text-brand-600/70">الناتج المحوّل</div>
+                    <div className="font-display text-2xl font-bold text-brand-900">{result.primary}</div>
+                    <div className="mt-1 text-sm text-brand-700/70">{result.secondary}</div>
+                  </div>
+                </div>
+
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  <InfoTile label="اليوم" value={result.weekday} />
+                  <InfoTile label="الهجري (رقمي)" value={result.hijriShort} />
+                  <InfoTile label="الميلادي (رقمي)" value={result.gregorianShort} />
+                  <InfoTile
+                    label="الفرق عن اليوم"
+                    value={diffLabel(result.greg)}
+                  />
+                </div>
+
+                <button onClick={copyResult} className="btn-primary mt-5 w-full">
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  {copied ? 'تم النسخ' : 'نسخ النتيجة'}
+                </button>
               </div>
             </div>
-
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <InfoTile label="اليوم" value={result.weekday} />
-              <InfoTile label="الهجري (رقمي)" value={result.hijriShort} />
-              <InfoTile label="الميلادي (رقمي)" value={result.gregorianShort} />
-              <InfoTile
-                label="الفرق عن اليوم"
-                value={diffLabel(result.greg)}
-              />
-            </div>
-
-            <button onClick={copyResult} className="btn-primary mt-5 w-full">
-              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copied ? 'تم النسخ' : 'نسخ النتيجة'}
-            </button>
           </div>
+
+          <AdPlacement name="content" unit="rectangle" className="mt-10" />
+
+          <SmartlinkCard
+            className="mt-8"
+            title="عرض من شريكنا"
+            description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة ولا علاقة له بأداة تحويل التاريخ."
+          />
+
+          {/* SEO content */}
+          <section className="mt-10 card p-6 sm:p-8">
+            <h2 className="font-display text-lg font-bold text-brand-900">كيف تعمل أداة تحويل التاريخ؟</h2>
+            <div className="mt-3 space-y-3 text-sm leading-relaxed text-brand-700/85">
+              <p>
+                تعتمد الأداة على تقويم أم القرى الرسمي المعتمد في المملكة العربية السعودية كمرجع للتحويل
+                بين التاريخ الهجري والميلادي. يقوم المحرك بحساب رقم اليوم اليولياني ثم تحويله إلى
+                التقويم المقابل باستخدام القاعدة الحسابية التقريبية لتقويم أم القرى.
+              </p>
+              <p>
+                التحويل دقيق لمعظم التواريخ العملية، مع احتمال اختلاف يوم واحد قرب بدايات الأشهر
+                الهجرية لأن رؤية الهلال تعتمد على الرصد الفعلي. للمسائل القانونية والرسمية يُنصح
+                بالرجوع للتقويم الرسمي الصادر عن المملكة.
+              </p>
+            </div>
+          </section>
         </div>
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <AdPlacement name="sidebar" />
+          </div>
+        </aside>
       </div>
-
-      <AdPlacement name="content" unit="native" className="mt-10" />
-
-      {/* SEO content */}
-      <section className="mt-10 card p-6 sm:p-8">
-        <h2 className="font-display text-lg font-bold text-brand-900">كيف تعمل أداة تحويل التاريخ؟</h2>
-        <div className="mt-3 space-y-3 text-sm leading-relaxed text-brand-700/85">
-          <p>
-            تعتمد الأداة على تقويم أم القرى الرسمي المعتمد في المملكة العربية السعودية كمرجع للتحويل
-            بين التاريخ الهجري والميلادي. يقوم المحرك بحساب رقم اليوم اليولياني ثم تحويله إلى
-            التقويم المقابل باستخدام القاعدة الحسابية التقريبية لتقويم أم القرى.
-          </p>
-          <p>
-            التحويل دقيق لمعظم التواريخ العملية، مع احتمال اختلاف يوم واحد قرب بدايات الأشهر
-            الهجرية لأن رؤية الهلال تعتمد على الرصد الفعلي. للمسائل القانونية والرسمية يُنصح
-            بالرجوع للتقويم الرسمي الصادر عن المملكة.
-          </p>
-        </div>
-      </section>
     </div>
   );
 }

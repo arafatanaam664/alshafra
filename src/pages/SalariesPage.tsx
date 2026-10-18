@@ -52,15 +52,17 @@ export default function SalariesPage() {
 
   return (
     <div className="container-page py-10">
-      <header className="max-w-2xl">
-        <h1 className="section-title">مواعيد صرف الرواتب والدعم</h1>
-        <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-          مواعيد صرف رواتب الموظفين الحكوميين، حساب المواطن، رواتب المتقاعدين، الضمان الاجتماعي
-          المطوّر، والدعم السكني في المملكة العربية السعودية، مع عدّ تنازلي مباشر لكل موعد.
-        </p>
-      </header>
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+        <div className="min-w-0">
+          <header className="max-w-2xl">
+            <h1 className="section-title">مواعيد صرف الرواتب والدعم</h1>
+            <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
+              مواعيد صرف رواتب الموظفين الحكوميين، حساب المواطن، رواتب المتقاعدين، الضمان الاجتماعي
+              المطوّر، والدعم السكني في المملكة العربية السعودية، مع عدّ تنازلي مباشر لكل موعد.
+            </p>
+          </header>
 
-      <AdPlacement name="content" unit="native" className="mt-8" />
+          <AdPlacement name="content" unit="native" className="mt-8" />
 
       {/* Next-up highlight */}
       <section className="mt-8">
@@ -172,6 +174,13 @@ export default function SalariesPage() {
           </div>
         </div>
       </section>
+        </div>
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <AdPlacement name="sidebar" />
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

@@ -68,14 +68,16 @@ export function CountdownHubPage() {
 
   return (
     <div className="container-page py-10">
-      <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'كم باقي على…' }]} />
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+        <div className="min-w-0">
+          <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'كم باقي على…' }]} />
 
-      <header className="mt-4 max-w-2xl">
-        <h1 className="section-title">كم باقي على…؟ عدّادات تنازلية سعودية</h1>
-        <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-          {COUNTDOWNS_INTRO}
-        </p>
-      </header>
+          <header className="mt-4 max-w-2xl">
+            <h1 className="section-title">كم باقي على…؟ عدّادات تنازلية سعودية</h1>
+            <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
+              {COUNTDOWNS_INTRO}
+            </p>
+          </header>
 
       {nearest && (
         <section className="mt-8 card overflow-hidden">
@@ -131,24 +133,37 @@ export function CountdownHubPage() {
       </section>
 
       <AdSlot slot="countdown" />
-      <AdPlacement name="content" unit="native" />
+          <AdPlacement name="content" unit="native" />
+          <AdPlacement name="content" unit="rectangle" className="mt-8" />
+          <SmartlinkCard
+            className="mt-8"
+            title="عرض من شريكنا"
+            description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة."
+          />
 
-      <section className="mt-10 card p-6 sm:p-8">
-        <h2 className="font-display text-lg font-bold text-brand-900">كيف تُحسب هذه العدّادات؟</h2>
-        <div className="mt-3 space-y-3 text-sm leading-relaxed text-brand-700/85">
-          <p>
-            كل عدّاد يعتمد على قاعدة زمنية واضحة بدل التواريخ المكتوبة يدوياً: المناسبات الدينية
-            تُشتق من تاريخها الهجري عبر تقويم أم القرى الرسمي (مثلاً عيد الأضحى = 10 ذو الحجة)،
-            والمناسبات الوطنية من تاريخها الميلادي الثابت، ومواعيد الرواتب والدعم من يوم الصرف
-            الشهري بعد تطبيق قاعدة نهاية الأسبوع، والمواعيد الدراسية من التقويم المعتمد لوزارة
-            التعليم.
-          </p>
-          <p>
-            جميع الأيام تُحسب بتوقيت الرياض (UTC+3) حتى يرى الزائر داخل المملكة وخارجها الرقم
-            نفسه. التواريخ الدينية تبقى مرتبطة بإعلان رؤية الهلال وقد تتغير بيوم واحد.
-          </p>
+          <section className="mt-10 card p-6 sm:p-8">
+            <h2 className="font-display text-lg font-bold text-brand-900">كيف تُحسب هذه العدّادات؟</h2>
+            <div className="mt-3 space-y-3 text-sm leading-relaxed text-brand-700/85">
+              <p>
+                كل عدّاد يعتمد على قاعدة زمنية واضحة بدل التواريخ المكتوبة يدوياً: المناسبات الدينية
+                تُشتق من تاريخها الهجري عبر تقويم أم القرى الرسمي (مثلاً عيد الأضحى = 10 ذو الحجة)،
+                والمناسبات الوطنية من تاريخها الميلادي الثابت، ومواعيد الرواتب والدعم من يوم الصرف
+                الشهري بعد تطبيق قاعدة نهاية الأسبوع، والمواعيد الدراسية من التقويم المعتمد لوزارة
+                التعليم.
+              </p>
+              <p>
+                جميع الأيام تُحسب بتوقيت الرياض (UTC+3) حتى يرى الزائر داخل المملكة وخارجها الرقم
+                نفسه. التواريخ الدينية تبقى مرتبطة بإعلان رؤية الهلال وقد تتغير بيوم واحد.
+              </p>
+            </div>
+          </section>
         </div>
-      </section>
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <AdPlacement name="sidebar" />
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

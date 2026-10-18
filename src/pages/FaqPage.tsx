@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { ChevronDown, HelpCircle, Mail } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
+import AdPlacement from '../components/AdPlacement';
+import SmartlinkCard from '../components/SmartlinkCard';
 
 interface QA {
   q: string;
@@ -112,63 +114,82 @@ export default function FaqPage() {
   return (
     <div className="container-page py-10">
       <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'الأسئلة الشائعة' }]} />
-      <header className="mt-4 max-w-2xl">
-        <h1 className="section-title">الأسئلة الشائعة</h1>
-        <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-          إجابات على أكثر الأسئلة شيوعاً عن مواعيد الرواتب وحساب المواطن والمتقاعدين والتقويم
-          الهجري والميلادي والإجازات الرسمية وتحويل التاريخ في المملكة العربية السعودية.
-        </p>
-      </header>
+      <div className="mt-4 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+        <div className="min-w-0">
+          <header className="max-w-2xl">
+            <h1 className="section-title">الأسئلة الشائعة</h1>
+            <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
+              إجابات على أكثر الأسئلة شيوعاً عن مواعيد الرواتب وحساب المواطن والمتقاعدين والتقويم
+              الهجري والميلادي والإجازات الرسمية وتحويل التاريخ في المملكة العربية السعودية.
+            </p>
+          </header>
 
-      <div className="mt-8 space-y-8">
-        {FAQ_GROUPS.map((group, gi) => (
-          <section key={gi}>
-            <h2 className="font-display text-lg font-bold text-brand-900">{group.title}</h2>
-            <div className="mt-3 space-y-2">
-              {group.items.map((item, ii) => {
-                const id = `${gi}-${ii}`;
-                const isOpen = open === id;
-                return (
-                  <div key={id} className="card overflow-hidden">
-                    <button
-                      onClick={() => setOpen(isOpen ? null : id)}
-                      className="flex w-full items-center justify-between gap-3 p-4 text-right"
-                      aria-expanded={isOpen}
-                    >
-                      <span className="flex items-center gap-2 text-sm font-semibold text-brand-900">
-                        <HelpCircle className="h-4 w-4 text-brand-600" />
-                        {item.q}
-                      </span>
-                      <ChevronDown
-                        className={`h-4 w-4 shrink-0 text-brand-600 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                      />
-                    </button>
-                    {isOpen && (
-                      <div className="border-t border-brand-900/5 px-4 py-3 text-sm leading-relaxed text-brand-700/85">
-                        {item.a}
+          <AdPlacement name="content" unit="native" className="mt-8" />
+
+          <div className="mt-8 space-y-8">
+            {FAQ_GROUPS.map((group, gi) => (
+              <section key={gi}>
+                <h2 className="font-display text-lg font-bold text-brand-900">{group.title}</h2>
+                <div className="mt-3 space-y-2">
+                  {group.items.map((item, ii) => {
+                    const id = `${gi}-${ii}`;
+                    const isOpen = open === id;
+                    return (
+                      <div key={id} className="card overflow-hidden">
+                        <button
+                          onClick={() => setOpen(isOpen ? null : id)}
+                          className="flex w-full items-center justify-between gap-3 p-4 text-right"
+                          aria-expanded={isOpen}
+                        >
+                          <span className="flex items-center gap-2 text-sm font-semibold text-brand-900">
+                            <HelpCircle className="h-4 w-4 text-brand-600" />
+                            {item.q}
+                          </span>
+                          <ChevronDown
+                            className={`h-4 w-4 shrink-0 text-brand-600 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                          />
+                        </button>
+                        {isOpen && (
+                          <div className="border-t border-brand-900/5 px-4 py-3 text-sm leading-relaxed text-brand-700/85">
+                            {item.a}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                    );
+                  })}
+                </div>
+                {gi === 0 && <AdPlacement name="content" unit="rectangle" className="mt-6" />}
+                {gi === 1 && (
+                  <SmartlinkCard
+                    className="mt-6"
+                    title="عرض من شريكنا"
+                    description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة ولا علاقة له بمحتوى الأسئلة."
+                  />
+                )}
+              </section>
+            ))}
+          </div>
+
+          <section className="mt-10 card p-6 sm:p-8">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+                <Mail className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="font-display text-lg font-bold text-brand-900">لديك سؤال آخر؟</h2>
+                <p className="mt-2 text-sm text-brand-700/85">
+                  راسلنا على info@alshafra.com وسنحاول الإجابة على سؤالك في التحديثات القادمة.
+                </p>
+              </div>
             </div>
           </section>
-        ))}
-      </div>
-
-      <section className="mt-10 card p-6 sm:p-8">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
-            <Mail className="h-5 w-5" />
-          </span>
-          <div>
-            <h2 className="font-display text-lg font-bold text-brand-900">لديك سؤال آخر؟</h2>
-            <p className="mt-2 text-sm text-brand-700/85">
-              راسلنا على info@alshafra.com وسنحاول الإجابة على سؤالك في التحديثات القادمة.
-            </p>
-          </div>
         </div>
-      </section>
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <AdPlacement name="sidebar" />
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
