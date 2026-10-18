@@ -180,46 +180,56 @@ export function ArticlesListPage() {
 
   return (
     <div className="container-page py-10">
-      <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'المقالات' }]} />
-      <header className="mt-4 max-w-2xl">
-        <h1 className="section-title">مقالات ودلائل</h1>
-        <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-          مقالات ودلائل شاملة عن مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي والإجازات
-          الرسمية وتحويل التاريخ في المملكة العربية السعودية.
-        </p>
-      </header>
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+        <div className="min-w-0">
+          <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'المقالات' }]} />
+          <header className="mt-4 max-w-2xl">
+            <h1 className="section-title">مقالات ودلائل</h1>
+            <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
+              مقالات ودلائل شاملة عن مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي والإجازات
+              الرسمية وتحويل التاريخ في المملكة العربية السعودية.
+            </p>
+          </header>
 
-      <AdPlacement name="content" unit="native" className="my-8" />
+          <AdPlacement name="content" unit="native" className="my-8" />
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {ARTICLES.map((a) => (
-          <a
-            key={a.slug}
-            href={`/articles/${a.slug}`}
-            className="card group flex flex-col p-5 transition-all hover:-translate-y-0.5 hover:shadow-soft"
-          >
-            <div className="flex items-center justify-between">
-              <span className="chip bg-brand-50 text-brand-700 ring-1 ring-brand-200">
-                {CATEGORY_LABELS_ARTICLE[a.category]}
-              </span>
-              <span className="flex items-center gap-1 text-xs text-brand-600/70">
-                <Clock className="h-3.5 w-3.5" />
-                {a.readMinutes} د
-              </span>
-            </div>
-            <h3 className="mt-3 font-display text-base font-bold leading-snug text-brand-900 group-hover:text-brand-700">
-              {a.title}
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-brand-700/75 line-clamp-3">{a.description}</p>
-            <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-brand-600">
-              اقرأ المزيد
-              <ArrowLeft className="h-3.5 w-3.5" />
-            </span>
-          </a>
-        ))}
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {ARTICLES.map((a) => (
+              <a
+                key={a.slug}
+                href={`/articles/${a.slug}`}
+                className="card group flex flex-col p-5 transition-all hover:-translate-y-0.5 hover:shadow-soft"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="chip bg-brand-50 text-brand-700 ring-1 ring-brand-200">
+                    {CATEGORY_LABELS_ARTICLE[a.category]}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-brand-600/70">
+                    <Clock className="h-3.5 w-3.5" />
+                    {a.readMinutes} د
+                  </span>
+                </div>
+                <h3 className="mt-3 font-display text-base font-bold leading-snug text-brand-900 group-hover:text-brand-700">
+                  {a.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-brand-700/75 line-clamp-3">{a.description}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-brand-600">
+                  اقرأ المزيد
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                </span>
+              </a>
+            ))}
+          </div>
+
+          <AdPlacement name="content" unit="rectangle" className="mt-10" />
+          <SmartlinkCard className="mt-8" title="عرض من شريكنا" description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة." />
+        </div>
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <AdPlacement name="sidebar" />
+          </div>
+        </aside>
       </div>
-
-      <AdPlacement name="content" unit="rectangle" className="mt-10" />
     </div>
   );
 }

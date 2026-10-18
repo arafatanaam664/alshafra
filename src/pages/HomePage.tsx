@@ -172,7 +172,16 @@ export default function HomePage() {
       </section>
 
       <div className="container-page mt-10">
-        <AdPlacement name="content" unit="native" lazy={false} />
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+          <div className="min-w-0">
+            <AdPlacement name="content" unit="native" lazy={false} />
+          </div>
+          <aside className="hidden lg:block">
+            <div className="sticky top-24">
+              <AdPlacement name="sidebar" />
+            </div>
+          </aside>
+        </div>
       </div>
 
       {/* Next event countdown */}

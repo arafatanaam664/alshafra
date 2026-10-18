@@ -1,6 +1,8 @@
 import { Mail, MessageCircle, ShieldCheck, FileText, Info } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
+import AdPlacement from '../components/AdPlacement';
+import SmartlinkCard from '../components/SmartlinkCard';
 
 function LegalLayout({
   title,
@@ -16,6 +18,38 @@ function LegalLayout({
         <h1 className="section-title">{title}</h1>
         <div className="mt-6 space-y-5 text-sm leading-loose text-brand-800/90">{children}</div>
       </article>
+    </div>
+  );
+}
+
+function LegalWithAdsLayout({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="container-page py-10">
+      <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: title }]} />
+      <div className="mt-4 grid items-start gap-8 lg:grid-cols-[minmax(0,48rem)_160px] lg:justify-center">
+        <article className="min-w-0 max-w-3xl">
+          <h1 className="section-title">{title}</h1>
+          <AdPlacement name="content" unit="native" className="mt-6" />
+          <div className="mt-6 space-y-5 text-sm leading-loose text-brand-800/90">{children}</div>
+          <AdPlacement name="content" unit="rectangle" className="mt-8" />
+          <SmartlinkCard
+            className="mt-8"
+            title="عرض من شريكنا"
+            description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة ولا علاقة له بمحتوى هذه الصفحة."
+          />
+        </article>
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <AdPlacement name="sidebar" />
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
@@ -194,7 +228,7 @@ export function AboutPage() {
     keywords: 'عن تقويم السعودية, من نحن, رسالة الموقع',
   });
   return (
-    <LegalLayout title="عن الموقع">
+    <LegalWithAdsLayout title="عن الموقع">
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
           <Info className="h-5 w-5" />
@@ -236,7 +270,7 @@ export function AboutPage() {
       <p>
         لأي ملاحظة أو اقتراح، راسلنا على info@alshafra.com.
       </p>
-    </LegalLayout>
+    </LegalWithAdsLayout>
   );
 }
 
@@ -249,7 +283,7 @@ export function ContactPage() {
     keywords: 'اتصل بنا, تواصل, تقويم السعودية, الدعم',
   });
   return (
-    <LegalLayout title="اتصل بنا">
+    <LegalWithAdsLayout title="اتصل بنا">
       <p>
         يسعدنا تواصلك معنا لأي سبب: ملاحظة على المحتوى، اقتراح ميزة جديدة، أو تصحيح معلومة.
       </p>
@@ -294,6 +328,6 @@ export function ContactPage() {
           للإبلاغ عن محتوى مخالف أو طلب إزالة، استخدم نفس البريد مع وصف واضح للمحتوى والرابط.
         </p>
       </div>
-    </LegalLayout>
+    </LegalWithAdsLayout>
   );
 }

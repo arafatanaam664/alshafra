@@ -103,14 +103,15 @@ export default function TodayPage() {
   return (
     <div className="container-page py-10">
       <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'التاريخ اليوم' }]} />
-
-      <header className="mt-4 max-w-2xl">
-        <h1 className="section-title">التاريخ اليوم في السعودية</h1>
-        <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-          التاريخ الهجري والميلادي الآن بتوقيت الرياض وفق تقويم أم القرى الرسمي، مع الوقت الحالي
-          وتفاصيل الشهر الهجري وأقرب المواعيد القادمة.
-        </p>
-      </header>
+      <div className="mt-4 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+        <div className="min-w-0">
+          <header className="max-w-2xl">
+            <h1 className="section-title">التاريخ اليوم في السعودية</h1>
+            <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
+              التاريخ الهجري والميلادي الآن بتوقيت الرياض وفق تقويم أم القرى الرسمي، مع الوقت الحالي
+              وتفاصيل الشهر الهجري وأقرب المواعيد القادمة.
+            </p>
+          </header>
 
       <section className="mt-8 grid gap-4 sm:grid-cols-2">
         <div className="card overflow-hidden">
@@ -172,6 +173,7 @@ export default function TodayPage() {
 
       <AdSlot slot="today" />
       <AdPlacement name="content" unit="native" />
+      <AdPlacement name="content" unit="rectangle" className="mt-8" />
 
       <section className="mt-8">
         <div className="flex items-center justify-between gap-3">
@@ -228,6 +230,13 @@ export default function TodayPage() {
       </section>
 
       <SmartlinkCard variant="inline" className="mt-8" />
+        </div>
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <AdPlacement name="sidebar" />
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

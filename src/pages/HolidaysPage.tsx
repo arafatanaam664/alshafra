@@ -86,14 +86,16 @@ export default function HolidaysPage() {
 
   return (
     <div className="container-page py-10">
-      <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'الإجازات الرسمية' }]} />
-      <header className="mt-4 max-w-2xl">
-        <h1 className="section-title">الإجازات الرسمية في السعودية</h1>
-        <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-          قائمة كاملة بالإجازات الرسمية في المملكة العربية السعودية للعام 2026-2027م مع تواريخها
-          الهجرية والميلادية ومدة كل إجازة، تشمل الإجازات الدينية والوطنية والإجازات الدراسية.
-        </p>
-      </header>
+      <div className="mt-4 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+        <div className="min-w-0">
+          <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'الإجازات الرسمية' }]} />
+          <header className="mt-4 max-w-2xl">
+            <h1 className="section-title">الإجازات الرسمية في السعودية</h1>
+            <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
+              قائمة كاملة بالإجازات الرسمية في المملكة العربية السعودية للعام 2026-2027م مع تواريخها
+              الهجرية والميلادية ومدة كل إجازة، تشمل الإجازات الدينية والوطنية والإجازات الدراسية.
+            </p>
+          </header>
 
       {nextHoliday && (
         <section className="mt-8 card overflow-hidden">
@@ -183,23 +185,31 @@ export default function HolidaysPage() {
       </section>
 
       <AdPlacement name="content" unit="native" className="mt-10" />
+          <AdPlacement name="content" unit="rectangle" className="mt-8" />
 
-      <section className="mt-10 card p-6 sm:p-8">
-        <h2 className="font-display text-lg font-bold text-brand-900">عن الإجازات الرسمية في السعودية</h2>
-        <div className="mt-3 space-y-3 text-sm leading-relaxed text-brand-700/85">
-          <p>
-            تُحدد الإجازات الرسمية في المملكة العربية السعودية وفق تقويم أم القرى وتشمل الإجازات
-            الدينية (رأس السنة الهجرية، المولد النبوي، عيد الفطر، عرفة، عيد الأضحى) والإجازات الوطنية
-            (يوم التأسيس، يوم العلم، اليوم الوطني) والإجازات الدراسية وفق تقويم وزارة التعليم.
-          </p>
-          <p>
-            تُعلن الإجازات الرسمية من قبل الجهات المختصة وقد تختلف مدتها من عام لآخر. التواريخ
-            المعروضة هنا تقريبية ولأغراض معلوماتية، ويُنصح بمتابعة الإعلانات الرسمية.
-          </p>
+          <section className="mt-10 card p-6 sm:p-8">
+            <h2 className="font-display text-lg font-bold text-brand-900">عن الإجازات الرسمية في السعودية</h2>
+            <div className="mt-3 space-y-3 text-sm leading-relaxed text-brand-700/85">
+              <p>
+                تُحدد الإجازات الرسمية في المملكة العربية السعودية وفق تقويم أم القرى وتشمل الإجازات
+                الدينية (رأس السنة الهجرية، المولد النبوي، عيد الفطر، عرفة، عيد الأضحى) والإجازات الوطنية
+                (يوم التأسيس، يوم العلم، اليوم الوطني) والإجازات الدراسية وفق تقويم وزارة التعليم.
+              </p>
+              <p>
+                تُعلن الإجازات الرسمية من قبل الجهات المختصة وقد تختلف مدتها من عام لآخر. التواريخ
+                المعروضة هنا تقريبية ولأغراض معلوماتية، ويُنصح بمتابعة الإعلانات الرسمية.
+              </p>
+            </div>
+          </section>
+
+          <SmartlinkCard variant="inline" className="mt-10" />
         </div>
-      </section>
-
-      <SmartlinkCard variant="inline" className="mt-10" />
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <AdPlacement name="sidebar" />
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

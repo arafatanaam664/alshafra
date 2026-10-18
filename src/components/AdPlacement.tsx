@@ -40,16 +40,17 @@ export default function AdPlacement({ name, unit, className = '', lazy }: AdPlac
   }
 
   if (name === 'footer') {
-    if (page.density !== 'high') return null;
+    if (page.density === 'minimal') return null;
     return <FooterAd key={page.path} className={className} />;
   }
 
   if (name === 'sidebar') {
-    if (page.density === 'light' || page.density === 'minimal') return null;
+    if (page.density === 'minimal') return null;
     return <SidebarAd key={page.path} density={page.density} className={className} />;
   }
 
   if (unit === 'native') {
+    if (page.density === 'minimal') return null;
     return (
       <AdsterraBanner
         key={page.path}
@@ -61,7 +62,7 @@ export default function AdPlacement({ name, unit, className = '', lazy }: AdPlac
   }
 
   if (unit === 'rectangle') {
-    if (page.density === 'light' || page.density === 'minimal') return null;
+    if (page.density === 'minimal') return null;
     return (
       <AdsterraDisplay
         key={page.path}
@@ -131,17 +132,36 @@ function FooterAd({ className }: { className?: string }) {
     if (!el) return;
 
     const apply = () => {
-      const next = pickLeaderboardSize(el.clientWidth);
-      // Footer never reuses the header leaderboard. 728 is header-only;
-      // footer takes 468 when the slot is wide enough that header already
-      // took 728. If the slot is mid-width, header owns 468, so we skip.
+      const w = el.clientWidth;
+      const candidates: AdsterraDisplaySize[] = [];
+      if (w >= 728) candidates.push('728x90', '468x60', '320x50');
+      else if (w >= 468) candidates.push('468x60', '320x50');
+      else if (w >= 320) candidates.push('320x50');
+
+      if (candidates.length === 0) {
+        setSize(null);
+        return;
+      }
+
+      // Prefer the largest that is not already taken by header.
+      // If all are taken, fall back to the smallest that fits.
       setSize((prev) => {
-        const candidate = next === '728x90' ? '468x60' : null;
-        if (!candidate) return null;
-        if (!prev) return candidate;
-        const prevWidth = ADSTERRA.displayBanners[prev].width;
-        if (el.clientWidth < prevWidth) return candidate;
-        return prev;
+        // If container shrank below previous size, downgrade.
+        if (prev) {
+          const prevWidth = ADSTERRA.displayBanners[prev].width;
+          if (w < prevWidth) {
+            // Find first candidate that fits and is <= previous width
+            const next = candidates.find((c) => ADSTERRA.displayBanners[c].width <= w) ?? null;
+            return next;
+          }
+          // If container grew, allow upgrade only if it fits and not blocked logic handled by AdsterraDisplay.
+          // Keep current to avoid flicker unless width grew significantly.
+          return prev;
+        }
+        // Initial pick: try 468 when 728 is available (header likely took 728), otherwise first free.
+        // To maximize footer visibility, if width >=728 we start with 468 (header owns 728).
+        if (w >= 728) return '468x60';
+        return candidates[0];
       });
     };
 
