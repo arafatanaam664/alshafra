@@ -56,6 +56,7 @@ export function NameDecorationHubPage() {
           </header>
 
           <AdPlacement name="content" unit="native" className="mt-8" />
+          <AdPlacement name="content" size="320x50" className="mt-6" />
 
           {/* Tools grid */}
           <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -80,6 +81,7 @@ export function NameDecorationHubPage() {
             ))}
           </section>
 
+          <AdPlacement name="content" size="468x60" className="mt-8" />
           <AdPlacement name="content" unit="rectangle" className="mt-10" />
 
           <SmartlinkCard
@@ -118,6 +120,8 @@ export function NameDecorationHubPage() {
               </p>
             </div>
           </section>
+          <AdPlacement name="content" size="160x300" className="mt-8" />
+          <SmartlinkCard className="mt-8" />
         </div>
         <aside className="hidden lg:block">
           <div className="sticky top-24">
@@ -246,6 +250,7 @@ export default function NameDecorationToolPage({ slug }: { slug: string }) {
           </header>
 
           <AdPlacement name="content" unit="native" className="mt-8" />
+          <AdPlacement name="content" size="320x50" className="mt-6" />
 
           {/* Input + Results */}
           <div className="mt-8 grid gap-6 lg:grid-cols-3">
@@ -315,6 +320,7 @@ export default function NameDecorationToolPage({ slug }: { slug: string }) {
             </div>
           </div>
 
+          <AdPlacement name="content" size="468x60" className="mt-8" />
           <AdPlacement name="content" unit="rectangle" className="mt-10" />
 
           <SmartlinkCard
@@ -351,6 +357,8 @@ export default function NameDecorationToolPage({ slug }: { slug: string }) {
               ))}
             </div>
           </section>
+          <AdPlacement name="content" size="160x300" className="mt-8" />
+          <SmartlinkCard className="mt-8" />
         </div>
         <aside className="hidden lg:block">
           <div className="sticky top-24 space-y-6">

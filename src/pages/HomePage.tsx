@@ -306,6 +306,10 @@ export default function HomePage() {
         </div>
       </section>
 
+      <div className="container-page mt-8">
+        <AdPlacement name="content" size="320x50" />
+      </div>
+
       {/* Salary schedule preview */}
       <section className="container-page mt-14">
         <div className="flex items-end justify-between">
@@ -325,6 +329,11 @@ export default function HomePage() {
         </div>
         <AdPlacement name="content" unit="rectangle" />
       </section>
+
+      <div className="container-page mt-8">
+        <AdPlacement name="content" size="468x60" />
+        <SmartlinkCard className="mt-8" />
+      </div>
 
       {/* Upcoming events */}
       <section className="container-page mt-14">
@@ -371,6 +380,7 @@ export default function HomePage() {
 
       {/* Adsterra smartlink — high-intent partner offer */}
       <div className="container-page mt-6">
+        <AdPlacement name="content" size="160x300" className="mb-8" />
         <SmartlinkCard variant="inline" />
       </div>
 

@@ -126,6 +126,8 @@ export default function FaqPage() {
 
           <AdPlacement name="content" unit="native" className="mt-8" />
 
+          <AdPlacement name="content" size="320x50" className="mt-6" />
+
           <div className="mt-8 space-y-8">
             {FAQ_GROUPS.map((group, gi) => (
               <section key={gi}>
@@ -159,6 +161,9 @@ export default function FaqPage() {
                   })}
                 </div>
                 {gi === 0 && <AdPlacement name="content" unit="rectangle" className="mt-6" />}
+                {gi === 1 && <AdPlacement name="content" size="468x60" className="mt-6" />}
+                {gi === 2 && <AdPlacement name="content" size="160x300" className="mt-6 lg:hidden" />}
+                {gi === 3 && <AdPlacement name="content" size="728x90" className="mt-6" />}
                 {gi === 1 && (
                   <SmartlinkCard
                     className="mt-6"
@@ -169,6 +174,8 @@ export default function FaqPage() {
               </section>
             ))}
           </div>
+
+          <SmartlinkCard className="mt-8" />
 
           <section className="mt-10 card p-6 sm:p-8">
             <div className="flex items-start gap-3">
@@ -185,8 +192,8 @@ export default function FaqPage() {
           </section>
         </div>
         <aside className="hidden lg:block">
-          <div className="sticky top-24">
-            <AdPlacement name="sidebar" />
+          <div className="sticky top-24 space-y-6">
+            <AdPlacement name="sidebar" includeCompactSidebar />
           </div>
         </aside>
       </div>

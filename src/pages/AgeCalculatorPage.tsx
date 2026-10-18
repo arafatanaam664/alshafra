@@ -112,6 +112,7 @@ export default function AgeCalculatorPage() {
           </header>
 
           <AdPlacement name="content" unit="native" className="mt-8" />
+          <AdPlacement name="content" size="320x50" className="mt-6" />
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
             <div className="card p-6">
@@ -192,6 +193,7 @@ export default function AgeCalculatorPage() {
             </div>
           </div>
 
+          <AdPlacement name="content" size="468x60" className="mt-8" />
           <AdPlacement name="content" unit="rectangle" className="mt-10" />
 
           <SmartlinkCard
@@ -214,10 +216,12 @@ export default function AgeCalculatorPage() {
               </p>
             </div>
           </section>
+          <AdPlacement name="content" size="160x300" className="mt-8 lg:hidden" />
+          <SmartlinkCard className="mt-8" />
         </div>
         <aside className="hidden lg:block">
-          <div className="sticky top-24">
-            <AdPlacement name="sidebar" />
+          <div className="sticky top-24 space-y-6">
+            <AdPlacement name="sidebar" includeCompactSidebar />
           </div>
         </aside>
       </div>
