@@ -36,17 +36,22 @@ function LegalWithAdsLayout({
         <article className="min-w-0 max-w-3xl">
           <h1 className="section-title">{title}</h1>
           <AdPlacement name="content" unit="native" className="mt-6" />
+          <AdPlacement name="content" size="320x50" className="mt-6" />
           <div className="mt-6 space-y-5 text-sm leading-loose text-brand-800/90">{children}</div>
           <AdPlacement name="content" unit="rectangle" className="mt-8" />
+          <AdPlacement name="content" size="160x300" className="mt-8 lg:hidden" />
           <SmartlinkCard
             className="mt-8"
             title="عرض من شريكنا"
             description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة ولا علاقة له بمحتوى هذه الصفحة."
           />
+          <AdPlacement name="content" size="468x60" className="mt-8" />
+          <SmartlinkCard className="mt-8" />
+          <AdPlacement name="content" size="728x90" className="mt-8" />
         </article>
         <aside className="hidden lg:block">
-          <div className="sticky top-24">
-            <AdPlacement name="sidebar" />
+          <div className="sticky top-24 space-y-6">
+            <AdPlacement name="sidebar" includeCompactSidebar />
           </div>
         </aside>
       </div>

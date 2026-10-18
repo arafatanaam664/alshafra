@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import {
   ADSTERRA,
   adDensityForRoute,
+  ownerOfDisplayKey,
+  subscribeAdInventory,
   pickLeaderboardSize,
   pickSidebarSize,
   type AdDensity,
@@ -15,6 +17,9 @@ import AdsterraDisplay from './AdsterraDisplay';
 interface AdPlacementProps {
   name: AdPlacementName;
   unit?: 'native' | 'rectangle';
+  size?: AdsterraDisplaySize;
+  /** Add a 160x300 below the desktop 160x600, never on mobile. */
+  includeCompactSidebar?: boolean;
   className?: string;
   lazy?: boolean;
 }
@@ -24,7 +29,14 @@ interface AdPlacementProps {
  * size that fits, loads only that unit, and refuses to mount a key that is
  * already live elsewhere on the page.
  */
-export default function AdPlacement({ name, unit, className = '', lazy }: AdPlacementProps) {
+export default function AdPlacement({
+  name,
+  unit,
+  size,
+  includeCompactSidebar = false,
+  className = '',
+  lazy,
+}: AdPlacementProps) {
   const [path] = useRoute();
   const { name: routeName } = parseRoute(path);
   const page = {
@@ -46,7 +58,14 @@ export default function AdPlacement({ name, unit, className = '', lazy }: AdPlac
 
   if (name === 'sidebar') {
     if (page.density === 'minimal') return null;
-    return <SidebarAd key={page.path} density={page.density} className={className} />;
+    return (
+      <SidebarAd
+        key={page.path}
+        density={page.density}
+        includeCompact={includeCompactSidebar}
+        className={className}
+      />
+    );
   }
 
   if (unit === 'native') {
@@ -61,13 +80,12 @@ export default function AdPlacement({ name, unit, className = '', lazy }: AdPlac
     );
   }
 
-  if (unit === 'rectangle') {
+  if (unit === 'rectangle' || size) {
     if (page.density === 'minimal') return null;
     return (
-      <AdsterraDisplay
+      <ContentDisplay
         key={page.path}
-        size="300x250"
-        placement="content"
+        size={size ?? '300x250'}
         className={className}
         lazy={lazy ?? true}
       />
@@ -75,6 +93,32 @@ export default function AdPlacement({ name, unit, className = '', lazy }: AdPlac
   }
 
   return null;
+}
+
+/** Measure the content box: do not request hidden or oversized units. */
+function ContentDisplay({ size, className, lazy }: {
+  size: AdsterraDisplaySize;
+  className?: string;
+  lazy: boolean;
+}) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [fits, setFits] = useState(false);
+
+  useEffect(() => {
+    const el = hostRef.current;
+    if (!el) return;
+    const apply = () => setFits(el.clientWidth >= ADSTERRA.displayBanners[size].width);
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [size]);
+
+  return (
+    <div ref={hostRef} className={`w-full min-w-0 ${className ?? ''}`}>
+      {fits && <AdsterraDisplay size={size} placement="content" className="!my-0" lazy={lazy} />}
+    </div>
+  );
 }
 
 function HeaderAd({ className }: { className?: string }) {
@@ -133,42 +177,32 @@ function FooterAd({ className }: { className?: string }) {
 
     const apply = () => {
       const w = el.clientWidth;
-      const candidates: AdsterraDisplaySize[] = [];
-      if (w >= 728) candidates.push('728x90', '468x60', '320x50');
-      else if (w >= 468) candidates.push('468x60', '320x50');
-      else if (w >= 320) candidates.push('320x50');
+      const candidates: AdsterraDisplaySize[] =
+        w >= 728 ? ['728x90', '468x60', '320x50', '300x250', '160x300'] :
+        w >= 468 ? ['468x60', '320x50', '300x250', '160x300'] :
+        w >= 320 ? ['320x50', '300x250', '160x300'] :
+        w >= 300 ? ['300x250', '160x300', '320x50'] :
+        w >= 160 ? ['160x300', '160x600'] : [];
+      const preferred: AdsterraDisplaySize = w >= 728 ? '468x60' : w >= 468 ? '320x50' : '300x250';
+      const ordered = [preferred, ...candidates.filter((candidate) => candidate !== preferred)];
+      const available = (candidate: AdsterraDisplaySize) => {
+        const banner = ADSTERRA.displayBanners[candidate];
+        const owner = ownerOfDisplayKey(banner.key);
+        return candidates.includes(candidate) && banner.width <= w && (!owner || owner === 'footer');
+      };
 
-      if (candidates.length === 0) {
-        setSize(null);
-        return;
-      }
-
-      // Prefer the largest that is not already taken by header.
-      // If all are taken, fall back to the smallest that fits.
-      setSize((prev) => {
-        // If container shrank below previous size, downgrade.
-        if (prev) {
-          const prevWidth = ADSTERRA.displayBanners[prev].width;
-          if (w < prevWidth) {
-            // Find first candidate that fits and is <= previous width
-            const next = candidates.find((c) => ADSTERRA.displayBanners[c].width <= w) ?? null;
-            return next;
-          }
-          // If container grew, allow upgrade only if it fits and not blocked logic handled by AdsterraDisplay.
-          // Keep current to avoid flicker unless width grew significantly.
-          return prev;
-        }
-        // Initial pick: try 468 when 728 is available (header likely took 728), otherwise first free.
-        // To maximize footer visibility, if width >=728 we start with 468 (header owns 728).
-        if (w >= 728) return '468x60';
-        return candidates[0];
-      });
+      // Keep the reservation stable; header may reclaim it after a resize.
+      setSize((prev) => prev && available(prev) ? prev : ordered.find(available) ?? null);
     };
 
     apply();
     const ro = new ResizeObserver(apply);
     ro.observe(el);
-    return () => ro.disconnect();
+    const unsubscribe = subscribeAdInventory(apply);
+    return () => {
+      ro.disconnect();
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -178,6 +212,7 @@ function FooterAd({ className }: { className?: string }) {
           <AdsterraDisplay
             size={size}
             placement="footer"
+            reserve
             className="!my-0"
             lazy
           />
@@ -189,9 +224,11 @@ function FooterAd({ className }: { className?: string }) {
 
 function SidebarAd({
   density,
+  includeCompact,
   className,
 }: {
   density: AdDensity;
+  includeCompact: boolean;
   className?: string;
 }) {
   const [wide, setWide] = useState(false);
@@ -208,8 +245,9 @@ function SidebarAd({
   if (!wide || !size) return null;
 
   return (
-    <div className={`flex justify-center ${className}`}>
+    <div className={`flex flex-col items-center gap-6 ${className ?? ''}`}>
       <AdsterraDisplay size={size} placement="sidebar" className="!my-0" lazy />
+      {includeCompact && <AdsterraDisplay size="160x300" placement="sidebar" className="!my-0" lazy />}
     </div>
   );
 }

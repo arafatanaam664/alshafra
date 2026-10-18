@@ -46,6 +46,8 @@ interface AdsterraDisplayProps {
   label?: string;
   /** Above-the-fold slots skip IntersectionObserver. */
   lazy?: boolean;
+  /** Reserve the key before scrolling into view (used by the global footer). */
+  reserve?: boolean;
 }
 
 function AdsterraDisplay({
@@ -54,6 +56,7 @@ function AdsterraDisplay({
   className = '',
   label = 'إعلان',
   lazy = true,
+  reserve = false,
 }: AdsterraDisplayProps) {
   const { key, width, height } = ADSTERRA.displayBanners[size];
   const hostRef = useRef<HTMLDivElement>(null);
@@ -84,17 +87,17 @@ function AdsterraDisplay({
     return () => io.disconnect();
   }, [lazy, size]);
 
+  const shouldClaim = reserve || inView;
   useEffect(() => {
-    if (!inView) return;
+    if (!shouldClaim) return;
     const ok = claimDisplayKey(key, placement);
     setStatus(ok ? 'live' : 'blocked');
     if (!ok) return;
-    trackAdMetric('ad_request', { placement, unit: 'display', size });
     return () => releaseDisplayKey(key, placement);
-  }, [inView, key, placement, size]);
+  }, [shouldClaim, key, placement, size]);
 
   useEffect(() => {
-    if (!inView || status !== 'live') return;
+    if (status !== 'live') return;
     return subscribeAdInventory(() => {
       if (ownerOfDisplayKey(key) !== placement) setStatus('blocked');
     });
@@ -106,6 +109,7 @@ function AdsterraDisplay({
     const iframe = frameRef.current;
     if (!iframe) return;
 
+    trackAdMetric('ad_request', { placement, unit: 'display', size });
     iframe.srcdoc = FRAME_DOC(
       JSON.stringify({ key, format: 'iframe', height, width, params: {} }),
       adsterraInvokeUrl(key)
