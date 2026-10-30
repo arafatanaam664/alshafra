@@ -1,14 +1,11 @@
 // Hijri (Umm Al-Qura) date conversion utilities.
 //
-// Primary engine: the ICU `islamic-umalqura` calendar exposed through
-// `Intl.DateTimeFormat`. This is the SAME data table used by the official Umm
-// Al-Qura calendar (KACST) and is available in every modern browser and in
-// Node 18+ (full-icu). It is exact, not an approximation.
+// Primary engine: the browser's ICU `islamic-umalqura` calendar when the
+// anchor sanity check succeeds. ICU versions may differ, so this does not
+// independently verify an official announcement or every supported date.
 //
-// Fallback engine: the Kuwaiti/arithmetical tabular algorithm, used only when
-// ICU is unavailable (very old browsers / small-icu Node builds). The tabular
-// algorithm drifts up to ±2 days from Umm Al-Qura, which is why it must never
-// be the primary source for a Saudi calendar site.
+// Fallback: an arithmetical tabular calendar when the formatter is unavailable.
+// It is approximate and must not be represented as an official date.
 
 export interface HijriDate {
   year: number;
@@ -126,7 +123,7 @@ function readUmParts(f: Intl.DateTimeFormat, date: Date): HijriDate | null {
   return { year, month, day };
 }
 
-/** True when the exact Umm Al-Qura table is being used (not the approximation). */
+/** The browser formatter passed the anchor check; not proof of official dates. */
 export function isUmmAlQuraExact(): boolean {
   return getUmFormatter() !== null;
 }
@@ -165,7 +162,7 @@ export function isHijriLeapYear(year: number): boolean {
   return (year * 11 + 14) % 30 < 11;
 }
 
-/** Real length (29 or 30) of a Hijri month, from the Umm Al-Qura table. */
+/** Month length derived from the browser calendar, or the tabular fallback. */
 export function hijriMonthLength(year: number, month: number): number {
   if (!getUmFormatter()) return tabularMonthLengths(year)[month - 1];
   const start = hijriToJdn({ year, month, day: 1 });
@@ -179,6 +176,21 @@ export function hijriMonthLength(year: number, month: number): number {
 
 export function hijriMonthLengths(year: number): number[] {
   return Array.from({ length: 12 }, (_, i) => hijriMonthLength(year, i + 1));
+}
+
+/** Validate picker input before invoking date conversion; invalid dates must not roll over. */
+export function isValidGregorianDate(g: GregorianDate): boolean {
+  if (!Number.isInteger(g.year) || g.year < 1900 || g.year > 2100 ||
+      !Number.isInteger(g.month) || g.month < 1 || g.month > 12 || !Number.isInteger(g.day)) return false;
+  const leap = g.year % 4 === 0 && (g.year % 100 !== 0 || g.year % 400 === 0);
+  const lengths = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return g.day >= 1 && g.day <= lengths[g.month - 1];
+}
+
+export function isValidHijriDate(h: HijriDate): boolean {
+  if (!Number.isInteger(h.year) || h.year < 1 || h.year > 1700 ||
+      !Number.isInteger(h.month) || h.month < 1 || h.month > 12 || !Number.isInteger(h.day)) return false;
+  return h.day >= 1 && h.day <= hijriMonthLength(h.year, h.month);
 }
 
 export function gregorianToHijri(year: number, month: number, day: number): HijriDate {
@@ -276,10 +288,10 @@ export function todayGregorian(): GregorianDate {
       return { year, month, day };
     }
   } catch {
-    // fall through to local time
+    // Saudi Arabia uses UTC+03:00; never fall back to the visitor’s timezone.
   }
-  const d = new Date();
-  return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() };
+  const d = new Date(Date.now() + 3 * 60 * 60 * 1000);
+  return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate() };
 }
 
 export function todayHijri(): HijriDate {

@@ -14,7 +14,7 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
       '@type': 'ListItem',
       position: i + 1,
       name: item.name,
-      item: item.path ? `${SITE_URL}${item.path}` : `${SITE_URL}/`,
+      item: item.path ? `${SITE_URL}${item.path}` : i === items.length - 1 ? `${SITE_URL}${window.location.pathname}` : undefined,
     })),
   };
   // Own a dedicated JSON-LD node so the page-level useSeo() call cannot

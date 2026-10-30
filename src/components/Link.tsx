@@ -21,6 +21,9 @@ export default function Link({ to, children, onClick, ...rest }: LinkProps) {
     onClick?.(event);
     if (
       event.defaultPrevented ||
+      (rest.target && rest.target !== '_self') ||
+      rest.download !== undefined ||
+      !to.startsWith('/') || to.startsWith('//') || to.includes('#') || to.includes('?') ||
       event.button !== 0 ||
       event.metaKey ||
       event.ctrlKey ||

@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'react';
+import articles from '../data/articles.json';
+import countdowns from '../data/countdowns.json';
+import { matchRoute } from './route-match.mjs';
+import { isPrivateDatePath } from './date-privacy.mjs';
 
 export type RoutePath = string;
 
@@ -29,11 +33,18 @@ export function useRoute(): [RoutePath, (path: RoutePath) => void] {
 
   const navigate = (next: RoutePath) => {
     const target = next.startsWith('/') ? next : `/${next}`;
+    // A fresh document is required when crossing the privacy boundary: scripts
+    // loaded by a previous SPA page cannot be safely unloaded.
+    if (normalize(window.location.pathname) !== normalize(target) && (isPrivateDatePath(normalize(window.location.pathname)) || isPrivateDatePath(normalize(target)))) {
+      window.location.assign(target);
+      return;
+    }
     if (normalize(window.location.pathname) !== target) {
       window.history.pushState({}, '', target);
     }
     window.dispatchEvent(new Event(ROUTE_CHANGE_EVENT));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
   };
 
   return [path, navigate];
@@ -47,8 +58,9 @@ function normalize(pathname: string): RoutePath {
   return withSlash.length > 1 ? withSlash.replace(/\/+$/, '') : withSlash;
 }
 
+const articleSlugs = articles.map(article => article.slug);
+const countdownSlugs = countdowns.countdowns.map(countdown => countdown.slug);
+
 export function parseRoute(path: RoutePath): { name: string; param?: string } {
-  const segments = path.split('/').filter(Boolean);
-  if (segments.length === 0) return { name: 'home' };
-  return { name: segments[0], param: segments[1] };
+  return matchRoute(path, articleSlugs, countdownSlugs);
 }

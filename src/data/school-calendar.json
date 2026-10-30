@@ -1,0 +1,66 @@
+{
+  "source": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
+  "verifiedAt": "2026-10-29",
+  "notice": "تُعرض التواريخ كما وردت في صفحة وزارة التعليم عند المراجعة. قد تُحدّث الوزارة التقويم أو تختلف الترتيبات محلياً؛ راجع المصدر قبل الاعتماد.",
+  "events": [
+    {
+      "id": "school-return-1448",
+      "title": "عودة المعلمين الممارسين للتدريس",
+      "date": "2026-08-16",
+      "hijri": "03/03/1448",
+      "holiday": false
+    },
+    {
+      "id": "school-start-1448",
+      "title": "بداية العام الدراسي 1448-1449هـ",
+      "date": "2026-08-23",
+      "hijri": "10/03/1448",
+      "holiday": false,
+      "countdownSlug": "school-start"
+    },
+    {
+      "id": "school-national-day-1448",
+      "title": "إجازة اليوم الوطني للمدارس",
+      "date": "2026-09-23",
+      "hijri": "12/04/1448",
+      "holiday": true
+    },
+    {
+      "id": "fall-break-1448",
+      "title": "إجازة الخريف",
+      "date": "2026-11-20",
+      "hijri": "10/06/1448",
+      "holiday": true,
+      "countdownSlug": "fall-break"
+    },
+    {
+      "id": "midyear-break-1448",
+      "title": "إجازة منتصف العام الدراسي",
+      "date": "2027-01-08",
+      "hijri": "30/07/1448",
+      "holiday": true,
+      "countdownSlug": "midyear-break"
+    },
+    {
+      "id": "school-founding-day-1448",
+      "title": "إجازة يوم التأسيس للمدارس",
+      "date": "2027-02-19",
+      "hijri": "12/09/1448",
+      "holiday": true
+    },
+    {
+      "id": "school-eid-fitr-1448",
+      "title": "إجازة عيد الفطر للمدارس",
+      "date": "2027-02-26",
+      "hijri": "19/09/1448",
+      "holiday": true
+    },
+    {
+      "id": "school-eid-adha-1448",
+      "title": "إجازة عيد الأضحى للمدارس",
+      "date": "2027-05-07",
+      "hijri": "01/12/1448",
+      "holiday": true
+    }
+  ]
+}

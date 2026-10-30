@@ -1,10 +1,14 @@
 import { useMemo, useState } from 'react';
 import { ArrowLeftRight, Calendar, CalendarDays, Copy, Check } from 'lucide-react';
 import { useSeo } from '../lib/seo';
-import AdPlacement from '../components/AdPlacement';
-import SmartlinkCard from '../components/SmartlinkCard';
+import Link from '../components/Link';
+import ToolGuide from '../components/ToolGuide';
+import { useRiyadhToday } from '../lib/useRiyadhToday';
+import { parseYearInput } from '../lib/number-input';
+import { calculateGregorianInterval } from '../lib/age';
 import {
   gregorianToHijri,
+  isUmmAlQuraExact,
   hijriToGregorian,
   formatHijri,
   formatGregorian,
@@ -13,8 +17,8 @@ import {
   weekdayName,
   HIJRI_MONTHS,
   GREGORIAN_MONTHS,
-  todayGregorian,
-  todayHijri,
+  isValidGregorianDate,
+  isValidHijriDate,
   type HijriDate,
   type GregorianDate,
 } from '../lib/hijri';
@@ -22,17 +26,18 @@ import {
 type Mode = 'g2h' | 'h2g';
 
 export default function DateConverterPage() {
+  const hasCalendar = isUmmAlQuraExact();
   const [mode, setMode] = useState<Mode>('g2h');
-  const today = todayGregorian();
-  const todayH = todayHijri();
+  const today = useRiyadhToday();
+  const todayH = gregorianToHijri(today.year, today.month, today.day);
   const [g, setG] = useState<GregorianDate>(today);
   const [h, setH] = useState<HijriDate>(todayH);
-  const [copied, setCopied] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   useSeo({
     title: 'تحويل التاريخ بين الهجري والميلادي | تقويم السعودية',
     description:
-      'أداة مجانية لتحويل التاريخ بين التقويم الهجري والميلادي بدقة وفق تقويم أم القرى الرسمي. حوّل أي تاريخ هجري إلى ميلادي أو العكس مع عرض اليوم من الأسبوع.',
+      'أداة لتحويل التاريخ بين الهجري والميلادي بتقويم أم القرى المتاح في المتصفح، مع بيان الحدود والتنبيه إلى الإعلانات الرسمية.',
     canonical: 'https://alshafra.com/date-converter',
     keywords: 'تحويل التاريخ, الهجري إلى الميلادي, الميلادي إلى الهجري, تقويم أم القرى, حاسبة تاريخ',
     jsonLd: {
@@ -47,7 +52,9 @@ export default function DateConverterPage() {
   });
 
   const result = useMemo(() => {
+    if (!hasCalendar) return null;
     if (mode === 'g2h') {
+      if (!isValidGregorianDate(g)) return null;
       const hijri = gregorianToHijri(g.year, g.month, g.day);
       return {
         primary: formatHijri(hijri),
@@ -59,7 +66,11 @@ export default function DateConverterPage() {
         greg: g,
       };
     }
+    if (!isValidHijriDate(h)) return null;
     const greg = hijriToGregorian(h);
+    if (!isValidGregorianDate(greg)) return null;
+    const roundTrip = gregorianToHijri(greg.year, greg.month, greg.day);
+    if (roundTrip.year !== h.year || roundTrip.month !== h.month || roundTrip.day !== h.day) return null;
     return {
       primary: formatGregorian(greg),
       secondary: formatHijri(h),
@@ -69,34 +80,37 @@ export default function DateConverterPage() {
       hijri: h,
       greg,
     };
-  }, [mode, g, h]);
+  }, [mode, g, h, hasCalendar]);
 
   const copyResult = async () => {
+    if (!result) return;
     try {
       await navigator.clipboard.writeText(`${result.primary} (${result.secondary}) — ${result.weekday}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      setCopyStatus('success');
     } catch {
-      /* ignore */
+      setCopyStatus('error');
     }
   };
 
-  const swap = () => setMode((m) => (m === 'g2h' ? 'h2g' : 'g2h'));
+  const swap = () => {
+    if (!result) return;
+    if (mode === 'g2h') setH(result.hijri);
+    else setG(result.greg);
+    setCopyStatus('idle');
+    setMode(mode === 'g2h' ? 'h2g' : 'g2h');
+  };
 
   return (
     <div className="container-page py-10">
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+      <div className="grid items-start gap-8">
         <div className="min-w-0">
           <header className="max-w-2xl">
             <h1 className="section-title">تحويل التاريخ بين الهجري والميلادي</h1>
             <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-              أداة دقيقة لتحويل التاريخ بين التقويم الهجري والميلادي وفق تقويم أم القرى الرسمي المعتمد في
-              المملكة العربية السعودية. اختر التاريخ ثم اضغط زر التبديل لعكس الاتجاه.
+              أداة لتحويل التاريخ الهجري والميلادي باستخدام تقويم أم القرى المتاح في المتصفح عند دعمه،
+              وتتوقف الأداة إذا لم يتوفر أو لم يجتز فحص التوافق. النطاق المتاح 1900–2100 ميلادية. راجع الجهة المختصة للقرارات الرسمية.
             </p>
           </header>
-
-          <AdPlacement name="content" unit="native" className="mt-8" />
-          <AdPlacement name="content" size="320x50" className="mt-6" />
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
             {/* Input */}
@@ -107,6 +121,7 @@ export default function DateConverterPage() {
                 </h2>
                 <button
                   onClick={swap}
+                  disabled={!result}
                   className="btn-ghost"
                   title="تبديل الاتجاه"
                 >
@@ -115,10 +130,12 @@ export default function DateConverterPage() {
                 </button>
               </div>
 
+              {!result && <button type="button" className="mt-4 text-sm font-medium text-brand-700 underline" onClick={() => { if (mode === 'g2h') setG(today); else setH(todayH); setCopyStatus('idle'); }}>استخدام تاريخ اليوم</button>}
+
               {mode === 'g2h' ? (
-                <GregorianPicker value={g} onChange={setG} />
+                <GregorianPicker value={g} onChange={(value) => { setCopyStatus('idle'); setG(value); }} />
               ) : (
-                <HijriPicker value={h} onChange={setH} />
+                <HijriPicker value={h} onChange={(value) => { setCopyStatus('idle'); setH(value); }} />
               )}
             </div>
 
@@ -128,6 +145,7 @@ export default function DateConverterPage() {
                 <h2 className="font-display text-lg font-bold text-brand-900">النتيجة</h2>
               </div>
               <div className="p-6">
+                {result ? <>
                 <div className="flex items-start gap-3">
                   <span className="flex h-12 w-12 items-center justify-center rounded-xl gradient-brand text-white">
                     {mode === 'g2h' ? <CalendarDays className="h-6 w-6" /> : <Calendar className="h-6 w-6" />}
@@ -145,58 +163,75 @@ export default function DateConverterPage() {
                   <InfoTile label="الميلادي (رقمي)" value={result.gregorianShort} />
                   <InfoTile
                     label="الفرق عن اليوم"
-                    value={diffLabel(result.greg)}
+                    value={diffLabel(result.greg, today)}
                   />
                 </div>
 
                 <button onClick={copyResult} className="btn-primary mt-5 w-full">
-                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  {copied ? 'تم النسخ' : 'نسخ النتيجة'}
+                  {copyStatus === 'success' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  {copyStatus === 'success' ? 'تم النسخ' : 'نسخ النتيجة'}
                 </button>
+                {copyStatus === 'error' && <p role="status" className="mt-2 text-sm text-rose-700">تعذر النسخ؛ يمكنك تحديد النتيجة ونسخها يدوياً.</p>}
+                </> : <p role="alert" className="text-sm text-red-700">{hasCalendar ? 'يرجى إدخال تاريخ صحيح يقابله تاريخ ميلادي بين 1900 و2100؛ تحقق من عدد أيام الشهر.' : 'تقويم أم القرى غير متاح أو لم يجتز فحص المتصفح؛ جرّب متصفحاً آخر.'}</p>}
               </div>
             </div>
           </div>
-
-          <AdPlacement name="content" size="468x60" className="mt-8" />
-          <AdPlacement name="content" unit="rectangle" className="mt-10" />
-
-          <SmartlinkCard
-            className="mt-8"
-            title="عرض من شريكنا"
-            description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة ولا علاقة له بأداة تحويل التاريخ."
-          />
 
           {/* SEO content */}
           <section className="mt-10 card p-6 sm:p-8">
             <h2 className="font-display text-lg font-bold text-brand-900">كيف تعمل أداة تحويل التاريخ؟</h2>
             <div className="mt-3 space-y-3 text-sm leading-relaxed text-brand-700/85">
               <p>
-                تعتمد الأداة على تقويم أم القرى الرسمي المعتمد في المملكة العربية السعودية كمرجع للتحويل
-                بين التاريخ الهجري والميلادي. يقوم المحرك بحساب رقم اليوم اليولياني ثم تحويله إلى
-                التقويم المقابل باستخدام القاعدة الحسابية التقريبية لتقويم أم القرى.
+                تستخدم الأداة تقويم أم القرى الذي يوفره المتصفح إن اجتاز فحص التوافق، وتتوقف عند عدم توفره.
+                قد تختلف بيانات المتصفحات وإصداراتها؛ لا يغني التحويل عن مراجعة الجهة الرسمية.
               </p>
               <p>
-                التحويل دقيق لمعظم التواريخ العملية، مع احتمال اختلاف يوم واحد قرب بدايات الأشهر
-                الهجرية لأن رؤية الهلال تعتمد على الرصد الفعلي. للمسائل القانونية والرسمية يُنصح
-                بالرجوع للتقويم الرسمي الصادر عن المملكة.
+                قد تختلف بداية الأشهر والمناسبات الدينية عن الحساب بحسب إعلان رؤية الهلال الرسمي.
               </p>
+              <p><a className="underline" href="https://www.ummulqura.org.sa/ar/calendar" target="_blank" rel="noopener noreferrer">موقع تقويم أم القرى</a> — مرجع للمراجعة، ولا تتصل الأداة به لإجراء الحساب.</p>
             </div>
           </section>
-          <AdPlacement name="content" size="160x300" className="mt-8 lg:hidden" />
-          <SmartlinkCard className="mt-8" />
+          <DateInterval />
+          <ToolGuide tool="converter" />
+          <section className="mt-8 card p-6" aria-labelledby="converter-related">
+            <h2 id="converter-related" className="font-display text-lg font-bold text-brand-900">أدوات التقويم المرتبطة</h2>
+            <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-brand-700 underline">
+              <li><Link to="/age-calculator">حساب العمر بالهجري والميلادي</Link></li>
+              <li><Link to="/today">تاريخ اليوم في السعودية</Link></li>
+              <li><Link to="/hijri-calendar">التقويم الهجري الشهري</Link></li>
+            </ul>
+          </section>
         </div>
-        <aside className="hidden lg:block">
-          <div className="sticky top-24 space-y-6">
-            <AdPlacement name="sidebar" includeCompactSidebar />
-          </div>
-        </aside>
       </div>
     </div>
   );
 }
 
-function diffLabel(target: GregorianDate): string {
-  const today = todayGregorian();
+function DateInterval() {
+  const [start, setStart] = useState('');
+  const [end, setEnd] = useState('');
+  const parse = (value: string): GregorianDate | null => {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    return match ? { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) } : null;
+  };
+  const a = parse(start), b = parse(end);
+  const interval = a && b ? calculateGregorianInterval(a, b) : null;
+  const inputClass = 'mt-2 w-full rounded-xl bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500';
+  return (
+    <section className="mt-8 card p-6" aria-labelledby="interval-heading">
+      <h2 id="interval-heading" className="font-display text-lg font-bold text-brand-900">حساب الفرق بين تاريخين ميلاديين</h2>
+      <p className="mt-2 text-sm text-brand-700/80">اختر تاريخ البداية والنهاية بين 1900 و2100. الفرق بالأيام لا يشمل يوم البداية مرة إضافية.</p>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <label className="text-sm text-brand-700">تاريخ البداية<input className={inputClass} type="date" min="1900-01-01" max="2100-12-31" value={start} onChange={e => setStart(e.target.value)} /></label>
+        <label className="text-sm text-brand-700">تاريخ النهاية<input className={inputClass} type="date" min="1900-01-01" max="2100-12-31" value={end} onChange={e => setEnd(e.target.value)} /></label>
+      </div>
+      {start && end && (interval ? <p role="status" className="mt-4 text-sm font-bold text-brand-900">الفرق: {interval.totalDays.toLocaleString('ar-SA')} يوم — {interval.span.years} سنة و{interval.span.months} شهر و{interval.span.days} يوم</p> : <p role="alert" className="mt-4 text-sm text-rose-700">تحقق من التاريخين والنطاق؛ يجب أن يكون تاريخ النهاية في تاريخ البداية أو بعده.</p>)}
+      <p className="mt-3 text-xs leading-relaxed text-brand-700/80">لحساب الأشهر المكتملة، إذا لم يوجد يوم البداية في شهر أقصر نستخدم آخر يوم في ذلك الشهر؛ قد تختلف طرق الحساب الأخرى.</p>
+    </section>
+  );
+}
+
+function diffLabel(target: GregorianDate, today: GregorianDate): string {
   const a = Date.UTC(today.year, today.month - 1, today.day);
   const b = Date.UTC(target.year, target.month - 1, target.day);
   const diff = Math.round((b - a) / 86400000);
@@ -210,7 +245,7 @@ function GregorianPicker({ value, onChange }: { value: GregorianDate; onChange: 
     <div className="mt-5 grid gap-4 sm:grid-cols-3">
       <Field label="اليوم">
         <select
-          className="input"
+          className="w-full rounded-xl bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500"
           value={value.day}
           onChange={(e) => onChange({ ...value, day: +e.target.value })}
         >
@@ -221,7 +256,7 @@ function GregorianPicker({ value, onChange }: { value: GregorianDate; onChange: 
       </Field>
       <Field label="الشهر">
         <select
-          className="input"
+          className="w-full rounded-xl bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500"
           value={value.month}
           onChange={(e) => onChange({ ...value, month: +e.target.value })}
         >
@@ -232,15 +267,12 @@ function GregorianPicker({ value, onChange }: { value: GregorianDate; onChange: 
       </Field>
       <Field label="السنة">
         <input
-          type="number"
-          className="input"
-          value={value.year}
-          min={1900}
-          max={2100}
-          onChange={(e) => onChange({ ...value, year: +e.target.value })}
+          type="text" inputMode="numeric"
+          className="w-full rounded-xl bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500"
+          value={value.year || ''}
+          onChange={(e) => onChange({ ...value, year: parseYearInput(e.target.value) })}
         />
       </Field>
-      <style>{`.input{ @apply w-full rounded-xl border-0 bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500; }`}</style>
     </div>
   );
 }
@@ -250,7 +282,7 @@ function HijriPicker({ value, onChange }: { value: HijriDate; onChange: (v: Hijr
     <div className="mt-5 grid gap-4 sm:grid-cols-3">
       <Field label="اليوم">
         <select
-          className="input-h"
+          className="w-full rounded-xl bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500"
           value={value.day}
           onChange={(e) => onChange({ ...value, day: +e.target.value })}
         >
@@ -261,7 +293,7 @@ function HijriPicker({ value, onChange }: { value: HijriDate; onChange: (v: Hijr
       </Field>
       <Field label="الشهر">
         <select
-          className="input-h"
+          className="w-full rounded-xl bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500"
           value={value.month}
           onChange={(e) => onChange({ ...value, month: +e.target.value })}
         >
@@ -272,16 +304,12 @@ function HijriPicker({ value, onChange }: { value: HijriDate; onChange: (v: Hijr
       </Field>
       <Field label="السنة">
         <input
-          type="number"
-          className="input-h"
-          value={value.year}
-          min={1}
-          max={1700}
-          onChange={(e) => onChange({ ...value, year: +e.target.value })}
+          type="text" inputMode="numeric"
+          className="w-full rounded-xl bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500"
+          value={value.year || ''}
+          onChange={(e) => onChange({ ...value, year: parseYearInput(e.target.value) })}
         />
       </Field>
-      <style>{`.input-h{ width:100%; border-radius:0.75rem; background:#faf7f2; padding:0.625rem 0.75rem; font-size:0.875rem; color:#022c22; outline:none; box-shadow: inset 0 0 0 1px #c9aa7c; }
-      .input-h:focus{ box-shadow: inset 0 0 0 2px #10b981; }`}</style>
     </div>
   );
 }

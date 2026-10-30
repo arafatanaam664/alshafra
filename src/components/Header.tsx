@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Calendar, Menu, X, Clock, Coins, BookOpen, CalendarDays, Sparkles, Flag, HelpCircle, FileText, Wand2, Timer, Sun } from 'lucide-react';
 import { useRoute } from '../lib/router';
 import Link from './Link';
@@ -21,6 +21,11 @@ const NAV = [
 export default function Header() {
   const [path] = useRoute();
   const [open, setOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => setOpen(false), [path]);
+  const escapeMenu = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape' && open) { setOpen(false); menuButton.current?.focus(); }
+  };
   const close = () => setOpen(false);
 
   return (
@@ -29,7 +34,7 @@ export default function Header() {
         <Link
           to="/"
           onClick={close}
-          className="group flex items-center gap-2.5"
+          className="group flex shrink-0 items-center gap-2.5"
           aria-label="تقويم السعودية - الصفحة الرئيسية"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-xl gradient-brand text-white shadow-soft transition-transform group-hover:scale-105">
@@ -37,11 +42,11 @@ export default function Header() {
           </span>
           <span className="text-right leading-tight">
             <span className="block font-display text-base font-bold text-brand-900">تقويم السعودية</span>
-            <span className="block text-[11px] text-brand-600/70">بوابة المواعيد الرسمية</span>
+            <span className="block text-[11px] text-brand-600/70">منصة مستقلة للتقويم والمواعيد</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden min-w-0 items-center gap-1 overflow-x-auto lg:flex">
           {NAV.map((item) => {
             const active = path === item.to;
             const Icon = item.icon;
@@ -51,7 +56,7 @@ export default function Header() {
                 to={item.to}
                 onClick={close}
                 aria-current={active ? 'page' : undefined}
-                className={`nav-link flex items-center gap-1.5 ${active ? 'nav-link-active' : ''}`}
+                className={`nav-link flex shrink-0 items-center gap-1.5 ${active ? 'nav-link-active' : ''}`}
               >
                 <Icon className="h-4 w-4" />
                 {item.label}
@@ -61,16 +66,19 @@ export default function Header() {
         </nav>
 
         <button
+          ref={menuButton}
           onClick={() => setOpen((v) => !v)}
           className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-700 ring-1 ring-brand-200 lg:hidden"
-          aria-label="القائمة"
+          aria-label={open ? 'إغلاق القائمة' : 'فتح القائمة'}
+          aria-expanded={open}
+          aria-controls="mobile-navigation"
+          onKeyDown={escapeMenu}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
-      {open && (
-        <div className="border-t border-brand-900/5 bg-white lg:hidden">
+      <div id="mobile-navigation" hidden={!open} onKeyDown={escapeMenu} className="max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain border-t border-brand-900/5 bg-white lg:hidden">
           <nav className="container-page grid gap-1 py-3">
             {NAV.map((item) => {
               const active = path === item.to;
@@ -92,7 +100,6 @@ export default function Header() {
             })}
           </nav>
         </div>
-      )}
     </header>
   );
 }

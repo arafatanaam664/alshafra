@@ -21,3 +21,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Local recovery archives are not deployment artifacts.
+backups/

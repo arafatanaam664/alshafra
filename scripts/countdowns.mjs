@@ -5,11 +5,13 @@
 // interactive page can never disagree about a date. Only the date maths is
 // reimplemented here, because a .mjs build script cannot import TypeScript.
 //
-// Hijri conversion uses the ICU `islamic-umalqura` calendar — the same table
-// used by the official Umm Al-Qura calendar — never a hand-typed date.
+// Hijri conversion uses Node ICU `islamic-umalqura` for calculations, not an
+// official announcement; results may depend on the ICU version.
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { salaryScheduleApproved } from '../src/lib/salary-trust.mjs';
+import { validIso } from '../src/lib/iso-date.mjs';
 
 export const HIJRI_MONTHS = [
   'محرم',
@@ -152,17 +154,26 @@ export function todayInRiyadh() {
 
 export function loadCountdowns(root = process.cwd()) {
   const file = join(root, 'src', 'data', 'countdowns.json');
-  return JSON.parse(readFileSync(file, 'utf-8')).countdowns;
+  const school = JSON.parse(readFileSync(join(root, 'src', 'data', 'school-calendar.json'), 'utf-8'));
+  const guide = JSON.parse(readFileSync(join(root, 'src', 'data', 'holiday-guide.json'), 'utf-8'));
+  return JSON.parse(readFileSync(file, 'utf-8')).countdowns.map((def) => {
+    if (def.category === 'national') return { ...def, source: { ...guide.sources[0], verifiedAt: guide.verifiedAt } };
+    if (def.category !== 'school') return def;
+    const event = school.events.find((item) => item.countdownSlug === def.slug);
+    return { ...def, schedule: { type: 'fixed', dates: event ? [event.date] : [] } };
+  });
 }
 
 function parseIso(value) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value).trim());
+  if (!validIso(value)) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   return m ? { year: +m[1], month: +m[2], day: +m[3] } : null;
 }
 
 const jdnOf = (d) => gregorianToJdn(d.year, d.month, d.day);
 
 export function occurrences(def, from, limit = 3) {
+  if (!salaryScheduleApproved(def, from)) return [];
   const fromJdn = jdnOf(from);
   const s = def.schedule;
   const out = [];

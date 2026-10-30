@@ -1,0 +1,1 @@
+export function salaryScheduleApproved(def: { category: string; schedule: { type: string }; source?: { label: string; url: string }; verification?: { status: string; editorApproved: boolean; verifiedAt: string; reviewDue: string; sourceUrl: string } }, today: { year: number; month: number; day: number }): boolean;

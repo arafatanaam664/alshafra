@@ -5,7 +5,7 @@
 // app and the crawlable markup can never disagree about a date.
 //
 // No Gregorian date of a religious event is ever written by hand: Hijri
-// schedules are resolved through the Umm Al-Qura table in lib/hijri.ts.
+// schedules are resolved using the browser calendar or a tabular fallback.
 
 import type { GregorianDate, HijriDate } from './hijri';
 import {
@@ -16,9 +16,15 @@ import {
   hijriToGregorian,
   jdnToGregorian,
   weekdayName,
+  todayGregorian,
 } from './hijri';
 import { applyWeekendRule } from './events';
 import raw from '../data/countdowns.json';
+import schoolCalendar from '../data/school-calendar.json';
+import holidayGuide from '../data/holiday-guide.json';
+import { countdownNotice } from './countdown-notice.mjs';
+import { salaryScheduleApproved } from './salary-trust.mjs';
+import { validIso } from './iso-date.mjs';
 
 export type CountdownCategory = 'national' | 'religious' | 'salary' | 'school' | 'seasonal';
 
@@ -47,7 +53,8 @@ export interface CountdownDef {
   notes: string[];
   faq: CountdownFaq[];
   related: string[];
-  source?: { label: string; url: string };
+  source?: { label: string; url: string; verifiedAt?: string };
+  verification?: { status: string; editorApproved: boolean; verifiedAt: string; reviewDue: string; sourceUrl: string };
 }
 
 export interface ResolvedCountdown {
@@ -65,7 +72,16 @@ export interface ResolvedCountdown {
   upcoming: GregorianDate[];
 }
 
-export const COUNTDOWNS = (raw as { countdowns: CountdownDef[] }).countdowns;
+export const COUNTDOWNS = (raw as { countdowns: CountdownDef[] }).countdowns.map((def) => {
+  if (def.category === 'national') return { ...def, source: { ...holidayGuide.sources[0], verifiedAt: holidayGuide.verifiedAt } };
+  if (def.category !== 'school') return def;
+  const event = schoolCalendar.events.find((item) => 'countdownSlug' in item && item.countdownSlug === def.slug);
+  return { ...def, schedule: { type: 'fixed' as const, dates: event ? [event.date] : [] } };
+});
+
+export function getCountdownNotice(def: CountdownDef): string {
+  return countdownNotice(def, schoolCalendar.verifiedAt, todayGregorian());
+}
 
 export const COUNTDOWN_CATEGORY_LABELS: Record<CountdownCategory, string> = {
   national: 'وطنية',
@@ -88,7 +104,8 @@ export function getCountdown(slug: string): CountdownDef | undefined {
 }
 
 function parseIso(value: string): GregorianDate | null {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (!validIso(value)) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!m) return null;
   return { year: +m[1], month: +m[2], day: +m[3] };
 }
@@ -99,9 +116,11 @@ function jdn(d: GregorianDate): number {
 
 /**
  * Every future occurrence needed by the UI (max `limit`), already adjusted for
- * the Saudi weekend rule where the schedule asks for it.
+ * the configured weekend adjustment where applicable. Salary dates require
+ * separately reviewed fixed dates and cannot use a recurring rule.
  */
 export function occurrences(def: CountdownDef, from: GregorianDate, limit = 3): GregorianDate[] {
+  if (!salaryScheduleApproved(def, from)) return [];
   const fromJdn = jdn(from);
   const out: GregorianDate[] = [];
   const s = def.schedule;

@@ -1,167 +1,42 @@
-import { BookOpen, GraduationCap, CalendarCheck } from 'lucide-react';
 import { useSeo } from '../lib/seo';
-import AdPlacement from '../components/AdPlacement';
-import SmartlinkCard from '../components/SmartlinkCard';
-import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
-import { eventsByCategory, daysUntilEvent, rawDaysUntilEvent,
-  eventHijriText,
-} from '../lib/events';
-import Countdown from '../components/Countdown';
+import schoolCalendar from '../data/school-calendar.json';
+import Link from '../components/Link';
+
+const weekday = new Intl.DateTimeFormat('ar-SA', { weekday: 'long', timeZone: 'Asia/Riyadh' });
+const dateFormat = new Intl.DateTimeFormat('ar-SA-u-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Riyadh' });
 
 export default function SchoolCalendarPage() {
-  const today = todayGregorian();
-  const schoolEvents = [...eventsByCategory('school')].sort(
-    (a, b) => a.date.year - b.date.year || a.date.month - b.date.month || a.date.day - b.date.day,
-  );
-  // Signed difference — `daysUntilEvent` clamps to 0 and would happily return
-  // a school date that already passed.
-  const next = schoolEvents.find((e) => rawDaysUntilEvent(e, today) >= 0);
-
   useSeo({
     title: 'التقويم الدراسي 1448-1449هـ (2026-2027م) | تقويم السعودية',
-    description:
-      'التقويم الدراسي الرسمي للعام 1448-1449هـ (2026-2027م) وفق وزارة التعليم السعودية وتقويم أم القرى — مواعيد بداية الدراسة وإجازات المدارس لجميع مراحل التعليم.',
+    description: 'مواعيد بداية الدراسة وإجازات المدارس 1448-1449هـ حسب صفحة التقويم الدراسي لوزارة التعليم، مع رابط المصدر وتاريخ المراجعة.',
     canonical: 'https://alshafra.com/school-calendar',
-    keywords: 'التقويم الدراسي, 1448, بداية الدراسة, إجازات المدارس, وزارة التعليم, التقويم المدرسي',
-    jsonLd: schoolEvents.map((e) => {
-      const startDate = `${e.date.year}-${String(e.date.month).padStart(2, '0')}-${String(e.date.day).padStart(2, '0')}`;
-      const endDateObj = e.holidayDays && e.holidayDays > 1
-        ? (() => {
-            const d = new Date(e.date.year, e.date.month - 1, e.date.day + e.holidayDays - 1);
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          })()
-        : startDate;
-      return {
-        '@context': 'https://schema.org',
-        '@type': 'Event',
-        name: e.title,
-        description: e.description,
-        startDate,
-        endDate: endDateObj,
-        eventStatus: 'https://schema.org/EventScheduled',
-        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-        location: {
-          '@type': 'Place',
-          name: 'مدارس المملكة العربية السعودية',
-          address: { '@type': 'PostalAddress', addressCountry: 'SA' },
-        },
-        organizer: {
-          '@type': 'GovernmentOrganization',
-          name: 'وزارة التعليم السعودية',
-          url: 'https://www.moe.gov.sa',
-        },
-        inLanguage: 'ar-SA',
-      };
-    }),
   });
 
   return (
     <div className="container-page py-10">
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
-        <div className="min-w-0">
-          <header className="max-w-2xl">
-            <h1 className="section-title">التقويم الدراسي 1448-1449هـ</h1>
-            <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-              التقويم الدراسي الرسمي وفق وزارة التعليم السعودية وتقويم أم القرى — مواعيد بداية الدراسة
-              وإجازات المدارس لجميع مراحل التعليم العام في المملكة العربية السعودية.
-            </p>
-          </header>
-
-      {next && (
-        <section className="mt-8 card overflow-hidden">
-          <div className="border-b border-brand-900/5 bg-gradient-to-l from-sky-50 to-transparent px-6 py-4">
-            <h2 className="font-display text-lg font-bold text-brand-900">أقرب موعد دراسي</h2>
-          </div>
-          <div className="p-6">
-            <div className="flex items-start gap-3">
-              <span className="text-3xl">{next.emoji}</span>
-              <div>
-                <h3 className="font-display text-xl font-bold text-brand-900">{next.title}</h3>
-                <p className="mt-1 text-sm text-brand-700/80">
-                  {formatGregorian(next.date)} — {eventHijriText(next)} — {weekdayName(next.date)}
-                </p>
-              </div>
-            </div>
-            <div className="mt-5">
-              <Countdown target={next.date} />
-            </div>
-            <p className="mt-5 text-sm leading-relaxed text-brand-700/80">{next.description}</p>
-          </div>
-        </section>
-      )}
-
-      <section className="mt-10">
-        <h2 className="font-display text-lg font-bold text-brand-900">جدول التقويم الدراسي</h2>
-        <div className="mt-4 space-y-4">
-          {schoolEvents.map((e, idx) => {
-            const h = gregorianToHijri(e.date.year, e.date.month, e.date.day);
-            const days = daysUntilEvent(e, today);
-            const isPast = days === 0 && new Date(e.date.year, e.date.month - 1, e.date.day) < new Date(today.year, today.month - 1, today.day);
-            return (
-              <div key={e.id} className="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-                <div className="flex items-center gap-4">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
-                    <BookOpen className="h-6 w-6" />
-                  </span>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-display text-base font-bold text-brand-900">{e.title}</span>
-                      {e.isHoliday && (
-                        <span className="chip bg-sky-50 text-sky-700 ring-1 ring-sky-200">
-                          <CalendarCheck className="h-3 w-3" />
-                          إجازة {e.holidayDays} أيام
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-1 text-xs text-brand-700/70">
-                      {formatGregorian(e.date)} — {formatHijri(h)} — {weekdayName(e.date)}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between gap-3 sm:mr-auto sm:justify-end">
-                  <div className="text-right">
-                    <div className="font-display text-2xl font-bold tabular-nums text-brand-700">
-                      {isPast ? 'انتهت' : days}
-                    </div>
-                    <div className="text-[11px] text-brand-600/70">{isPast ? '' : 'يوم متبقي'}</div>
-                  </div>
-                  <span className="text-2xl">{e.emoji}</span>
-                </div>
-                {idx === 0 && <div className="hidden" />}
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <AdPlacement name="content" unit="native" className="mt-10" />
-          <AdPlacement name="content" unit="rectangle" className="mt-8" />
-
-          <section className="mt-10 card p-6 sm:p-8">
-            <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
-                <GraduationCap className="h-5 w-5" />
-              </span>
-              <div>
-                <h2 className="font-display text-lg font-bold text-brand-900">عن التقويم الدراسي</h2>
-                <p className="mt-2 text-sm leading-relaxed text-brand-700/85">
-                  يُحدد التقويم الدراسي في المملكة العربية السعودية من قبل وزارة التعليم لجميع مراحل
-                  التعليم العام (الابتدائي، المتوسط، الثانوي) في جميع المناطق الإدارية. يتضمن التقويم
-                  مواعيد بداية ونهاية كل فصل دراسي، وإجازات منتصف الفصل، والإجازات الرسمية الدينية
-                  والوطنية. التقويم المعروض هنا تقريبي ولأغراض معلوماتية.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <SmartlinkCard variant="inline" className="mt-10" />
-        </div>
-        <aside className="hidden lg:block">
-          <div className="sticky top-24">
-            <AdPlacement name="sidebar" />
-          </div>
-        </aside>
+      <header className="max-w-3xl">
+        <h1 className="section-title">التقويم الدراسي 1448-1449هـ (2026-2027م)</h1>
+        <p className="mt-3 leading-relaxed text-brand-700/80">بداية الدراسة وإجازات المدارس كما وردت في صفحة وزارة التعليم عند المراجعة. تاريخ إجازة المدرسة ليس بالضرورة يوم العيد نفسه.</p>
+      </header>
+      <div className="mt-6 rounded-xl bg-sky-50 p-4 text-sm leading-relaxed text-sky-900">
+        <p>{schoolCalendar.notice}</p>
+        <p className="mt-2">آخر تحقق: {schoolCalendar.verifiedAt} · <a className="underline" href={schoolCalendar.source} target="_blank" rel="noopener noreferrer">صفحة التقويم الدراسي بوزارة التعليم</a></p>
       </div>
+      <section className="mt-8" aria-labelledby="school-dates">
+        <h2 id="school-dates" className="font-display text-xl font-bold">مواعيد الدراسة والإجازات المدرسية</h2>
+        <div className="mt-4 overflow-x-auto rounded-xl bg-white ring-1 ring-brand-900/10">
+          <table className="w-full min-w-[34rem] text-right text-sm">
+            <caption className="sr-only">مواعيد التقويم الدراسي وتواريخها كما في وزارة التعليم</caption>
+            <thead className="bg-brand-50"><tr><th scope="col" className="p-4">المناسبة</th><th scope="col" className="p-4">اليوم والميلادي</th><th scope="col" className="p-4">الهجري كما في المصدر</th></tr></thead>
+            <tbody>{schoolCalendar.events.map((event) => {
+              const [year, month, day] = event.date.split('-').map(Number);
+              const instant = new Date(Date.UTC(year, month - 1, day, 12));
+              return <tr key={event.id} className="border-t border-brand-900/10"><th scope="row" className="p-4 font-semibold">{event.title}{'countdownSlug' in event && <span className="mt-1 block font-normal"><Link className="text-brand-700 underline" to={`/countdown/${event.countdownSlug}`}>عرض العداد</Link></span>}</th><td className="p-4">{weekday.format(instant)}، {dateFormat.format(instant)}</td><td className="p-4"><span dir="ltr">{event.hijri}</span> هـ</td></tr>;
+            })}</tbody>
+          </table>
+        </div>
+        <p className="mt-4 text-sm leading-relaxed text-brand-700/80">الفئة: المدارس، مع تحديد عودة المعلمين في صفها. الحالة: منقول من صفحة الوزارة عند تاريخ التحقق أعلاه، لا يغني عن متابعة تحديثاتها. لم تُحدّد في الصفحة المعروضة هنا آخر أيام الإجازات أو العودة منها؛ لا نستنتجها من تاريخ البداية. راجع الوزارة وإدارة التعليم المختصة لأي تحديث.</p>
+      </section>
     </div>
   );
 }

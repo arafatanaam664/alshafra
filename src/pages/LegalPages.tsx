@@ -3,6 +3,8 @@ import { useSeo } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
 import AdPlacement from '../components/AdPlacement';
 import SmartlinkCard from '../components/SmartlinkCard';
+import privacyNotice from '../data/privacy-notice.json';
+import contact from '../data/site-contact.json';
 
 function LegalLayout({
   title,
@@ -69,88 +71,14 @@ export function PrivacyPage() {
   });
   return (
     <LegalLayout title="سياسة الخصوصية">
-      <p>
-        نحترم خصوصية زوار موقعنا «تقويم السعودية» (alshafra.com). توضّح هذه السياسة كيفية جمع
-        البيانات واستخدامها وحمايتها عند استخدامك لموقعنا.
-      </p>
-
-      <h2 className="font-display text-lg font-bold text-brand-900">1. البيانات التي نجمعها</h2>
-      <p>
-        موقعنا لا يتطلب إنشاء حساب ولا يجمع بياناتك الشخصية (الاسم، البريد، رقم الهوية) إلا إذا
-        تواصلت معنا طوعاً عبر البريد الإلكتروني. نجمع تلقائياً بيانات تقنية عامة مثل نوع المتصفح،
-        نظام التشغيل، الصفحات المُزارَة، ومصدر الزيارة عبر أدوات تحليلات مثل Google Analytics.
-      </p>
-
-      <h2 className="font-display text-lg font-bold text-brand-900">2. ملفات تعريف الارتباط (Cookies)</h2>
-      <p>
-        يستخدم موقعنا ملفات تعريف ارتباط لتحسين تجربة المستخدم وتحليل الأداء. كما يستخدمها شركاؤنا
-        مثل Google لعرض الإعلانات. يمكنك التحكم في هذه الملفات أو تعطيلها من إعدادات متصفحك، لكن
-        ذلك قد يؤثر على بعض الوظائف.
-      </p>
-
-      <h2 className="font-display text-lg font-bold text-brand-900">3. إعلانات Google AdSense</h2>
-      <p>
-        نستخدم خدمة Google AdSense لعرض الإعلانات. تستخدم Google ملفات تعريف ارتباط لعرض إعلانات
-        بناءً على زياراتك السابقة لموقعنا أو مواقع أخرى. يمكنك تعطيل الإعلانات المخصصة عبر زيارة
-        <a href="https://www.google.com/settings/ads" className="text-brand-700 underline" target="_blank" rel="noopener noreferrer"> إعدادات إعلانات Google</a>.
-      </p>
-      <p>
-        قد يستخدم طرف ثالث ملفات تعريف ارتباط لتحسين جودة الخدمة. يمكنك الاطلاع على سياسة Google
-        للإعلانات عبر <a href="https://policies.google.com/technologies/ads" className="text-brand-700 underline" target="_blank" rel="noopener noreferrer">هذه الصفحة</a>.
-      </p>
-
-      <h2 className="font-display text-lg font-bold text-brand-900">4. إعلانات شبكة Adsterra</h2>
-      <p>
-        نستخدم إلى جانب Google AdSense شبكة <strong>Adsterra</strong> لعرض أنواع أخرى من الإعلانات:
-        شريط اجتماعي في أسفل الصفحة، بانر أصلي داخل المحتوى، بانرات مقاسَة في أعلى الصفحة ومحتواها
-        وشريطها الجانبي وذيلها (حسب عرض الموضع ونوع الصفحة)، وروابط إعلانية مدعومة. تستخدم Adsterra
-        ملفات تعريف ارتباط ومعرّفات غير شخصية لقياس مرات الظهور والنقرات واختيار الإعلان الأنسب. يمكنك
-        الاطلاع على سياسة الخصوصية الخاصة بها عبر{' '}
-        <a href="https://adsterra.com/privacy-policy/" className="text-brand-700 underline" target="_blank" rel="noopener noreferrer">
-          هذه الصفحة
-        </a>.
-      </p>
-      <p>
-        كل مواضع Adsterra على الموقع موسومة بكلمة «إعلان» أو «إعلان مدعوم». الروابط الذكية تُفتح في
-        نافذة جديدة بـ rel=&quot;sponsored nofollow&quot; ولا تُفتح تلقائياً ولا تُربط بأزرار التقويم أو
-        التحويل أو التحميل. صفحات سياسة الخصوصية وشروط الاستخدام لا تعرض بانرات إضافية فوق الشريط
-        الاجتماعي.
-      </p>
-      <p>
-        تشغيل AdSense وAdsterra معاً ممكن تقنياً، لكن سياسات Google قد تقيّد بعض أشكال الإعلانات
-        (نوافذ أو طبقات). لا نضمن امتثال الحساب بسبب عدد محدد من الوحدات.
-      </p>
-
-      <h2 className="font-display text-lg font-bold text-brand-900">5. خدمات التحليلات</h2>
-      <p>
-        قد نستخدم Google Analytics لفهم كيفية استخدام الزوار للموقع وتحسين محتواه. تجمع هذه الخدمة
-        بيانات مجهولة الهوية ولا تكشف هويتك الشخصية.
-      </p>
-
-      <h2 className="font-display text-lg font-bold text-brand-900">6. الروابط الخارجية</h2>
-      <p>
-        يحتوي موقعنا على روابط لمواقع خارجية (مثل البوابة الرسمية لحساب المواطن ووزارة التعليم).
-        لسنا مسؤولين عن سياسات الخصوصية لتلك المواقع، وننصحك بقراءتها.
-      </p>
-
-      <h2 className="font-display text-lg font-bold text-brand-900">7. أمن البيانات</h2>
-      <p>
-        نتخذ إجراءات معقولة لحماية البيانات من الوصول غير المصرّح به. ومع ذلك، لا يمكن ضمان أمن أي
-        نقل عبر الإنترنت بنسبة 100%.
-      </p>
-
-      <h2 className="font-display text-lg font-bold text-brand-900">8. حقوق المستخدم</h2>
-      <p>
-        يمكنك طلب الاطلاع على أي بيانات جمعناها عنك أو طلب حذفها عبر التواصل معنا على
-        info@alshafra.com.
-      </p>
-
-      <h2 className="font-display text-lg font-bold text-brand-900">9. تحديثات السياسة</h2>
-      <p>
-        قد نُحدّث سياسة الخصوصية من وقت لآخر. سيتم نشر أي تغييرات على هذه الصفحة مع تحديث التاريخ.
-      </p>
-
-      <p className="text-xs text-brand-600/70">آخر تحديث: أكتوبر 2026</p>
+      <p>{privacyNotice.intro}</p>
+      {privacyNotice.sections.map(section => (
+        <section key={section.heading}>
+          <h2 className="font-display text-lg font-bold text-brand-900">{section.heading}</h2>
+          <p className="mt-2">{section.body}</p>
+          {section.links.length > 0 && <ul className="mt-2 list-disc pr-5">{section.links.map(link => <li key={link.url}><a href={link.url} target="_blank" rel="noopener noreferrer" className="text-brand-700 underline">{link.label}</a></li>)}</ul>}
+        </section>
+      ))}
     </LegalLayout>
   );
 }
@@ -219,7 +147,6 @@ export function TermsPage() {
         تخضع هذه الشروط للأنظمة والقوانين المعمول بها في المملكة العربية السعودية.
       </p>
 
-      <p className="text-xs text-brand-600/70">آخر تحديث: يوليو 2026</p>
     </LegalLayout>
   );
 }
@@ -259,6 +186,9 @@ export function AboutPage() {
         <li>بيانات المؤسسة العامة للتقاعد وحساب المواطن.</li>
       </ul>
 
+      <h2 className="font-display text-lg font-bold text-brand-900">التحرير</h2>
+      <p>يتولى {contact.editorialTeam} مسؤولية مراجعة المحتوى والمواعيد واعتماد النشر. راجع المصادر الرسمية للتحديثات النهائية.</p>
+
       <h2 className="font-display text-lg font-bold text-brand-900">استقلالنا</h2>
       <p>
         موقعنا مستقل ولا يتبع لأي جهة حكومية. لا نطلب تسجيل الدخول ولا نجمع بياناتك الشخصية لاستخدام
@@ -267,13 +197,13 @@ export function AboutPage() {
 
       <h2 className="font-display text-lg font-bold text-brand-900">التمويل</h2>
       <p>
-        يُموَّل الموقع ذاتياً عبر إعلانات Google AdSense لاستمرار تقديم الخدمة مجاناً. لا تؤثر
-        الإعلانات على محتوى المقالات أو الأدوات.
+        يتضمن الموقع مواضع إعلانية وروابط إعلانية من شبكات تشمل Google وAdsterra. لا يُعد الإعلان
+        مصدراً تحريرياً للمواعيد.
       </p>
 
       <h2 className="font-display text-lg font-bold text-brand-900">التواصل</h2>
       <p>
-        لأي ملاحظة أو اقتراح، راسلنا على info@alshafra.com.
+        لأي ملاحظة أو اقتراح، راسلنا على <a className="break-all text-brand-700 underline" href={`mailto:${contact.email}`}>{contact.email}</a>.
       </p>
     </LegalWithAdsLayout>
   );
@@ -299,8 +229,7 @@ export function ContactPage() {
             <Mail className="h-5 w-5" />
           </span>
           <h3 className="mt-3 font-display text-base font-bold text-brand-900">البريد الإلكتروني</h3>
-          <p className="mt-1 text-sm text-brand-700/85">info@alshafra.com</p>
-          <p className="mt-1 text-xs text-brand-600/70">نرد خلال 48 ساعة عادةً</p>
+          <p className="mt-1 text-sm text-brand-700/85"><a className="break-all underline" href={`mailto:${contact.email}`}>{contact.email}</a></p>
         </div>
         <div className="card p-5">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
@@ -308,7 +237,7 @@ export function ContactPage() {
           </span>
           <h3 className="mt-3 font-display text-base font-bold text-brand-900">تصحيح معلومة</h3>
           <p className="mt-1 text-sm text-brand-700/85">
-            إن لاحظت خطأً في موعد أو تاريخ، أرسل لنا المصدر الرسمي وسنحدّث الصفحة فوراً.
+            إن لاحظت خطأً في موعد أو تاريخ، أرسل لنا المصدر الرسمي لمراجعته من فريق التحرير.
           </p>
         </div>
       </div>

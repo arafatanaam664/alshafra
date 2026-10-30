@@ -6,13 +6,7 @@ import {
   Flag,
   Sparkles,
   ArrowLeft,
-  Users,
-  HandCoins,
-  ShieldCheck,
-  Home as HomeIcon,
-  Briefcase,
   Download,
-  TrendingUp,
   FileText,
   HelpCircle,
   Wand2,
@@ -23,53 +17,29 @@ import { useSeo } from '../lib/seo';
 import { useNow } from '../lib/useNow';
 import {
   todayGregorian,
-  todayHijri,
+  gregorianToHijri,
   formatHijri,
   formatGregorian,
   weekdayName,
   formatHijriShort,
   formatGregorianShort,
 } from '../lib/hijri';
-import {
-  upcomingEvents,
-  buildSalaryInstances,
-  daysUntilEvent,
-  eventHijriText,
-  nextHolidayAfter,
-  CATEGORY_LABELS,
-  CATEGORY_STYLES,
-  SAUDI_EVENTS,
-  type SalaryInstance,
-} from '../lib/events';
 import { ARTICLES, CATEGORY_LABELS_ARTICLE } from '../lib/articles';
-import Countdown from '../components/Countdown';
 import Link from '../components/Link';
 import AdSlot from '../components/AdSlot';
 import AdPlacement from '../components/AdPlacement';
 import SmartlinkCard from '../components/SmartlinkCard';
 
-const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Briefcase,
-  Users,
-  HandCoins,
-  ShieldCheck,
-  Home: HomeIcon,
-};
-
 export default function HomePage() {
   const now = useNow(1000);
   const today = todayGregorian();
-  const hijri = todayHijri();
+  const hijri = gregorianToHijri(today.year, today.month, today.day);
   const weekday = weekdayName(today);
-  const upcoming = upcomingEvents(today, 6);
-  const salaries = buildSalaryInstances(today);
-  const nextEvent = upcoming[0];
-  const nextHoliday = nextHolidayAfter(today) ?? upcoming[0];
 
   useSeo({
     title: 'تقويم السعودية | مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي',
     description:
-      'بوابة سعودية شاملة لمواعيد صرف الرواتب الحكومية، حساب المواطن، الضمان الاجتماعي المطوّر، رواتب المتقاعدين، التقويم الهجري والميلادي، التقويم الدراسي، الإجازات الرسمية، وتحويل التاريخ وحاسبة العمر — وفق تقويم أم القرى الرسمي.',
+      'منصة مستقلة للتقويم والمواعيد والأدوات في السعودية؛ مواعيد الرواتب والدعم بانتظار التحقق، والتواريخ الحسابية تحتاج إلى مراجعة المصادر الرسمية.',
     canonical: 'https://alshafra.com/',
     keywords:
       'التقويم الهجري, التقويم الميلادي, مواعيد الرواتب, حساب المواطن, رواتب المتقاعدين, الضمان الاجتماعي, التقويم الدراسي, الإجازات الرسمية, تحويل التاريخ, حاسبة العمر, تقويم أم القرى, السعودية',
@@ -95,6 +65,7 @@ export default function HomePage() {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
+    timeZone: 'Asia/Riyadh',
   });
 
   return (
@@ -109,15 +80,14 @@ export default function HomePage() {
             <div className="animate-fade-in-up">
               <span className="chip bg-white/15 text-white ring-1 ring-white/20">
                 <Sparkles className="h-3.5 w-3.5 text-gold-300" />
-                البوابة السعودية الأولى للمواعيد الرسمية
+                منصة مستقلة للمواعيد والتقويم
               </span>
               <h1 className="mt-4 font-display text-4xl font-bold leading-tight text-balance sm:text-5xl">
                 مواعيد الرواتب، التقويم الهجري، والإجازات الرسمية في مكان واحد
               </h1>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-brand-50/90 sm:text-lg">
-                منصة سعودية شاملة تجمع مواعيد صرف الرواتب الحكومية، حساب المواطن، الضمان الاجتماعي
-                المطوّر، رواتب المتقاعدين، التقويم الهجري والميلادي، التقويم الدراسي، والإجازات
-                الرسمية، مع أدوات تحويل التاريخ وحاسبة العمر — وفق تقويم أم القرى الرسمي.
+                منصة مستقلة للتقويم والمواعيد والأدوات في السعودية. مواعيد الرواتب والدعم بانتظار
+                التحقق؛ راجع المصادر الرسمية قبل الاعتماد على أي موعد.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link to="/salaries" className="btn bg-gold-500 text-brand-900 hover:bg-gold-400">
@@ -161,16 +131,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats bar */}
-      <section className="container-page -mt-8 relative z-10">
-        <div className="card grid grid-cols-2 gap-4 p-5 sm:grid-cols-4 sm:p-6">
-          <Stat label="أقرب مناسبة" value={`${daysUntilEvent(nextEvent, today)} يوم`} sub={nextEvent.title} />
-          <Stat label="أقرب إجازة" value={`${daysUntilEvent(nextHoliday, today)} يوم`} sub={nextHoliday.title} />
-          <Stat label="المناسبات هذا العام" value={`${SAUDI_EVENTS.length}`} sub="مناسبة رسمية" />
-          <Stat label="برامج الرواتب" value="5" sub="حكومية ومستحقة" />
-        </div>
-      </section>
-
       <div className="container-page mt-10">
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
           <div className="min-w-0">
@@ -184,62 +144,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Next event countdown */}
-      <section className="container-page mt-12">
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="card overflow-hidden lg:col-span-2">
-            <div className="border-b border-brand-900/5 bg-gradient-to-l from-brand-50 to-transparent px-6 py-4">
-              <div className="flex items-center justify-between">
-                <h2 className="font-display text-lg font-bold text-brand-900">العدّ التنازلي لأقرب مناسبة</h2>
-                <span className={`chip ring-1 ${CATEGORY_STYLES[nextEvent.category]}`}>
-                  {CATEGORY_LABELS[nextEvent.category]}
-                </span>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="flex items-start gap-3">
-                <span className="text-3xl">{nextEvent.emoji}</span>
-                <div>
-                  <h3 className="font-display text-xl font-bold text-brand-900">{nextEvent.title}</h3>
-                  <p className="mt-1 text-sm text-brand-700/80">
-                    {formatGregorian(nextEvent.date)} — {eventHijriText(nextEvent)}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-5">
-                <Countdown target={nextEvent.date} />
-              </div>
-              <p className="mt-5 text-sm leading-relaxed text-brand-700/80">{nextEvent.description}</p>
-            </div>
-          </div>
-
-          <div className="card overflow-hidden">
-            <div className="border-b border-brand-900/5 bg-gradient-to-l from-gold-50 to-transparent px-6 py-4">
-              <h2 className="font-display text-lg font-bold text-brand-900">أقرب إجازة رسمية</h2>
-            </div>
-            <div className="p-6">
-              <div className="flex items-start gap-3">
-                <span className="text-3xl">{nextHoliday.emoji}</span>
-                <div>
-                  <h3 className="font-display text-lg font-bold text-brand-900">{nextHoliday.title}</h3>
-                  <p className="mt-1 text-sm text-brand-700/80">
-                    {formatGregorian(nextHoliday.date)} — {eventHijriText(nextHoliday)}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-5">
-                <Countdown target={nextHoliday.date} />
-              </div>
-              {nextHoliday.holidayDays ? (
-                <p className="mt-4 rounded-lg bg-gold-50 px-3 py-2 text-sm text-gold-800">
-                  مدة الإجازة المتوقعة: {nextHoliday.holidayDays} أيام
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Services grid */}
       <section className="container-page mt-14">
         <div className="flex items-end justify-between">
@@ -252,13 +156,13 @@ export default function HomePage() {
           <ServiceCard
             icon={Timer}
             title="كم باقي على…"
-            desc="عدّادات تنازلية مباشرة لرمضان والعيدين واليوم الوطني والرواتب وبداية الدراسة."
+            desc="عدّادات للمناسبات ومواعيد الدراسة المراجَعة؛ مواعيد الرواتب بانتظار التحقق."
             to="/countdown"
           />
           <ServiceCard
             icon={Sun}
             title="التاريخ اليوم"
-            desc="التاريخ الهجري والميلادي الآن بتوقيت الرياض وفق تقويم أم القرى الرسمي."
+            desc="التاريخ الهجري والميلادي بتوقيت الرياض؛ التاريخ الهجري حسابي وقد يستخدم بديلاً تقريبياً."
             to="/today"
           />
           <ServiceCard
@@ -270,7 +174,7 @@ export default function HomePage() {
           <ServiceCard
             icon={CalendarDays}
             title="التقويم الهجري"
-            desc="تقويم أم القرى الرسمي لكل الشهور الهجرية مع المناسبات الدينية والوطنية."
+            desc="تقويم هجري حسابي مع مناسبات مختارة وروابط مصادرها المتاحة."
             to="/hijri-calendar"
           />
           <ServiceCard
@@ -282,13 +186,13 @@ export default function HomePage() {
           <ServiceCard
             icon={Flag}
             title="الإجازات الرسمية"
-            desc="قائمة كاملة بالإجازات الدينية والوطنية مع مدة كل إجازة وتاريخها الهجري."
+            desc="دليل الإجازات بحسب الفئة والجهة، مع روابط المصادر."
             to="/holidays"
           />
           <ServiceCard
             icon={Clock}
             title="تحويل التاريخ"
-            desc="حوّل بين التاريخ الهجري والميلادي بدقة وفق تقويم أم القرى."
+            desc="أداة تحويل حسابية مع بيان حدود النتيجة."
             to="/date-converter"
           />
           <ServiceCard
@@ -310,73 +214,12 @@ export default function HomePage() {
         <AdPlacement name="content" size="320x50" />
       </div>
 
-      {/* Salary schedule preview */}
-      <section className="container-page mt-14">
-        <div className="flex items-end justify-between">
-          <div>
-            <h2 className="section-title">مواعيد الصرف القادمة</h2>
-            <p className="mt-1 text-sm text-brand-700/70">أقرب مواعيد صرف البرامج الحكومية والدعم</p>
-          </div>
-          <Link to="/salaries" className="btn-ghost">
-            عرض الكل
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {salaries.slice(0, 6).map((s) => (
-            <SalaryMiniCard key={s.schedule.id} instance={s} to="/salaries" />
-          ))}
-        </div>
-        <AdPlacement name="content" unit="rectangle" />
-      </section>
+      <div className="container-page mt-8"><AdPlacement name="content" unit="rectangle" /></div>
 
       <div className="container-page mt-8">
         <AdPlacement name="content" size="468x60" />
         <SmartlinkCard className="mt-8" />
       </div>
-
-      {/* Upcoming events */}
-      <section className="container-page mt-14">
-        <div className="flex items-end justify-between">
-          <div>
-            <h2 className="section-title">أقرب المناسبات</h2>
-            <p className="mt-1 text-sm text-brand-700/70">مناسبات دينية ووطنية ودراسية قادمة</p>
-          </div>
-        </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {upcoming.map((e) => {
-            const days = daysUntilEvent(e, today);
-            return (
-              <Link
-                key={e.id}
-                to={e.category === 'school' ? '/school-calendar' : '/holidays'}
-                className="card group block p-5 text-right transition-all hover:-translate-y-0.5 hover:shadow-soft"
-              >
-                <div className="flex items-start justify-between">
-                  <span className="text-2xl">{e.emoji}</span>
-                  <span className={`chip ring-1 ${CATEGORY_STYLES[e.category]}`}>
-                    {CATEGORY_LABELS[e.category]}
-                  </span>
-                </div>
-                <h3 className="mt-3 font-display text-base font-bold text-brand-900">{e.title}</h3>
-                <p className="mt-1 text-xs text-brand-700/70">
-                  {formatGregorian(e.date)} — {eventHijriText(e)}
-                </p>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="font-display text-2xl font-bold tabular-nums text-brand-700">{days}</span>
-                  <span className="text-xs text-brand-600/70">يوم متبقي</span>
-                </div>
-                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-brand-100">
-                  <div
-                    className="h-full rounded-full gradient-brand transition-all group-hover:opacity-90"
-                    style={{ width: `${Math.max(8, 100 - days * 2)}%` }}
-                  />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
 
       {/* Adsterra smartlink — high-intent partner offer */}
       <div className="container-page mt-6">
@@ -390,17 +233,16 @@ export default function HomePage() {
           <div className="grid items-center gap-6 p-6 sm:p-8 md:grid-cols-3">
             <div className="md:col-span-2">
               <h2 className="font-display text-xl font-bold text-brand-900 sm:text-2xl">
-                تحميل التقويم الهجري 1448هـ — PDF مجاني
+                طباعة التقويم الهجري
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-                نسخة PDF كاملة جاهزة للطباعة والتشاريك، تشمل جميع المناسبات الدينية والوطنية والإجازات
-                الرسمية وفق تقويم أم القرى الرسمي للعام الهجري 1448هـ (2026-2027م).
+                انتقل إلى التقويم واختر الطباعة؛ يمكنك حفظه بصيغة PDF إذا دعم متصفحك ذلك.
               </p>
             </div>
             <div className="flex md:justify-end">
               <Link to="/hijri-calendar" className="btn-primary">
                 <Download className="h-4 w-4" />
-                تحميل التقويم PDF
+                عرض التقويم للطباعة
               </Link>
             </div>
           </div>
@@ -471,14 +313,12 @@ export default function HomePage() {
           <div className="mt-4 space-y-3 text-sm leading-relaxed text-brand-700/85">
             <p>
               <strong className="text-brand-900">تقويم السعودية</strong> هي بوابة إلكترونية متخصصة في عرض
-              التقويمات والمواعيد المهمة في المملكة العربية السعودية. نقدم لكم مواعيد صرف الرواتب
-              الحكومية، حساب المواطن، الضمان الاجتماعي المطوّر، رواتب المتقاعدين، والدعم السكني،
-              بالإضافة إلى التقويم الهجري والميلادي، التقويم الدراسي، وجميع المناسبات الوطنية والدينية.
+              التقويمات ومعلومات المواعيد في المملكة العربية السعودية. مواعيد الرواتب والدعم بانتظار
+              التحقق، وتتوفر مواعيد دراسية مختارة وروابط الجهات المختصة.
             </p>
             <p>
-              تعتمد البوابة على تقويم أم القرى الرسمي الصادر عن المملكة العربية السعودية كمرجع أساسي
-              لتحديد مواعيد الإجازات الرسمية والمناسبات. توفر المنصة أيضاً أدوات تحويل التاريخ بين
-              الهجري والميلادي، وحاسبة العمر بالسنوات والأشهر والأيام.
+              تستخدم أدوات التقويم بيانات أم القرى المتاحة في المتصفح عند دعمها، أو حساباً تقريبياً
+              عند عدم توفرها. لا تغني النتائج عن الإعلانات الرسمية واللوائح الخاصة بكل فئة.
             </p>
             <p>
               نسعى لجعل المعلومات في متناول الجميع بسرعة ودقة، مع التذكير بأن التواريخ المعروضة
@@ -487,16 +327,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-    </div>
-  );
-}
-
-function Stat({ label, value, sub }: { label: string; value: string; sub: string }) {
-  return (
-    <div className="text-center">
-      <div className="text-[11px] font-medium uppercase tracking-wide text-brand-600/70">{label}</div>
-      <div className="mt-1 stat-num text-brand-700">{value}</div>
-      <div className="mt-0.5 truncate text-xs text-brand-700/70">{sub}</div>
     </div>
   );
 }
@@ -521,39 +351,11 @@ function ServiceCard({
         <Icon className="h-5 w-5" />
       </span>
       <h3 className="mt-4 font-display text-base font-bold text-brand-900">{title}</h3>
-      <p className="mt-1 text-sm leading-relaxed text-brand-700/75">{desc}</p>
+      <p className="mt-1 text-sm leading-relaxed text-brand-800">{desc}</p>
       <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-brand-600">
         اكتشف المزيد
         <ArrowLeft className="h-3.5 w-3.5" />
       </span>
-    </Link>
-  );
-}
-
-function SalaryMiniCard({ instance, to }: { instance: SalaryInstance; to: string }) {
-  const Icon = ICONS[instance.schedule.icon] ?? Coins;
-  return (
-    <Link
-      to={to}
-      className="card group block p-5 text-right transition-all hover:-translate-y-0.5 hover:shadow-soft"
-    >
-      <div className="flex items-center justify-between">
-        <span className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${instance.schedule.accent} text-white`}>
-          <Icon className="h-5 w-5" />
-        </span>
-        <span className="font-display text-2xl font-bold tabular-nums text-brand-700">
-          {instance.daysRemaining}
-          <span className="mr-1 text-xs font-medium text-brand-600/70">يوم</span>
-        </span>
-      </div>
-      <h3 className="mt-3 font-display text-sm font-bold text-brand-900">{instance.schedule.title}</h3>
-      <p className="mt-1 text-xs text-brand-700/70">
-        {instance.gregorianText} — {instance.weekdayText}
-      </p>
-      <div className="mt-3 flex items-center gap-1 text-[11px] text-brand-600/70">
-        <TrendingUp className="h-3.5 w-3.5" />
-        {instance.hijriText}
-      </div>
     </Link>
   );
 }

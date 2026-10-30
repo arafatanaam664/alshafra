@@ -106,12 +106,12 @@ export function adDensityForRoute(name: string): AdDensity {
     case 'school-calendar':
     case 'holidays':
     case 'date-converter':
-    case 'age-calculator':
     case 'name-decoration':
     case 'faq':
     case 'about':
     case 'contact':
       return 'standard';
+    case 'age-calculator':
     case 'privacy':
     case 'terms':
       return 'minimal';

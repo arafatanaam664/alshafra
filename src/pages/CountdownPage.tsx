@@ -3,16 +3,19 @@ import { Timer, CalendarDays, ArrowLeft, ExternalLink, Info, ListChecks } from '
 import { useSeo, SITE_URL } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
 import Countdown from '../components/Countdown';
+import { useRiyadhToday } from '../lib/useRiyadhToday';
 import Link from '../components/Link';
 import AdSlot from '../components/AdSlot';
 import AdPlacement from '../components/AdPlacement';
 import SmartlinkCard from '../components/SmartlinkCard';
 import type { GregorianDate } from '../lib/hijri';
-import { todayGregorian, formatGregorian, formatHijri, gregorianToHijri, weekdayName } from '../lib/hijri';
+import { formatGregorian, formatHijri, gregorianToHijri, weekdayName, gregorianToJdn } from '../lib/hijri';
+import { validIso } from '../lib/iso-date.mjs';
 import {
   COUNTDOWN_CATEGORY_LABELS,
   COUNTDOWN_CATEGORY_STYLES,
   getCountdown,
+  getCountdownNotice,
   isoDate,
   resolveAll,
   resolveCountdown,
@@ -28,7 +31,7 @@ import {
 type Filter = 'all' | CountdownCategory;
 
 export function CountdownHubPage() {
-  const today = todayGregorian();
+  const today = useRiyadhToday();
   const [filter, setFilter] = useState<Filter>('all');
   const all = resolveAll(today);
 
@@ -38,7 +41,7 @@ export function CountdownHubPage() {
   useSeo({
     title: 'كم باقي على… | عدّادات تنازلية للمناسبات والرواتب في السعودية',
     description:
-      'عدّادات تنازلية مباشرة لكل ما يهم السعوديين: كم باقي على رمضان، عيد الفطر، عيد الأضحى، اليوم الوطني، يوم التأسيس، حساب المواطن، الرواتب، بداية الدراسة والإجازات — محسوبة وفق تقويم أم القرى بتوقيت الرياض.',
+      'عدّادات ومواعيد دراسية ومناسبات بتوقيت الرياض، مع بيان حالة الموعد؛ الرواتب والدعم بانتظار التحقق.',
     canonical: `${SITE_URL}/countdown`,
     keywords:
       'كم باقي على رمضان, كم باقي على العيد, كم باقي على الراتب, كم باقي على اليوم الوطني, عداد تنازلي, كم باقي على حساب المواطن, كم باقي على الدراسة',
@@ -47,7 +50,7 @@ export function CountdownHubPage() {
         '@context': 'https://schema.org',
         '@type': 'ItemList',
         name: 'العدّادات التنازلية في تقويم السعودية',
-        itemListElement: all.map((c, i) => ({
+        itemListElement: list.map((c, i) => ({
           '@type': 'ListItem',
           position: i + 1,
           name: c.def.question,
@@ -68,7 +71,7 @@ export function CountdownHubPage() {
 
   return (
     <div className="container-page py-10">
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+      <div className="grid items-start gap-8">
         <div className="min-w-0">
           <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'كم باقي على…' }]} />
 
@@ -93,6 +96,7 @@ export function CountdownHubPage() {
                   <p className="mt-1 text-sm text-brand-700/80">
                     {nearest.gregorianText} — {nearest.hijriText} — {nearest.weekdayText}
                   </p>
+                  <p className="mt-1 text-xs text-brand-700/80">{getCountdownNotice(nearest.def)}</p>
                   <Link
                     to={`/countdown/${nearest.def.slug}`}
                     className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:underline"
@@ -110,11 +114,14 @@ export function CountdownHubPage() {
         </section>
       )}
 
-      <div className="mt-8 flex flex-wrap gap-2">
+      <CustomCountdown today={today} />
+
+      <div className="mt-8 flex flex-wrap gap-2" aria-label="تصفية العدادات حسب النوع">
         {filters.map((f) => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
+            aria-pressed={filter === f.key}
             className={`chip ring-1 transition-colors ${
               filter === f.key
                 ? 'bg-brand-600 text-white ring-brand-600'
@@ -132,44 +139,53 @@ export function CountdownHubPage() {
         ))}
       </section>
 
-      <AdSlot slot="countdown" />
-          <AdPlacement name="content" unit="native" />
-          <AdPlacement name="content" unit="rectangle" className="mt-8" />
-          <SmartlinkCard
-            className="mt-8"
-            title="عرض من شريكنا"
-            description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة."
-          />
-
           <section className="mt-10 card p-6 sm:p-8">
             <h2 className="font-display text-lg font-bold text-brand-900">كيف تُحسب هذه العدّادات؟</h2>
             <div className="mt-3 space-y-3 text-sm leading-relaxed text-brand-700/85">
               <p>
-                كل عدّاد يعتمد على قاعدة زمنية واضحة بدل التواريخ المكتوبة يدوياً: المناسبات الدينية
-                تُشتق من تاريخها الهجري عبر تقويم أم القرى الرسمي (مثلاً عيد الأضحى = 10 ذو الحجة)،
-                والمناسبات الوطنية من تاريخها الميلادي الثابت، ومواعيد الرواتب والدعم من يوم الصرف
-                الشهري بعد تطبيق قاعدة نهاية الأسبوع، والمواعيد الدراسية من التقويم المعتمد لوزارة
-                التعليم.
+                المناسبات الدينية تُحسب من تاريخها الهجري باستخدام تقويم أم القرى الذي يوفره المتصفح،
+                أو حساب تقريبي عند عدم توفره (مثلاً عيد الأضحى = 10 ذو الحجة)،
+                والمناسبات الوطنية من تاريخها الميلادي الثابت. مواعيد الرواتب والدعم بانتظار
+                التحقق من الجهة المعنية، والمواعيد الدراسية من صفحة وزارة التعليم عند آخر مراجعة.
               </p>
               <p>
                 جميع الأيام تُحسب بتوقيت الرياض (UTC+3) حتى يرى الزائر داخل المملكة وخارجها الرقم
-                نفسه. التواريخ الدينية تبقى مرتبطة بإعلان رؤية الهلال وقد تتغير بيوم واحد.
+                نفسه. التواريخ الدينية تبقى مرتبطة بإعلان رؤية الهلال وقد تختلف عن الحساب.
               </p>
             </div>
           </section>
         </div>
-        <aside className="hidden lg:block">
-          <div className="sticky top-24">
-            <AdPlacement name="sidebar" />
-          </div>
-        </aside>
       </div>
     </div>
   );
 }
 
+function CustomCountdown({ today }: { today: GregorianDate }) {
+  const [value, setValue] = useState('');
+  const valid = validIso(value);
+  const [year, month, day] = valid ? value.split('-').map(Number) : [0, 0, 0];
+  const target = { year, month, day };
+  const days = valid ? gregorianToJdn(year, month, day) - gregorianToJdn(today.year, today.month, today.day) : 0;
+  return (
+    <section className="mt-8 card p-6" aria-labelledby="custom-countdown-title">
+      <h2 id="custom-countdown-title" className="font-display text-lg font-bold text-brand-900">عدّ تنازلي لتاريخ تختاره</h2>
+      <p className="mt-2 text-sm leading-relaxed text-brand-700/80">اختر تاريخاً ميلادياً من 1900 إلى 2100. ينتهي العد عند بداية ذلك اليوم بتوقيت الرياض (UTC+3)، وليس عند ساعة محددة.</p>
+      <label className="mt-4 block max-w-sm text-sm font-medium text-brand-800">التاريخ المطلوب
+        <input type="date" min="1900-01-01" max="2100-12-31" value={value} onChange={event => setValue(event.target.value)} className="mt-2 block w-full rounded-xl bg-sand-50 px-3 py-2.5 text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500" />
+      </label>
+      {value && !valid && <p role="alert" className="mt-4 text-sm text-rose-700">أدخل تاريخاً صحيحاً بين عامي 1900 و2100.</p>}
+      {valid && days < 0 && <p role="status" className="mt-4 text-sm text-brand-700">هذا التاريخ مضى بتوقيت الرياض. اختر تاريخاً آخر لبدء العدّ.</p>}
+      {valid && days === 0 && <p role="status" className="mt-4 text-sm text-brand-700">بدأ هذا اليوم بالفعل بتوقيت الرياض.</p>}
+      {valid && days > 0 && <div className="mt-4 max-w-lg">
+        <p className="mb-3 text-sm text-brand-700">حتى بداية {weekdayName(target)}، {formatGregorian(target)} — بعد {days} يوم تقويمي.</p>
+        <Countdown target={target} />
+      </div>}
+    </section>
+  );
+}
+
 const COUNTDOWNS_INTRO =
-  'عدّاد تنازلي مباشر لكل موعد يهم السعوديين: رمضان والعيدان والمناسبات الوطنية ومواعيد الرواتب وحساب المواطن والضمان والإجازات الدراسية والمواسم — محسوبة من تقويم أم القرى الرسمي وبتوقيت الرياض.';
+  'عدّادات بتوقيت الرياض للمناسبات والمواسم والمواعيد الدراسية المتاحة؛ الرواتب والدعم بانتظار التحقق. المواعيد الدينية حسابية وليست إعلاناً رسمياً.';
 
 function CountdownCard({ item }: { item: ResolvedCountdown }) {
   return (
@@ -189,6 +205,7 @@ function CountdownCard({ item }: { item: ResolvedCountdown }) {
         <CalendarDays className="h-3.5 w-3.5" />
         {item.date ? `${item.gregorianText} — ${item.hijriText}` : 'يُحدَّث قريباً'}
       </div>
+      {item.date && <p className="mt-2 text-xs leading-relaxed text-brand-700/80">{getCountdownNotice(item.def)}</p>}
       <p className="mt-3 flex-1 text-sm leading-relaxed text-brand-700/80">{item.def.summary}</p>
       <div className="mt-4 flex items-center justify-between border-t border-brand-900/5 pt-3">
         <span className="text-xs text-brand-600/70">{item.date ? item.weekdayText : '—'}</span>
@@ -205,7 +222,7 @@ function CountdownCard({ item }: { item: ResolvedCountdown }) {
 /* -------------------------------------------------------------------------- */
 
 export default function CountdownDetailPage({ slug }: { slug: string }) {
-  const today = todayGregorian();
+  const today = useRiyadhToday();
   const def = getCountdown(slug);
 
   if (!def) return <CountdownNotFound />;
@@ -213,9 +230,7 @@ export default function CountdownDetailPage({ slug }: { slug: string }) {
   const item = resolveCountdown(def, today);
   const related = resolveRelated(def, today);
   const title = `${def.question} العدّ التنازلي | تقويم السعودية`;
-  const description = item.date
-    ? `${def.question} ${item.daysRemaining} يوماً — ${item.displayTitle} يوم ${item.weekdayText} ${item.gregorianText} الموافق ${item.hijriText}. عدّاد تنازلي مباشر بالأيام والساعات والدقائق بتوقيت الرياض.`
-    : `${def.question} — ${def.summary}`;
+  const description = `${def.question} — ${def.summary}`;
 
   return (
     <CountdownDetailView
@@ -249,26 +264,6 @@ function CountdownDetailView({
     canonical: `${SITE_URL}/countdown/${def.slug}`,
     keywords: def.keywords,
     jsonLd: [
-      ...(item.date
-        ? [
-            {
-              '@context': 'https://schema.org',
-              '@type': 'Event',
-              name: item.displayTitle,
-              description: def.summary,
-              startDate: isoDate(item.date),
-              endDate: isoDate(item.date),
-              eventStatus: 'https://schema.org/EventScheduled',
-              eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-              location: {
-                '@type': 'Place',
-                name: 'المملكة العربية السعودية',
-                address: { '@type': 'PostalAddress', addressCountry: 'SA' },
-              },
-              inLanguage: 'ar-SA',
-            },
-          ]
-        : []),
       {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
@@ -311,30 +306,22 @@ function CountdownDetailView({
               {item.weekdayText} — {item.gregorianText} — {item.hijriText}
             </p>
           ) : (
-            <p className="mt-1 text-sm text-white/85">سيُحدَّث الموعد القادم فور اعتماده رسمياً.</p>
+            <p className="mt-1 text-sm text-white/85">لا يتوفر موعد مؤكد لهذا العدّاد حالياً.</p>
           )}
         </div>
         <div className="p-6">
           {item.date ? (
             <>
+              <p className="mb-4 text-sm leading-relaxed text-brand-700/80">{getCountdownNotice(def)}</p>
               <Countdown target={item.date} />
               <p className="mt-4 text-center text-sm text-brand-700/80">
-                باقٍ <strong className="font-display text-brand-800">{item.daysRemaining}</strong> يوماً من
-                اليوم ({formatGregorian(today)} — {formatHijri(gregorianToHijri(today.year, today.month, today.day))}
+                الفارق بين تاريخ اليوم وتاريخ المناسبة: <strong className="font-display text-brand-800">{item.daysRemaining}</strong> يوم تقويمي. العدّاد أعلاه يعرض الأيام الكاملة والساعات المتبقية حتى بداية التاريخ بتوقيت الرياض. اليوم ({formatGregorian(today)} — {formatHijri(gregorianToHijri(today.year, today.month, today.day))}
                 {' '}— {weekdayName(today)}).
               </p>
             </>
           ) : (
             <p className="text-sm text-brand-700/80">
-              لا يوجد موعد قادم مُعتمد لهذا العدّاد حالياً. راجع{' '}
-              <Link to="/school-calendar" className="text-brand-700 underline">
-                التقويم الدراسي
-              </Link>{' '}
-              أو{' '}
-              <Link to="/holidays" className="text-brand-700 underline">
-                الإجازات الرسمية
-              </Link>{' '}
-              لأحدث المواعيد.
+              لا يتوفر موعد مؤكد لهذا العدّاد حالياً. راجع تفاصيل الصفحة والمصدر المرتبط بها إن وُجد.
             </p>
           )}
         </div>

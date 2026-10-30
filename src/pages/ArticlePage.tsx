@@ -1,4 +1,4 @@
-import { Calendar, Clock, ArrowLeft, FileText } from 'lucide-react';
+import { Clock, ArrowLeft, FileText } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { articleBySlug, ARTICLES, CATEGORY_LABELS_ARTICLE, type Article } from '../lib/articles';
@@ -23,10 +23,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
             '@type': 'Article',
             headline: article.title,
             description: article.description,
-            datePublished: article.updatedAt,
-            dateModified: article.updatedAt,
             inLanguage: 'ar-SA',
-            author: { '@type': 'Organization', name: 'تقويم السعودية' },
             publisher: {
               '@type': 'Organization',
               name: 'تقويم السعودية',
@@ -85,15 +82,17 @@ export default function ArticlePage({ slug }: { slug: string }) {
             <Clock className="h-3.5 w-3.5" />
             {article.readMinutes} دقائق قراءة
           </span>
-          <span className="flex items-center gap-1 text-xs text-brand-600/70">
-            <Calendar className="h-3.5 w-3.5" />
-            تحديث {article.updatedAt}
-          </span>
         </div>
         <h1 className="mt-3 font-display text-3xl font-bold leading-tight text-brand-900 sm:text-4xl">
           {article.title}
         </h1>
         <p className="mt-3 text-base leading-relaxed text-brand-700/85">{article.description}</p>
+
+        {article.slug === 'salary-dates-saudi-arabia' && <p className="mt-5 text-sm"><a className="underline" href="https://www.mof.gov.sa/" target="_blank" rel="noopener noreferrer">وزارة المالية</a></p>}
+        {article.slug === 'citizen-account-payment-dates' && <p className="mt-5 text-sm"><a className="underline" href="https://portal.ca.gov.sa/" target="_blank" rel="noopener noreferrer">بوابة حساب المواطن الرسمية</a></p>}
+        {article.slug === 'official-holidays-saudi-arabia'  && <p className="mt-5 text-sm"><a className="underline" href="/holidays">جدول الإجازات والمصادر الرسمية</a></p>}
+        {article.slug === 'school-calendar-1448' && <p className="mt-5 text-sm"><a className="underline" href="/school-calendar">جدول التقويم المدرسي ومصدر وزارة التعليم</a></p>}
+        {article.slug === 'developed-social-security' && <p className="mt-5 text-sm"><a className="underline" href="https://www.hrsd.gov.sa/" target="_blank" rel="noopener noreferrer">وزارة الموارد البشرية والتنمية الاجتماعية</a></p>}
 
         <div className="mt-8 space-y-6">
           {article.sections.map((s, i) => (

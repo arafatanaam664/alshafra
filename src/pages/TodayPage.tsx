@@ -22,14 +22,14 @@ import {
   isUmmAlQuraExact,
   SITE_TIMEZONE,
 } from '../lib/hijri';
-import { resolveAll } from '../lib/countdowns';
+import { getCountdownNotice, resolveAll } from '../lib/countdowns';
 
 export default function TodayPage() {
   const now = useNow(1000);
   const today = todayGregorian();
   const hijri = gregorianToHijri(today.year, today.month, today.day);
   const weekday = weekdayName(today);
-  const [copied, setCopied] = useState<string | null>(null);
+  const [copyState, setCopyState] = useState<{ key: string; ok: boolean } | null>(null);
 
   const monthLength = hijriMonthLength(hijri.year, hijri.month);
   const daysLeftInHijriMonth = Math.max(0, monthLength - hijri.day);
@@ -48,8 +48,8 @@ export default function TodayPage() {
   const gregorianText = formatGregorian(today);
 
   useSeo({
-    title: `التاريخ اليوم: ${hijriText} — ${gregorianText} | تقويم السعودية`,
-    description: `التاريخ الهجري والميلادي اليوم في السعودية: ${weekday} ${hijriText} الموافق ${gregorianText} بتوقيت الرياض، وفق تقويم أم القرى الرسمي، مع الوقت الحالي وأقرب المواعيد والمناسبات.`,
+    title: 'تاريخ اليوم هجري وميلادي في السعودية | تقويم السعودية',
+    description: 'اعرف التاريخ الهجري والميلادي اليوم في السعودية بتوقيت الرياض، مع تفاصيل التقويم وأدوات التحويل.',
     canonical: `${SITE_URL}/today`,
     keywords:
       'التاريخ اليوم, كم التاريخ اليوم, التاريخ الهجري اليوم, التاريخ الميلادي اليوم, تاريخ اليوم بالهجري, اليوم كم بالهجري, تقويم أم القرى',
@@ -58,36 +58,20 @@ export default function TodayPage() {
         '@context': 'https://schema.org',
         '@type': 'WebPage',
         name: `التاريخ اليوم في السعودية — ${hijriText}`,
-        description: `التاريخ الهجري والميلادي اليوم في المملكة العربية السعودية وفق تقويم أم القرى: ${hijriText} الموافق ${gregorianText}.`,
+        description: `التاريخ الهجري والميلادي الحسابي في المملكة العربية السعودية: ${hijriText} الموافق ${gregorianText}.`,
         inLanguage: 'ar-SA',
         url: `${SITE_URL}/today`,
       },
-      {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        mainEntity: [
-          {
-            '@type': 'Question',
-            name: 'كم التاريخ الهجري اليوم؟',
-            acceptedAnswer: { '@type': 'Answer', text: `التاريخ الهجري اليوم هو ${hijriText} وفق تقويم أم القرى الرسمي.` },
-          },
-          {
-            '@type': 'Question',
-            name: 'كم التاريخ الميلادي اليوم؟',
-            acceptedAnswer: { '@type': 'Answer', text: `التاريخ الميلادي اليوم هو ${gregorianText}، ويوافق يوم ${weekday}.` },
-          },
-        ],
-      },
+
     ],
   });
 
   const copy = async (value: string, key: string) => {
     try {
       await navigator.clipboard.writeText(value);
-      setCopied(key);
-      window.setTimeout(() => setCopied(null), 1500);
+      setCopyState({ key, ok: true });
     } catch {
-      // clipboard unavailable — silently ignore
+      setCopyState({ key, ok: false });
     }
   };
 
@@ -108,7 +92,7 @@ export default function TodayPage() {
           <header className="max-w-2xl">
             <h1 className="section-title">التاريخ اليوم في السعودية</h1>
             <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-              التاريخ الهجري والميلادي الآن بتوقيت الرياض وفق تقويم أم القرى الرسمي، مع الوقت الحالي
+              التاريخ الهجري والميلادي الآن بتوقيت الرياض، مع الوقت الحالي
               وتفاصيل الشهر الهجري وأقرب المواعيد القادمة.
             </p>
           </header>
@@ -126,7 +110,7 @@ export default function TodayPage() {
               onClick={() => copy(formatHijriShort(hijri), 'hijri')}
               className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700 ring-1 ring-brand-200 hover:bg-brand-100"
             >
-              {copied === 'hijri' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              {copyState?.key === 'hijri' && copyState.ok ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
               {formatHijriShort(hijri)}
             </button>
           </div>
@@ -147,12 +131,13 @@ export default function TodayPage() {
               onClick={() => copy(formatGregorianShort(today), 'greg')}
               className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-medium text-gold-700 ring-1 ring-gold-200 hover:bg-gold-100"
             >
-              {copied === 'greg' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              {copyState?.key === 'greg' && copyState.ok ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
               {formatGregorianShort(today)}
             </button>
           </div>
         </div>
       </section>
+      {copyState && <p role="status" className="mt-2 text-sm text-brand-700">{copyState.ok ? 'تم نسخ التاريخ.' : 'تعذر النسخ؛ يمكنك تحديد التاريخ ونسخه يدوياً.'}</p>}
 
       <section className="mt-6 card p-6">
         <h2 className="font-display text-lg font-bold text-brand-900">تفاصيل اليوم</h2>
@@ -166,8 +151,8 @@ export default function TodayPage() {
         </dl>
         <p className="mt-4 text-xs text-brand-600/70">
           {isUmmAlQuraExact()
-            ? 'التحويل الهجري مأخوذ من جدول أم القرى الرسمي (ICU) وليس تقديراً حسابياً.'
-            : 'متصفحك لا يدعم جدول أم القرى، لذا يُستخدم التقويم الهجري الحسابي التقريبي (فارق يوم محتمل).'}
+            ? 'التحويل الهجري يستخدم تقويم أم القرى المتاح في المتصفح؛ راجع الإعلان الرسمي للتواريخ الحساسة.'
+            : 'متصفحك لا يدعم تقويم أم القرى، لذا يُستخدم حساب هجري تقريبي قد يختلف عن التقويم الرسمي.'}
         </p>
       </section>
 
@@ -199,6 +184,7 @@ export default function TodayPage() {
                   <CalendarDays className="h-3.5 w-3.5" />
                   {c.gregorianText}
                 </p>
+                <p className="mt-1 text-xs text-brand-700/80">{getCountdownNotice(c.def)}</p>
               </div>
               <span className="font-display text-lg font-bold tabular-nums text-brand-700">
                 {c.daysRemaining}
@@ -215,11 +201,11 @@ export default function TodayPage() {
           <p>
             تعتمد المملكة العربية السعودية تقويم أم القرى مرجعاً رسمياً للتواريخ الهجرية في
             المعاملات الحكومية والعقود والإجازات. يُحسب هذا التقويم فلكياً لتحديد بدايات الأشهر،
-            وقد يختلف بيوم واحد عن الرؤية الشرعية المُعلنة للأشهر ذات الشأن مثل رمضان وشوال وذي الحجة.
+            وقد يختلف عن الرؤية الشرعية المُعلنة للأشهر ذات الشأن مثل رمضان وشوال وذي الحجة.
           </p>
           <p>
             التاريخ المعروض في هذه الصفحة محسوب بتوقيت الرياض (UTC+3) بغض النظر عن موقع الزائر،
-            حتى لا يختلف التاريخ الذي يراه المقيم خارج المملكة عن التاريخ الرسمي داخلها. لتحويل أي
+            مع التنبيه إلى أن النتيجة الهجرية تعتمد على بيانات المتصفح. لتحويل أي
             تاريخ آخر استخدم{' '}
             <Link to="/date-converter" className="text-brand-700 underline">
               أداة تحويل التاريخ

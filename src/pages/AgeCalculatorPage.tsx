@@ -1,25 +1,38 @@
 import { useMemo, useState } from 'react';
 import { Cake, CalendarDays, Sparkles } from 'lucide-react';
 import { useSeo } from '../lib/seo';
-import AdPlacement from '../components/AdPlacement';
-import SmartlinkCard from '../components/SmartlinkCard';
+import Link from '../components/Link';
+import ToolGuide from '../components/ToolGuide';
 import {
-  gregorianToHijri,
   formatGregorian,
+  formatHijri,
+  weekdayName,
+  isUmmAlQuraExact,
+  gregorianToHijri,
   gregorianToJdn,
-  todayGregorian,
+  hijriToGregorian,
+  isValidHijriDate,
+  isValidGregorianDate,
+  HIJRI_MONTHS,
   type GregorianDate,
   GREGORIAN_MONTHS,
 } from '../lib/hijri';
+import { calculateAge, calculateGregorianInterval } from '../lib/age';
+import { validIso } from '../lib/iso-date.mjs';
+import { useRiyadhToday } from '../lib/useRiyadhToday';
+import { parseYearInput } from '../lib/number-input';
 
 export default function AgeCalculatorPage() {
-  const today = todayGregorian();
+  const today = useRiyadhToday();
+  const hasCalendar = isUmmAlQuraExact();
   const [birth, setBirth] = useState<GregorianDate>({ year: 2000, month: 1, day: 1 });
+  const [mode, setMode] = useState<'gregorian' | 'hijri'>('gregorian');
+  const [hijriBirth, setHijriBirth] = useState(() => gregorianToHijri(2000, 1, 1));
 
   useSeo({
     title: 'حاسبة العمر بالهجري والميلادي | تقويم السعودية',
     description:
-      'احسب عمرك بدقة بالسنوات والأشهر والأيام بالتقويمين الهجري والميلادي. أدخل تاريخ ميلادك واحصل على عمرك الكامل والقادم مع عدد الأيام التي عشتها.',
+      'احسب العمر بالسنوات والأشهر والأيام الهجرية والميلادية، والأيام المتبقية لعيد الميلاد وفق يوم الرياض.',
     canonical: 'https://alshafra.com/age-calculator',
     keywords: 'حاسبة العمر, حساب العمر, العمر بالهجري, العمر بالميلادي, كم عمري',
     jsonLd: {
@@ -32,98 +45,52 @@ export default function AgeCalculatorPage() {
     },
   });
 
-  const result = useMemo(() => {
-    const birthJdn = gregorianToJdn(birth.year, birth.month, birth.day);
-    const todayJdn = gregorianToJdn(today.year, today.month, today.day);
-    const totalDays = Math.max(0, todayJdn - birthJdn);
-    if (totalDays <= 0) return null;
-
-    // Gregorian age
-    let yearsG = today.year - birth.year;
-    let monthsG = today.month - birth.month;
-    let daysG = today.day - birth.day;
-    if (daysG < 0) {
-      monthsG -= 1;
-      const prevMonth = today.month === 1 ? 12 : today.month - 1;
-      const prevYear = today.month === 1 ? today.year - 1 : today.year;
-      const daysInPrev = new Date(prevYear, prevMonth, 0).getDate();
-      daysG += daysInPrev;
-    }
-    if (monthsG < 0) {
-      yearsG -= 1;
-      monthsG += 12;
-    }
-
-    // Hijri age
-    const birthH = gregorianToHijri(birth.year, birth.month, birth.day);
-    const todayH = gregorianToHijri(today.year, today.month, today.day);
-    let yearsH = todayH.year - birthH.year;
-    let monthsH = todayH.month - birthH.month;
-    let daysH = todayH.day - birthH.day;
-    if (daysH < 0) {
-      monthsH -= 1;
-      daysH += 30;
-    }
-    if (monthsH < 0) {
-      yearsH -= 1;
-      monthsH += 12;
-    }
-    if (yearsH < 0) yearsH = 0;
-
-    // Next birthday (gregorian)
-    let nextBYear = today.year;
-    if (today.month > birth.month || (today.month === birth.month && today.day > birth.day)) {
-      nextBYear = today.year + 1;
-    }
-    const nextBirthday: GregorianDate = { year: nextBYear, month: birth.month, day: birth.day };
-    const daysToBirthday = Math.max(0, gregorianToJdn(nextBirthday.year, nextBirthday.month, nextBirthday.day) - todayJdn);
-
-    const totalHours = totalDays * 24;
-    const totalMinutes = totalHours * 60;
-    const totalWeeks = Math.floor(totalDays / 7);
-
-    return {
-      yearsG,
-      monthsG,
-      daysG,
-      yearsH,
-      monthsH,
-      daysH,
-      totalDays,
-      totalWeeks,
-      totalHours,
-      totalMinutes,
-      daysToBirthday,
-      nextBirthday,
-    };
-  }, [birth, today]);
+  const resolvedBirth = useMemo(() => {
+    if (!hasCalendar) return null;
+    if (mode === 'gregorian') return isValidGregorianDate(birth) ? birth : null;
+    if (!isValidHijriDate(hijriBirth)) return null;
+    const converted = hijriToGregorian(hijriBirth);
+    if (!isValidGregorianDate(converted)) return null;
+    const roundTrip = gregorianToHijri(converted.year, converted.month, converted.day);
+    return roundTrip.year === hijriBirth.year && roundTrip.month === hijriBirth.month && roundTrip.day === hijriBirth.day ? converted : null;
+  }, [mode, birth, hijriBirth, hasCalendar]);
+  const result = useMemo(() => resolvedBirth ? calculateAge(resolvedBirth, today) : null, [resolvedBirth, today]);
+  const input = mode === 'gregorian' ? birth : hijriBirth;
+  const setInput = mode === 'gregorian' ? setBirth : setHijriBirth;
+  const switchMode = () => {
+    if (!resolvedBirth) return;
+    if (mode === 'gregorian') setHijriBirth(gregorianToHijri(birth.year, birth.month, birth.day));
+    else setBirth(resolvedBirth);
+    setMode(mode === 'gregorian' ? 'hijri' : 'gregorian');
+  };
 
   return (
     <div className="container-page py-10">
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_160px] lg:justify-center">
+      <div className="grid items-start gap-8">
         <div className="min-w-0">
           <header className="max-w-2xl">
             <h1 className="section-title">حاسبة العمر بالهجري والميلادي</h1>
             <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
-              أدخل تاريخ ميلادك بالتقويم الميلادي لتحصل على عمرك بالسنوات والأشهر والأيام بالتقويمين
-              الهجري والميلادي، بالإضافة إلى عدد الأيام والأسابيع والساعات التي عشتها، وعدد الأيام
-              المتبقية على عيد ميلادك القادم.
+              أدخل تاريخ ميلادك بالتقويم الميلادي أو الهجري لتحصل على عمرك بالسنوات والأشهر والأيام بالتقويمين
+              الهجري والميلادي، بالإضافة إلى عدد الأيام والأسابيع والأيام المتبقية لعيد ميلادك القادم.
             </p>
           </header>
-
-          <AdPlacement name="content" unit="native" className="mt-8" />
-          <AdPlacement name="content" size="320x50" className="mt-6" />
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
             <div className="card p-6">
               <h2 className="font-display text-lg font-bold text-brand-900">تاريخ الميلاد</h2>
+              <div className="mt-4 flex items-center gap-3">
+                <span className="text-sm text-brand-700">الإدخال: {mode === 'gregorian' ? 'ميلادي' : 'هجري'}</span>
+                <button type="button" className="btn-ghost" onClick={switchMode} disabled={!resolvedBirth}>تبديل إلى {mode === 'gregorian' ? 'الهجري' : 'الميلادي'}</button>
+              </div>
+              <button type="button" className="mt-3 text-sm font-medium text-brand-700 underline" onClick={() => { setBirth({ year: 2000, month: 1, day: 1 }); setMode('gregorian'); }}>إعادة الإدخال إلى 1 يناير 2000 ميلادي</button>
               <div className="mt-5 grid gap-4 sm:grid-cols-3">
                 <label className="block">
                   <span className="mb-1.5 block text-xs font-medium text-brand-700/80">اليوم</span>
                   <select
                     className="w-full rounded-xl bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500"
-                    value={birth.day}
-                    onChange={(e) => setBirth({ ...birth, day: +e.target.value })}
+                    value={input.day}
+                    onChange={(e) => setInput({ ...input, day: +e.target.value })}
                   >
                     {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
                       <option key={d} value={d}>{d}</option>
@@ -134,10 +101,10 @@ export default function AgeCalculatorPage() {
                   <span className="mb-1.5 block text-xs font-medium text-brand-700/80">الشهر</span>
                   <select
                     className="w-full rounded-xl bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500"
-                    value={birth.month}
-                    onChange={(e) => setBirth({ ...birth, month: +e.target.value })}
+                    value={input.month}
+                    onChange={(e) => setInput({ ...input, month: +e.target.value })}
                   >
-                    {GREGORIAN_MONTHS.map((m, i) => (
+                    {(mode === 'gregorian' ? GREGORIAN_MONTHS : HIJRI_MONTHS).map((m, i) => (
                       <option key={i + 1} value={i + 1}>{m}</option>
                     ))}
                   </select>
@@ -145,17 +112,16 @@ export default function AgeCalculatorPage() {
                 <label className="block">
                   <span className="mb-1.5 block text-xs font-medium text-brand-700/80">السنة</span>
                   <input
-                    type="number"
+                    type="text" inputMode="numeric"
                     className="w-full rounded-xl bg-sand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500"
-                    value={birth.year}
-                    min={1900}
-                    max={today.year}
-                    onChange={(e) => setBirth({ ...birth, year: +e.target.value })}
+                    value={input.year || ''}
+                    onChange={(e) => setInput({ ...input, year: parseYearInput(e.target.value) })}
                   />
                 </label>
               </div>
               <div className="mt-5 rounded-xl bg-brand-50 p-4 text-sm text-brand-700">
-                تاريخ الميلاد المُدخل: <strong>{formatGregorian(birth)}</strong>
+                تاريخ الميلاد المُدخل: <strong>{resolvedBirth ? (mode === 'gregorian' ? formatGregorian(birth) : formatHijri(hijriBirth)) : 'تاريخ غير صحيح أو خارج النطاق أو التقويم غير متاح'}</strong>
+                {resolvedBirth && <p className="mt-1">يقابله: {mode === 'gregorian' ? formatHijri(gregorianToHijri(birth.year, birth.month, birth.day)) : formatGregorian(resolvedBirth)}</p>}
               </div>
             </div>
 
@@ -165,27 +131,27 @@ export default function AgeCalculatorPage() {
               </div>
               <div className="p-6">
                 {!result ? (
-                  <div className="flex items-center gap-3 rounded-xl bg-rose-50 p-4 text-sm text-rose-700">
+                  <div role="alert" className="flex items-center gap-3 rounded-xl bg-rose-50 p-4 text-sm text-rose-700">
                     <Cake className="h-5 w-5" />
-                    تاريخ الميلاد يجب أن يكون قبل اليوم.
+                    {hasCalendar ? 'أدخل تاريخ ميلاد صحيحاً لا يتجاوز اليوم ويقابله تاريخ ميلادي من 1900 حتى اليوم.' : 'تقويم أم القرى غير متاح أو لم يجتز فحص المتصفح؛ لا يمكن حساب العمر الهجري هنا. جرّب متصفحاً آخر.'}
                   </div>
                 ) : (
                   <>
                     <div className="grid grid-cols-3 gap-3 text-center">
-                      <BigStat value={result.yearsG} label="سنة ميلادية" />
-                      <BigStat value={result.monthsG} label="شهر" />
-                      <BigStat value={result.daysG} label="يوم" />
+                      <BigStat value={result.gregorian.years} label="سنة ميلادية" />
+                      <BigStat value={result.gregorian.months} label="شهر" />
+                      <BigStat value={result.gregorian.days} label="يوم" />
                     </div>
                     <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-                      <BigStat value={result.yearsH} label="سنة هجرية" accent />
-                      <BigStat value={result.monthsH} label="شهر هجري" accent />
-                      <BigStat value={result.daysH} label="يوم هجري" accent />
+                      <BigStat value={result.hijri.years} label="سنة هجرية" accent />
+                      <BigStat value={result.hijri.months} label="شهر هجري" accent />
+                      <BigStat value={result.hijri.days} label="يوم هجري" accent />
                     </div>
                     <div className="mt-5 grid grid-cols-2 gap-3">
                       <MiniStat icon={CalendarDays} label="إجمالي الأيام" value={result.totalDays.toLocaleString('ar-SA')} />
                       <MiniStat icon={Sparkles} label="إجمالي الأسابيع" value={result.totalWeeks.toLocaleString('ar-SA')} />
-                      <MiniStat icon={CalendarDays} label="إجمالي الساعات" value={result.totalHours.toLocaleString('ar-SA')} />
-                      <MiniStat icon={Cake} label="عيد ميلادك القادم بعد" value={`${result.daysToBirthday} يوم`} />
+                      <MiniStat icon={CalendarDays} label="يوم الميلاد" value={weekdayName(resolvedBirth!)} />
+                      <MiniStat icon={Cake} label="عيد الميلاد الميلادي القادم" value={`${formatGregorian(result.nextBirthday)} — بعد ${result.daysToBirthday} يوم`} />
                     </div>
                   </>
                 )}
@@ -193,39 +159,66 @@ export default function AgeCalculatorPage() {
             </div>
           </div>
 
-          <AdPlacement name="content" size="468x60" className="mt-8" />
-          <AdPlacement name="content" unit="rectangle" className="mt-10" />
-
-          <SmartlinkCard
-            className="mt-8"
-            title="عرض من شريكنا"
-            description="عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة ولا علاقة له بحاسبة العمر."
-          />
+          <p className="mt-4 text-sm leading-relaxed text-brand-700/80">يجري كود الأداة الحساب داخل المتصفح ولا يرسل تاريخ الميلاد أو يحفظه بنفسه. نسخة الحاسبة المبنية تعزل الصفحة عن سكربتات الإعلان والتحليلات الخارجية، لكن يجب اختبار إعدادات النشر والمتصفح قبل تأكيد الخصوصية الشاملة. راجع <Link className="underline" to="/privacy">الخصوصية</Link>.</p>
+          <AgeComparison first={result ? resolvedBirth : null} today={today} />
 
           <section className="mt-10 card p-6 sm:p-8">
             <h2 className="font-display text-lg font-bold text-brand-900">عن حاسبة العمر</h2>
             <div className="mt-3 space-y-3 text-sm leading-relaxed text-brand-700/85">
               <p>
-                تحسب هذه الأداة عمرك بالتقويم الميلادي والهجري بدقة، مع عرض الفرق بالأيام والشهور
-                والسنوات. كما تحسب عدد الأيام والأسابيع والساعات الكلية التي عشتها منذ تاريخ ميلادك،
-                وعدد الأيام المتبقية على عيد ميلادك القادم.
+                يُحسب العمر حسب يوم الرياض من دون ساعة الميلاد. يُحتسب الشهر الكامل من يوم الميلاد،
+                وإذا لم يوجد ذلك اليوم في شهر أقصر يُستخدم آخر يوم فيه. يُحتسب عيد ميلاد 29 فبراير
+                في 28 فبراير خلال السنوات غير الكبيسة؛ وقد تختلف طرق الحساب الأخرى أو الأحكام الرسمية.
               </p>
               <p>
-                الحساب الهجري يعتمد على تقويم أم القرى التقريبي، وقد يختلف بيوم واحد عن التقويم الرسمي
-                قرب بدايات الأشهر الهجرية.
+                يستخدم الحساب تقويم أم القرى الذي يوفره المتصفح إن اجتاز فحص التوافق؛ وإلا تتوقف الحاسبة.
+                قد يختلف إعلان رؤية الهلال عن الحساب التقويمي؛ لا تستخدم النتيجة وثيقة رسمية وراجع الجهة المختصة.
               </p>
+              <p><a className="underline" href="https://www.ummulqura.org.sa/ar/calendar" target="_blank" rel="noopener noreferrer">موقع تقويم أم القرى</a> — مرجع للمراجعة، ولا تتصل الأداة به لإجراء الحساب.</p>
             </div>
           </section>
-          <AdPlacement name="content" size="160x300" className="mt-8 lg:hidden" />
-          <SmartlinkCard className="mt-8" />
+          <ToolGuide tool="age" />
+          <section className="mt-8 card p-6" aria-labelledby="age-related">
+            <h2 id="age-related" className="font-display text-lg font-bold text-brand-900">أدوات مرتبطة بحساب العمر</h2>
+            <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-brand-700 underline">
+              <li><Link to="/date-converter">تحويل تاريخ الميلاد بين الهجري والميلادي</Link></li>
+              <li><Link to="/today">تاريخ اليوم في السعودية</Link></li>
+              <li><Link to="/hijri-calendar">التقويم الهجري الشهري</Link></li>
+            </ul>
+          </section>
         </div>
-        <aside className="hidden lg:block">
-          <div className="sticky top-24 space-y-6">
-            <AdPlacement name="sidebar" includeCompactSidebar />
-          </div>
-        </aside>
       </div>
     </div>
+  );
+}
+
+function AgeComparison({ first, today }: { first: GregorianDate | null; today: GregorianDate }) {
+  const [secondValue, setSecondValue] = useState('');
+  const todayIso = `${today.year}-${String(today.month).padStart(2, '0')}-${String(today.day).padStart(2, '0')}`;
+  const secondValid = validIso(secondValue) && secondValue <= todayIso;
+  const second = secondValid ? (() => {
+    const [year, month, day] = secondValue.split('-').map(Number);
+    return { year, month, day };
+  })() : null;
+  const firstJdn = first ? gregorianToJdn(first.year, first.month, first.day) : null;
+  const secondJdn = second ? gregorianToJdn(second.year, second.month, second.day) : null;
+  const interval = first && second && firstJdn !== null && secondJdn !== null
+    ? calculateGregorianInterval(firstJdn <= secondJdn ? first : second, firstJdn <= secondJdn ? second : first)
+    : null;
+  return (
+    <section className="mt-8 card p-6" aria-labelledby="age-comparison-title">
+      <h2 id="age-comparison-title" className="font-display text-lg font-bold text-brand-900">مقارنة العمر بين شخصين</h2>
+      <p className="mt-2 text-sm leading-relaxed text-brand-700/80">يُستخدم تاريخ الميلاد أعلاه للشخص الأول. أدخل تاريخ الشخص الثاني ميلادياً لمعرفة الأكبر والفرق بين تاريخي الميلاد بالأيام والسنوات والأشهر المكتملة، دون احتساب ساعة الميلاد.</p>
+      <label className="mt-4 block max-w-sm text-sm font-medium text-brand-800">تاريخ ميلاد الشخص الثاني
+        <input type="date" min="1900-01-01" max={todayIso} value={secondValue} onChange={event => setSecondValue(event.target.value)} className="mt-2 block w-full rounded-xl bg-sand-50 px-3 py-2.5 text-brand-900 ring-1 ring-brand-200 focus:ring-2 focus:ring-brand-500" />
+      </label>
+      {secondValue && !secondValid && <p role="alert" className="mt-3 text-sm text-rose-700">أدخل تاريخاً صحيحاً من 1900 حتى اليوم بتوقيت الرياض.</p>}
+      {second && !first && <p className="mt-3 text-sm text-brand-700">أدخل تاريخاً صالحاً للشخص الأول أعلاه لإتمام المقارنة.</p>}
+      {interval && <div role="status" className="mt-4 rounded-xl bg-brand-50 p-4 text-sm leading-relaxed text-brand-900">
+        <p className="font-bold">{firstJdn === secondJdn ? 'تاريخا الميلاد متساويان.' : firstJdn! < secondJdn! ? 'الشخص الأول أكبر سناً.' : 'الشخص الثاني أكبر سناً.'}</p>
+        <p>الفرق: {interval.span.years} سنة و{interval.span.months} شهر و{interval.span.days} يوم، بإجمالي {interval.totalDays.toLocaleString('ar-SA')} يوم.</p>
+      </div>}
+    </section>
   );
 }
 

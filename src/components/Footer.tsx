@@ -1,6 +1,7 @@
-import { Calendar, Mail, Github, Shield } from 'lucide-react';
+import { Calendar, Mail, Shield } from 'lucide-react';
 import Link from './Link';
 import { SmartlinkFooterLink } from './SmartlinkCard';
+import contact from '../data/site-contact.json';
 
 const LINKS = [
   { to: '/', label: 'الرئيسية' },
@@ -29,13 +30,12 @@ export default function Footer() {
               </span>
               <div>
                 <div className="font-display text-lg font-bold">تقويم السعودية</div>
-                <div className="text-xs text-brand-200/80">بوابة المواعيد الرسمية</div>
+                <div className="text-xs text-brand-200/80">منصة مستقلة للتقويم والمواعيد</div>
               </div>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-brand-100/80">
-              منصة سعودية شاملة تجمع عدّادات «كم باقي على…»، مواعيد الرواتب وحساب المواطن
-              والمتقاعدين والضمان الاجتماعي، التقويم الهجري والميلادي، التقويم الدراسي، والإجازات
-              الرسمية، وأدوات تحويل التاريخ وحاسبة العمر — وفق تقويم أم القرى الرسمي.
+              منصة مستقلة لأدوات التقويم ومعلومات المواعيد. مواعيد الرواتب والدعم بانتظار
+              التحقق؛ راجع المصادر والإعلانات الرسمية قبل الاعتماد عليها.
             </p>
           </div>
 
@@ -58,17 +58,12 @@ export default function Footer() {
               <li className="flex items-start gap-2">
                 <Shield className="mt-0.5 h-4 w-4 shrink-0 text-gold-400" />
                 <span>
-                  التواريخ محسوبة وفق تقويم أم القرى التقريبي. للمسائل القانونية الرجاء الرجوع
-                  للتقويم الرسمي الصادر عن المملكة العربية السعودية.
+                  بعض التواريخ حسابية أو تقديرية؛ راجع المصدر والجهة المختصة للمواعيد الرسمية.
                 </span>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-gold-400" />
-                <span>info@alshafra.com</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Github className="h-4 w-4 text-gold-400" />
-                <span>تحديثات يومية تلقائية</span>
+                <a className="break-all hover:underline" href={`mailto:${contact.email}`}>{contact.email}</a>
               </li>
             </ul>
             <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-brand-200/70">

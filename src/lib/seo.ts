@@ -64,17 +64,19 @@ export function useSeo(opts: SeoOptions) {
       setMeta('twitter:description', opts.description);
     }
     if (opts.keywords) setMeta('keywords', opts.keywords);
+    else if (jsonLdId === 'page-jsonld') document.head.querySelector('meta[name="keywords"]')?.remove();
     if (opts.canonical) {
       setLink('canonical', opts.canonical);
       setMeta('og:url', opts.canonical, 'property');
     }
-    if (opts.jsonLd) {
-      setJsonLd(jsonLdId, opts.jsonLd);
+    // Replace the prerendered page payload rather than leaving a duplicate after navigation.
+    if (jsonLdId === 'page-jsonld') document.querySelector('script[data-page-jsonld]')?.remove();
+    if (jsonLdKey) {
+      setJsonLd(jsonLdId, JSON.parse(jsonLdKey));
     } else {
       const existing = document.getElementById(jsonLdId);
       if (existing) existing.remove();
     }
-    // `jsonLdKey` is a stable string hash of the payload, so this effect no
-    // longer re-runs on every render (the home page re-renders every second).
+    return () => { document.getElementById(jsonLdId)?.remove(); };
   }, [opts.title, opts.description, opts.canonical, opts.keywords, jsonLdKey, jsonLdId]);
 }
