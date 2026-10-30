@@ -339,11 +339,11 @@ ${ARTICLES.map((a) => `        <li><a href="/articles/${a.slug}">${escapeHtml(a.
     ],
     body: bodyWithNoscript(`
       <h1>التقويم الدراسي 1448-1449هـ (2026-2027م)</h1>
-      <p>بداية الدراسة وإجازات المدارس كما وردت في صفحة وزارة التعليم عند المراجعة. تاريخ إجازة المدرسة ليس بالضرورة يوم العيد نفسه.</p>
+      <p>راجع وزارة التعليم للمواعيد الرسمية. لا يعرض الموقع موعداً قبل مراجعة فريق التحرير واعتماده.</p>
       <p>${schoolCalendar.notice} آخر تحقق: ${schoolCalendar.verifiedAt} · <a href="${schoolCalendar.source}">صفحة التقويم الدراسي بوزارة التعليم</a></p>
       <h2>مواعيد الدراسة والإجازات المدرسية</h2>
-      <table><thead><tr><th>المناسبة</th><th>اليوم والميلادي</th><th>الهجري كما في المصدر</th></tr></thead><tbody>${schoolCalendar.events.map(e => `<tr><th scope="row">${escapeHtml(e.title)}${e.countdownSlug ? ` <a href="/countdown/${escapeHtml(e.countdownSlug)}">عرض العداد</a>` : ''}</th><td>${new Intl.DateTimeFormat('ar-SA', { weekday: 'long', timeZone: 'Asia/Riyadh' }).format(new Date(`${e.date}T12:00:00Z`))}، ${e.date}</td><td>${e.hijri}</td></tr>`).join('')}</tbody></table>
-      <p>الفئة: المدارس، مع تحديد عودة المعلمين في صفها. الحالة: منقول من صفحة الوزارة عند تاريخ التحقق أعلاه، لا يغني عن متابعة تحديثاتها. لم تُحدّد في الصفحة المعروضة هنا آخر أيام الإجازات أو العودة منها؛ لا نستنتجها من تاريخ البداية. راجع الوزارة وإدارة التعليم المختصة لأي تحديث.</p>
+      <p>المواعيد بانتظار التحقق والاعتماد، أو فعّل JavaScript لعرض أي مواعيد اعتمادها ساري المفعول. راجع الوزارة وإدارة التعليم المختصة.</p>
+      <p><a href="/countdown">العدادات المدرسية</a></p>
     `),
   },
   {

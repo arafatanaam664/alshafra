@@ -25,6 +25,7 @@ import holidayGuide from '../data/holiday-guide.json';
 import { countdownNotice } from './countdown-notice.mjs';
 import { salaryScheduleApproved } from './salary-trust.mjs';
 import { validIso } from './iso-date.mjs';
+import { schoolEventApproved } from './school-trust.mjs';
 
 export type CountdownCategory = 'national' | 'religious' | 'salary' | 'school' | 'seasonal';
 
@@ -80,6 +81,11 @@ export const COUNTDOWNS = (raw as { countdowns: CountdownDef[] }).countdowns.map
 });
 
 export function getCountdownNotice(def: CountdownDef): string {
+  if (def.category === 'school') {
+    const event = schoolCalendar.events.find(item => 'countdownSlug' in item && item.countdownSlug === def.slug);
+    if (!schoolEventApproved(schoolCalendar, event, todayGregorian())) return 'موعد بانتظار التحقق والاعتماد؛ راجع وزارة التعليم.';
+    return `حسب صفحة وزارة التعليم؛ آخر تحقق ${event!.verification.verifiedAt} والمراجعة مستحقة ${event!.verification.reviewDue}. راجع المصدر لأي تحديث.`;
+  }
   return countdownNotice(def, schoolCalendar.verifiedAt, todayGregorian());
 }
 
@@ -121,6 +127,10 @@ function jdn(d: GregorianDate): number {
  */
 export function occurrences(def: CountdownDef, from: GregorianDate, limit = 3): GregorianDate[] {
   if (!salaryScheduleApproved(def, from)) return [];
+  if (def.category === 'school') {
+    const event = schoolCalendar.events.find(item => 'countdownSlug' in item && item.countdownSlug === def.slug);
+    if (!schoolEventApproved(schoolCalendar, event, from)) return [];
+  }
   const fromJdn = jdn(from);
   const out: GregorianDate[] = [];
   const s = def.schedule;

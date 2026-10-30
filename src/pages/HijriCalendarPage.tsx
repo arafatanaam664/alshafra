@@ -14,7 +14,7 @@ import {
   isUmmAlQuraExact,
   type HijriDate,
 } from '../lib/hijri';
-import { SAUDI_EVENTS, CATEGORY_STYLES, CATEGORY_LABELS } from '../lib/events';
+import { SAUDI_EVENTS, schoolEventsForDay, CATEGORY_STYLES, CATEGORY_LABELS } from '../lib/events';
 import { useRiyadhToday } from '../lib/useRiyadhToday';
 
 export default function HijriCalendarPage() {
@@ -47,10 +47,10 @@ export default function HijriCalendarPage() {
   const firstGreg = hijriToGregorian(firstHijri);
   const firstWeekday = weekdayIndex(firstGreg);
 
-  const eventsThisMonth = useMemo(() => SAUDI_EVENTS.filter((e) => {
+  const eventsThisMonth = useMemo(() => [...SAUDI_EVENTS, ...schoolEventsForDay(todayGregorian)].filter((e) => {
     const h = gregorianToHijri(e.date.year, e.date.month, e.date.day);
     return h.year === year && h.month === month;
-  }), [year, month]);
+  }), [year, month, todayGregorian]);
 
   const eventByDay = useMemo(() => {
     const map = new Map<number, typeof SAUDI_EVENTS>();

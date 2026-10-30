@@ -1,14 +1,23 @@
 {
   "source": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
   "verifiedAt": "2026-10-29",
-  "notice": "تُعرض التواريخ كما وردت في صفحة وزارة التعليم عند المراجعة. قد تُحدّث الوزارة التقويم أو تختلف الترتيبات محلياً؛ راجع المصدر قبل الاعتماد.",
+  "notice": "المواعيد المدرسية لا تظهر قبل اعتماد كل موعد ومراجعته؛ راجع وزارة التعليم مباشرة للحصول على أحدث تقويم.",
   "events": [
     {
       "id": "school-return-1448",
       "title": "عودة المعلمين الممارسين للتدريس",
       "date": "2026-08-16",
       "hijri": "03/03/1448",
-      "holiday": false
+      "holiday": false,
+      "verification": {
+        "status": "pending",
+        "editorApproved": false,
+        "verifiedAt": "2026-10-29",
+        "reviewDue": null,
+        "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
+        "approvedBy": "",
+        "approvedAt": null
+      }
     },
     {
       "id": "school-start-1448",
@@ -16,14 +25,32 @@
       "date": "2026-08-23",
       "hijri": "10/03/1448",
       "holiday": false,
-      "countdownSlug": "school-start"
+      "countdownSlug": "school-start",
+      "verification": {
+        "status": "pending",
+        "editorApproved": false,
+        "verifiedAt": "2026-10-29",
+        "reviewDue": null,
+        "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
+        "approvedBy": "",
+        "approvedAt": null
+      }
     },
     {
       "id": "school-national-day-1448",
       "title": "إجازة اليوم الوطني للمدارس",
       "date": "2026-09-23",
       "hijri": "12/04/1448",
-      "holiday": true
+      "holiday": true,
+      "verification": {
+        "status": "pending",
+        "editorApproved": false,
+        "verifiedAt": "2026-10-29",
+        "reviewDue": null,
+        "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
+        "approvedBy": "",
+        "approvedAt": null
+      }
     },
     {
       "id": "fall-break-1448",
@@ -31,7 +58,16 @@
       "date": "2026-11-20",
       "hijri": "10/06/1448",
       "holiday": true,
-      "countdownSlug": "fall-break"
+      "countdownSlug": "fall-break",
+      "verification": {
+        "status": "pending",
+        "editorApproved": false,
+        "verifiedAt": "2026-10-29",
+        "reviewDue": null,
+        "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
+        "approvedBy": "",
+        "approvedAt": null
+      }
     },
     {
       "id": "midyear-break-1448",
@@ -39,28 +75,64 @@
       "date": "2027-01-08",
       "hijri": "30/07/1448",
       "holiday": true,
-      "countdownSlug": "midyear-break"
+      "countdownSlug": "midyear-break",
+      "verification": {
+        "status": "pending",
+        "editorApproved": false,
+        "verifiedAt": "2026-10-29",
+        "reviewDue": null,
+        "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
+        "approvedBy": "",
+        "approvedAt": null
+      }
     },
     {
       "id": "school-founding-day-1448",
       "title": "إجازة يوم التأسيس للمدارس",
       "date": "2027-02-19",
       "hijri": "12/09/1448",
-      "holiday": true
+      "holiday": true,
+      "verification": {
+        "status": "pending",
+        "editorApproved": false,
+        "verifiedAt": "2026-10-29",
+        "reviewDue": null,
+        "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
+        "approvedBy": "",
+        "approvedAt": null
+      }
     },
     {
       "id": "school-eid-fitr-1448",
       "title": "إجازة عيد الفطر للمدارس",
       "date": "2027-02-26",
       "hijri": "19/09/1448",
-      "holiday": true
+      "holiday": true,
+      "verification": {
+        "status": "pending",
+        "editorApproved": false,
+        "verifiedAt": "2026-10-29",
+        "reviewDue": null,
+        "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
+        "approvedBy": "",
+        "approvedAt": null
+      }
     },
     {
       "id": "school-eid-adha-1448",
       "title": "إجازة عيد الأضحى للمدارس",
       "date": "2027-05-07",
       "hijri": "01/12/1448",
-      "holiday": true
+      "holiday": true,
+      "verification": {
+        "status": "pending",
+        "editorApproved": false,
+        "verifiedAt": "2026-10-29",
+        "reviewDue": null,
+        "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
+        "approvedBy": "",
+        "approvedAt": null
+      }
     }
   ]
 }

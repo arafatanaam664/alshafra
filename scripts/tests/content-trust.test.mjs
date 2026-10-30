@@ -40,7 +40,7 @@ test('countdown detail disclosures reflect the kind of date and school review da
     assert.ok(page(`countdown/${slug}`).includes(countdownNotice(def, school.verifiedAt)), slug);
   }
   assert.match(page('countdown/ramadan'), /موعد حسابي غير نهائي/);
-  assert.match(page('countdown/fall-break'), new RegExp(school.verifiedAt));
+  assert.match(page('countdown/fall-break'), /موعد بانتظار التحقق والاعتماد/);
   assert.doesNotMatch(page('countdown/school-end'), new RegExp(`حسب صفحة وزارة التعليم عند آخر تحقق في ${school.verifiedAt}`));
   assert.match(page('countdown/new-year'), /لا تعني إجازة رسمية تلقائية/);
   assert.doesNotMatch(page('articles/citizen-account-payment-dates'), /إذا صادف اليوم العاشر يوم جمعة أو سبت/);

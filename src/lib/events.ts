@@ -1,6 +1,7 @@
 import schoolCalendar from '../data/school-calendar.json';
 import holidayGuide from '../data/holiday-guide.json';
 import type { GregorianDate } from './hijri';
+import { approvedSchoolEvents } from './school-trust.mjs';
 import {
   gregorianToHijri,
   hijriToGregorian,
@@ -8,6 +9,7 @@ import {
   weekdayIndex,
   gregorianToJdn,
   jdnToGregorian,
+  todayGregorian,
 } from './hijri';
 
 /**
@@ -37,10 +39,6 @@ export interface SaudiEvent {
 }
 
 export const SAUDI_EVENTS: SaudiEvent[] = [
-  ...schoolCalendar.events.map((event): SaudiEvent => {
-    const [year, month, day] = event.date.split('-').map(Number);
-    return { id: event.id, title: event.title, category: 'school', date: { year, month, day }, description: `حسب وزارة التعليم؛ آخر تحقق ${schoolCalendar.verifiedAt}. راجع المصدر لأي تحديث.`, isHoliday: event.holiday, emoji: '🏫', source: { url: schoolCalendar.source, label: 'وزارة التعليم', verifiedAt: schoolCalendar.verifiedAt } };
-  }),
   {
     id: 'hijri-new-year-1448',
     title: 'رأس السنة الهجرية 1448هـ',
@@ -134,13 +132,20 @@ export function applyWeekendRule(date: GregorianDate): GregorianDate {
   return date;
 }
 
+export function schoolEventsForDay(today: GregorianDate): SaudiEvent[] {
+  return approvedSchoolEvents(schoolCalendar, today).map(event => {
+    const [year, month, day] = event.date.split('-').map(Number);
+    return { id: event.id, title: event.title, category: 'school', date: { year, month, day }, description: `حسب وزارة التعليم؛ آخر تحقق ${event.verification.verifiedAt}. راجع المصدر لأي تحديث.`, isHoliday: event.holiday, emoji: '🏫', source: { url: schoolCalendar.source, label: 'وزارة التعليم', verifiedAt: event.verification.verifiedAt } };
+  });
+}
+
 export function eventsByCategory(category: EventCategory): SaudiEvent[] {
-  return SAUDI_EVENTS.filter((e) => e.category === category);
+  return [...SAUDI_EVENTS, ...schoolEventsForDay(todayGregorian())].filter((e) => e.category === category);
 }
 
 export function upcomingEvents(from: GregorianDate, limit = 6): SaudiEvent[] {
   const fromJdn = gregorianToJdn(from.year, from.month, from.day);
-  return [...SAUDI_EVENTS]
+  return [...SAUDI_EVENTS, ...schoolEventsForDay(from)]
     .filter((e) => gregorianToJdn(e.date.year, e.date.month, e.date.day) >= fromJdn)
     .sort(
       (a, b) =>
@@ -164,7 +169,7 @@ export function rawDaysUntilEvent(event: SaudiEvent, from: GregorianDate): numbe
 
 /** The next holiday that has NOT passed yet (never a stale past holiday). */
 export function nextHolidayAfter(from: GregorianDate): SaudiEvent | undefined {
-  return upcomingEvents(from, SAUDI_EVENTS.length).find((e) => e.isHoliday);
+  return upcomingEvents(from, SAUDI_EVENTS.length + schoolCalendar.events.length).find((e) => e.isHoliday);
 }
 
 /** Hijri text for an event, derived from the Umm Al-Qura table (never hardcoded). */

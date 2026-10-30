@@ -12,6 +12,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { salaryScheduleApproved } from '../src/lib/salary-trust.mjs';
 import { validIso } from '../src/lib/iso-date.mjs';
+import { schoolEventApproved } from '../src/lib/school-trust.mjs';
 
 export const HIJRI_MONTHS = [
   'محرم',
@@ -160,7 +161,7 @@ export function loadCountdowns(root = process.cwd()) {
     if (def.category === 'national') return { ...def, source: { ...guide.sources[0], verifiedAt: guide.verifiedAt } };
     if (def.category !== 'school') return def;
     const event = school.events.find((item) => item.countdownSlug === def.slug);
-    return { ...def, schedule: { type: 'fixed', dates: event ? [event.date] : [] } };
+    return { ...def, schoolSource: school.source, schoolEvent: event, schedule: { type: 'fixed', dates: event ? [event.date] : [] } };
   });
 }
 
@@ -174,6 +175,7 @@ const jdnOf = (d) => gregorianToJdn(d.year, d.month, d.day);
 
 export function occurrences(def, from, limit = 3) {
   if (!salaryScheduleApproved(def, from)) return [];
+  if (def.category === 'school' && !schoolEventApproved({ source: def.schoolSource }, def.schoolEvent, from)) return [];
   const fromJdn = jdnOf(from);
   const s = def.schedule;
   const out = [];

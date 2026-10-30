@@ -119,7 +119,8 @@ test('interactive routes, date tools, mobile menu and Riyadh midnight', async ()
     await navigate('/salaries');
     assert.equal(document.querySelector('meta[name="keywords"]'), null);
     await navigate('/school-calendar');
-    assert.ok(document.querySelector('main a[href="/countdown/fall-break"]'));
+    assert.match(document.querySelector('main').textContent, /المواعيد بانتظار التحقق والاعتماد/);
+    assert.doesNotMatch(document.querySelector('main').textContent, /20 نوفمبر 2026/);
     await navigate('/today');
     assert.match(document.body.textContent, /28 أكتوبر 2026/);
     await click([...document.querySelectorAll('button')].find(button => button.textContent.includes('2026-10-28')));
@@ -151,14 +152,12 @@ test('interactive routes, date tools, mobile menu and Riyadh midnight', async ()
 
     await navigate('/hijri-calendar');
     await click(document.querySelector('button[aria-label="الشهر السابق"]'));
-    const sharedDay = [...document.querySelectorAll('[title]')].find(el => el.title.includes('إجازة اليوم الوطني للمدارس') && el.title.includes('اليوم الوطني السعودي'));
-    assert.ok(sharedDay, 'both events on the same day are preserved');
+    assert.ok([...document.querySelectorAll('[title]')].some(el => el.title.includes('اليوم الوطني السعودي')));
+    assert.ok(![...document.querySelectorAll('[title]')].some(el => el.title.includes('إجازة اليوم الوطني للمدارس')));
     await click(document.querySelector('button[aria-label="الشهر التالي"]'));
     await click(document.querySelector('button[aria-label="الشهر التالي"]'));
     const eventSection = [...document.querySelectorAll('h2')].find(h => h.textContent === 'مناسبات الشهر').parentElement;
-    assert.match(eventSection.textContent, /إجازة الخريف/);
-    assert.match(eventSection.textContent, /آخر تحقق 2026-10-29/);
-    assert.ok(eventSection.querySelector('a[href="https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx"]'));
+    assert.doesNotMatch(eventSection.textContent, /إجازة الخريف/);
 
     await navigate('/not-a-real-page');
     assert.match(document.querySelector('h1').textContent, /غير موجودة/);
