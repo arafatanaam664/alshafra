@@ -6,7 +6,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { countdownNotice } from '../src/lib/countdown-notice.mjs';
+import { staticCountdownNotice } from '../src/lib/countdown-notice.mjs';
 import { isPrivateDatePath } from '../src/lib/date-privacy.mjs';
 import {
   loadCountdowns,
@@ -83,9 +83,8 @@ ${a.faq && a.faq.length ? `      <h2>الأسئلة الشائعة</h2>\n${a.faq
 
 // --- Countdown pages ("كم باقي على…") ----------------------------------------
 // Built from src/data/countdowns.json — the same file the React app imports —
-// with every date resolved at build time through the Umm Al-Qura table, so the
-// crawlable HTML already contains the real Gregorian + Hijri dates instead of
-// an empty shell that only fills in after JavaScript runs.
+// Sensitive source-review status must not be frozen into long-lived static HTML.
+// The interactive page evaluates approval at the current Riyadh date.
 
 const TODAY_SA = todayInRiyadh();
 const COUNTDOWNS = loadCountdowns();
@@ -179,7 +178,7 @@ function countdownRoutes() {
       body: bodyWithNoscript(`
       <h1>${def.emoji} ${def.question}</h1>
       <p>${description}</p>
-${countdownNotice(def, schoolCalendar.verifiedAt, TODAY_SA) ? `      <p>${countdownNotice(def, schoolCalendar.verifiedAt, TODAY_SA)}</p>` : ''}
+${staticCountdownNotice(def, schoolCalendar.verifiedAt, TODAY_SA) ? `      <p>${staticCountdownNotice(def, schoolCalendar.verifiedAt, TODAY_SA)}</p>` : ''}
       <h2>${def.title}</h2>
       <p>لعرض الموعد الحالي والعدّاد إن توفرا، فعّل JavaScript. راجع المصدر المرفق للموعد النهائي.</p>
       <h2>التفاصيل</h2>

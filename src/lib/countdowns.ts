@@ -55,7 +55,7 @@ export interface CountdownDef {
   faq: CountdownFaq[];
   related: string[];
   source?: { label: string; url: string; verifiedAt?: string };
-  verification?: { status: string; editorApproved: boolean; verifiedAt: string; reviewDue: string; sourceUrl: string };
+  verification?: { status: string; editorApproved: boolean; approvedBy: string; approvedAt: string; approvedSlug: string; approvedDates: string[]; verifiedAt: string; reviewDue: string; sourceUrl: string };
 }
 
 export interface ResolvedCountdown {

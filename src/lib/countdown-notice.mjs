@@ -14,3 +14,9 @@ export function countdownNotice(def, _verifiedAt, today) {
   if (def.category === 'seasonal') return 'موعد تقريبي متعارف عليه للموسم، وليس إعلاناً رسمياً.';
   return '';
 }
+
+// Static HTML can outlive a review window; never freeze a temporary approval in it.
+export function staticCountdownNotice(def, verifiedAt, today) {
+  if (def.category === 'salary' || def.category === 'school') return 'تحقق من حالة الاعتماد الحالية عبر الصفحة التفاعلية والمصدر الرسمي؛ قد تتغير المواعيد.';
+  return countdownNotice(def, verifiedAt, today);
+}

@@ -54,8 +54,13 @@ test('each school event needs editor approval, a current review, and the verifie
   const original = calendar.events.find(e => e.countdownSlug === 'fall-break');
   const today = { year:2026, month:10, day:30 };
   assert.equal(schoolEventApproved(calendar, original, today), false);
-  const event = { ...original, verification: { status:'official', editorApproved:true, approvedBy:'محرر اختباري', approvedAt:'2026-10-29', verifiedAt:'2026-10-29', reviewDue:'2026-11-01', sourceUrl:calendar.source } };
+  const event = { ...original, verification: { status:'official', editorApproved:true, approvedDate:original.date, approvedTitle:original.title, approvedEventId:original.id, approvedHijri:original.hijri, approvedCountdownSlug:original.countdownSlug ?? null, approvedBy:'محرر اختباري', approvedAt:'2026-10-29', verifiedAt:'2026-10-29', reviewDue:'2026-11-01', sourceUrl:calendar.source } };
   assert.equal(schoolEventApproved(calendar, event, today), true);
+  assert.equal(schoolEventApproved(calendar, {...event, date:'2026-11-21'}, today), false);
+  assert.equal(schoolEventApproved(calendar, {...event, title:'موعد مختلف'}, today), false);
+  assert.equal(schoolEventApproved(calendar, {...event, id:'different'}, today), false);
+  assert.equal(schoolEventApproved(calendar, {...event, hijri:'1448-01-01'}, today), false);
+  assert.equal(schoolEventApproved(calendar, {...event, countdownSlug:'other'}, today), false);
   assert.equal(schoolEventApproved(calendar, {...event, verification:{...event.verification,approvedBy:''}}, today), false);
   assert.equal(schoolEventApproved(calendar, {...event, verification:{...event.verification,approvedAt:'2026-10-31'}}, today), false);
   assert.equal(schoolEventApproved(calendar, event, { year:2026, month:11, day:2 }), false);

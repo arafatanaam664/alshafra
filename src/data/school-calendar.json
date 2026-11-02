@@ -16,7 +16,12 @@
         "reviewDue": null,
         "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
         "approvedBy": "",
-        "approvedAt": null
+        "approvedAt": null,
+        "approvedDate": null,
+        "approvedTitle": "",
+        "approvedEventId": "",
+        "approvedHijri": "",
+        "approvedCountdownSlug": null
       }
     },
     {
@@ -33,7 +38,12 @@
         "reviewDue": null,
         "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
         "approvedBy": "",
-        "approvedAt": null
+        "approvedAt": null,
+        "approvedDate": null,
+        "approvedTitle": "",
+        "approvedEventId": "",
+        "approvedHijri": "",
+        "approvedCountdownSlug": null
       }
     },
     {
@@ -49,7 +59,12 @@
         "reviewDue": null,
         "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
         "approvedBy": "",
-        "approvedAt": null
+        "approvedAt": null,
+        "approvedDate": null,
+        "approvedTitle": "",
+        "approvedEventId": "",
+        "approvedHijri": "",
+        "approvedCountdownSlug": null
       }
     },
     {
@@ -66,7 +81,12 @@
         "reviewDue": null,
         "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
         "approvedBy": "",
-        "approvedAt": null
+        "approvedAt": null,
+        "approvedDate": null,
+        "approvedTitle": "",
+        "approvedEventId": "",
+        "approvedHijri": "",
+        "approvedCountdownSlug": null
       }
     },
     {
@@ -83,7 +103,12 @@
         "reviewDue": null,
         "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
         "approvedBy": "",
-        "approvedAt": null
+        "approvedAt": null,
+        "approvedDate": null,
+        "approvedTitle": "",
+        "approvedEventId": "",
+        "approvedHijri": "",
+        "approvedCountdownSlug": null
       }
     },
     {
@@ -99,7 +124,12 @@
         "reviewDue": null,
         "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
         "approvedBy": "",
-        "approvedAt": null
+        "approvedAt": null,
+        "approvedDate": null,
+        "approvedTitle": "",
+        "approvedEventId": "",
+        "approvedHijri": "",
+        "approvedCountdownSlug": null
       }
     },
     {
@@ -115,7 +145,12 @@
         "reviewDue": null,
         "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
         "approvedBy": "",
-        "approvedAt": null
+        "approvedAt": null,
+        "approvedDate": null,
+        "approvedTitle": "",
+        "approvedEventId": "",
+        "approvedHijri": "",
+        "approvedCountdownSlug": null
       }
     },
     {
@@ -131,7 +166,12 @@
         "reviewDue": null,
         "sourceUrl": "https://www.moe.gov.sa/ar/education/generaleducation/Pages/academicCalendar.aspx",
         "approvedBy": "",
-        "approvedAt": null
+        "approvedAt": null,
+        "approvedDate": null,
+        "approvedTitle": "",
+        "approvedEventId": "",
+        "approvedHijri": "",
+        "approvedCountdownSlug": null
       }
     }
   ]

@@ -33,14 +33,14 @@ test('calendar and converter state limitations without promising official or com
 });
 
 test('countdown detail disclosures reflect the kind of date and school review date', async () => {
-  const { countdownNotice } = await import('../../src/lib/countdown-notice.mjs');
+  const { staticCountdownNotice } = await import('../../src/lib/countdown-notice.mjs');
   const school = JSON.parse(readFileSync(new URL('../../src/data/school-calendar.json', import.meta.url)));
   for (const slug of ['ramadan', 'eid-fitr', 'eid-adha', 'hijri-new-year', 'fall-break', 'national-day', 'new-year', 'suhail']) {
     const def = loadCountdowns().find(c => c.slug === slug);
-    assert.ok(page(`countdown/${slug}`).includes(countdownNotice(def, school.verifiedAt)), slug);
+    assert.ok(page(`countdown/${slug}`).includes(staticCountdownNotice(def, school.verifiedAt)), slug);
   }
   assert.match(page('countdown/ramadan'), /موعد حسابي غير نهائي/);
-  assert.match(page('countdown/fall-break'), /موعد بانتظار التحقق والاعتماد/);
+  assert.match(page('countdown/fall-break'), /تحقق من حالة الاعتماد الحالية/);
   assert.doesNotMatch(page('countdown/school-end'), new RegExp(`حسب صفحة وزارة التعليم عند آخر تحقق في ${school.verifiedAt}`));
   assert.match(page('countdown/new-year'), /لا تعني إجازة رسمية تلقائية/);
   assert.doesNotMatch(page('articles/citizen-account-payment-dates'), /إذا صادف اليوم العاشر يوم جمعة أو سبت/);

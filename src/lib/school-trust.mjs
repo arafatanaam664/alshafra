@@ -7,7 +7,11 @@ export function schoolEventApproved(calendar, event, today) {
       typeof v.approvedBy !== 'string' || !v.approvedBy.trim() ||
       !validIso(v.verifiedAt) || !validIso(v.approvedAt) || !validIso(v.reviewDue) ||
       v.approvedAt < v.verifiedAt || v.reviewDue < v.approvedAt ||
-      !validIso(event.date) || !v.sourceUrl || v.sourceUrl !== calendar.source) return false;
+      !validIso(event.date) || v.approvedDate !== event.date ||
+      typeof event.title !== 'string' || !event.title.trim() || v.approvedTitle !== event.title ||
+      typeof event.id !== 'string' || !event.id || v.approvedEventId !== event.id ||
+      typeof event.hijri !== 'string' || !event.hijri.trim() || v.approvedHijri !== event.hijri ||
+      v.approvedCountdownSlug !== (event.countdownSlug ?? null) || !v.sourceUrl || v.sourceUrl !== calendar.source) return false;
   const current = `${today.year}-${String(today.month).padStart(2, '0')}-${String(today.day).padStart(2, '0')}`;
   if (!validIso(current) || current < v.approvedAt || current > v.reviewDue) return false;
   try {
