@@ -10,13 +10,14 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "admin:dev": "node scripts/admin-server.mjs",
-    "test:admin": "node --test scripts/tests/admin-server.test.mjs scripts/tests/admin-integration.test.mjs",
+    "test:admin": "node --test scripts/tests/admin-server.test.mjs scripts/tests/admin-integration.test.mjs scripts/tests/admin-dev-probe.test.mjs",
     "test:dates": "npm run build && node --test scripts/tests/countdown-clock.test.mjs scripts/tests/calendar-data.test.mjs scripts/tests/content-trust.test.mjs scripts/tests/date-validation.test.mjs scripts/tests/age.test.mjs scripts/tests/salary-trust.test.mjs",
     "test:seo": "npm run build && node --test scripts/tests/static-seo.test.mjs scripts/tests/routing.test.mjs",
     "test:ui": "node --test scripts/tests/ui-dom.test.mjs scripts/tests/calendar-unavailable-ui.test.mjs scripts/tests/admin-ui-dom.test.mjs scripts/tests/admin-editor-ui-dom.test.mjs scripts/tests/school-expiry-ui.test.mjs",
     "test:all": "npm run typecheck && npm run lint && npm run test:dates && npm run test:seo && npm run test:admin && npm run test:ui",
     "test:browser": "node --test scripts/tests/browser.test.mjs",
-    "perf:browser": "node scripts/browser-lab.mjs"
+    "perf:browser": "node scripts/browser-lab.mjs",
+    "admin:probe": "node scripts/admin-dev-probe.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
