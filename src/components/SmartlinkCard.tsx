@@ -1,5 +1,7 @@
 import { ExternalLink, Megaphone, Sparkles } from 'lucide-react';
 import { ADSTERRA } from '../lib/ads';
+import { useRoute } from '../lib/router';
+import { isIsolatedPath } from '../lib/date-privacy.mjs';
 
 /**
  * Adsterra smartlink.
@@ -30,6 +32,8 @@ export default function SmartlinkCard({
   description = 'عرض مختار من شبكة إعلاناتنا — يُفتح في نافذة جديدة.',
   cta = 'مشاهدة العرض',
 }: SmartlinkCardProps) {
+  const [path] = useRoute();
+  if (isIsolatedPath(path)) return null;
   if (variant === 'inline') {
     return (
       <a
@@ -89,6 +93,8 @@ export default function SmartlinkCard({
 
 /** Compact site-wide link used in the footer. */
 export function SmartlinkFooterLink() {
+  const [path] = useRoute();
+  if (isIsolatedPath(path)) return null;
   return (
     <a
       {...LINK_PROPS}

@@ -29,7 +29,7 @@ export default function Footer() {
                 <Calendar className="h-5 w-5" />
               </span>
               <div>
-                <div className="font-display text-lg font-bold">تقويم السعودية</div>
+                <div className="font-display text-lg font-bold">خليجي تايم</div>
                 <div className="text-xs text-brand-200/80">منصة مستقلة للتقويم والمواعيد</div>
               </div>
             </div>
@@ -77,8 +77,8 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-brand-200/70 sm:flex-row">
-          <p>© {new Date().getFullYear()} تقويم السعودية — جميع الحقوق محفوظة.</p>
-          <p>صُمّم بشغف لخدمة المواطن والمقيم في المملكة العربية السعودية.</p>
+          <p>© {new Date().getFullYear()} خليجي تايم — جميع الحقوق محفوظة.</p>
+          <p>أدوات عربية للتقويم والمواعيد، مع أولوية للمصادر السعودية.</p>
         </div>
       </div>
     </footer>

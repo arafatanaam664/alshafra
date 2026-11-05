@@ -7,7 +7,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { staticCountdownNotice } from '../src/lib/countdown-notice.mjs';
-import { isPrivateDatePath } from '../src/lib/date-privacy.mjs';
+import { isIsolatedPath } from '../src/lib/date-privacy.mjs';
 import {
   loadCountdowns,
   resolveAll,
@@ -22,7 +22,7 @@ const faqGroups = JSON.parse(readFileSync(new URL('../src/data/faq.json', import
 const schoolCalendar = JSON.parse(readFileSync(new URL('../src/data/school-calendar.json', import.meta.url), 'utf-8'));
 
 const SITE_URL = 'https://alshafra.com';
-const SITE_NAME = 'تقويم السعودية';
+const SITE_NAME = 'خليجي تايم';
 
 const distDir = join(process.cwd(), 'dist');
 const templatePath = join(distDir, 'index.html');
@@ -44,7 +44,7 @@ const ARTICLES = JSON.parse(readFileSync(new URL('../src/data/articles.json', im
 function articleRoutes() {
   return ARTICLES.map((a) => ({
     path: `/articles/${a.slug}`,
-    title: `${a.title} | تقويم السعودية`,
+    title: `${a.title} | خليجي تايم`,
     description: a.description,
     keywords: a.keywords.join(', '),
     jsonLd: [
@@ -76,6 +76,7 @@ function articleRoutes() {
       <p>${escapeHtml(a.description)}</p>
 ${a.sections.map((s) => `      <h2>${escapeHtml(s.heading)}</h2>\n      <p>${escapeHtml(s.body)}</p>`).join('\n')}
 ${a.slug === 'salary-dates-saudi-arabia' ? `      <p><a href="https://www.mof.gov.sa/">وزارة المالية</a></p>` : a.slug === 'citizen-account-payment-dates' ? `      <p><a href="https://portal.ca.gov.sa/">بوابة حساب المواطن الرسمية</a></p>` : a.slug === 'official-holidays-saudi-arabia' ? `      <p><a href="/holidays">جدول الإجازات والمصادر الرسمية</a></p>` : a.slug === 'school-calendar-1448' ? `      <p><a href="/school-calendar">جدول التقويم المدرسي ومصدر وزارة التعليم</a></p>` : a.slug === 'developed-social-security' ? `      <p><a href="https://www.hrsd.gov.sa/">وزارة الموارد البشرية والتنمية الاجتماعية</a></p>` : ''}
+${['hijri-calendar-1448', 'hijri-to-gregorian-conversion'].includes(a.slug) ? `      <p><a href="https://www.ummulqura.org.sa/ar/about-calendar">عن تقويم أم القرى</a> · <a href="https://www.ummulqura.org.sa/ar/converter">المحول المرجعي</a></p>` : ''}
 ${a.faq && a.faq.length ? `      <h2>الأسئلة الشائعة</h2>\n${a.faq.map((f) => `      <h3>${escapeHtml(f.q)}</h3>\n      <p>${escapeHtml(f.a)}</p>`).join('\n')}` : ''}
     `),
   }));
@@ -125,7 +126,7 @@ function countdownHubRoute() {
       {
         '@context': 'https://schema.org',
         '@type': 'ItemList',
-        name: 'العدّادات التنازلية في تقويم السعودية',
+        name: 'العدّادات التنازلية في خليجي تايم',
         inLanguage: 'ar-SA',
         itemListElement: resolved.map((r, i) => ({
           '@type': 'ListItem',
@@ -161,7 +162,7 @@ function countdownRoutes() {
 
     return {
       path: `/countdown/${def.slug}`,
-      title: `${def.question} العدّ التنازلي | تقويم السعودية`,
+      title: `${def.question} العدّ التنازلي | خليجي تايم`,
       description,
       keywords: def.keywords,
       jsonLd: [
@@ -200,7 +201,7 @@ ${relatedHtml}
 function todayRoute() {
   return {
     path: '/today',
-    title: 'تاريخ اليوم هجري وميلادي في السعودية | تقويم السعودية',
+    title: 'تاريخ اليوم هجري وميلادي في السعودية | خليجي تايم',
     description: 'اعرف التاريخ الهجري والميلادي اليوم في السعودية بتوقيت الرياض، مع تفاصيل التقويم وأدوات التحويل.',
     keywords: 'التاريخ اليوم, التاريخ الهجري اليوم, التاريخ الميلادي اليوم, تقويم أم القرى',
     jsonLd: [],
@@ -219,20 +220,11 @@ function todayRoute() {
 const routes = [
   {
     path: '/',
-    title: 'تقويم السعودية | مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي',
+    title: 'خليجي تايم | مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي',
     description:
       'منصة مستقلة للتقويم والمواعيد والأدوات في السعودية؛ مواعيد الرواتب والدعم بانتظار التحقق، والتواريخ الحسابية تحتاج إلى مراجعة المصادر الرسمية.',
     keywords:
       'التقويم الهجري, التقويم الميلادي, مواعيد الرواتب, حساب المواطن, رواتب المتقاعدين, الضمان الاجتماعي, التقويم الدراسي, الإجازات الرسمية, تحويل التاريخ, حاسبة العمر, تقويم أم القرى, السعودية, زخرفة الأسماء',
-    jsonLd: [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'WebSite',
-        name: SITE_NAME,
-        url: SITE_URL + '/',
-        inLanguage: 'ar-SA',
-      },
-    ],
     body: bodyWithNoscript(`
 <h1>مواعيد الرواتب، التقويم الهجري، والإجازات الرسمية في مكان واحد</h1>
     <p>منصة مستقلة للتقويم والمواعيد والأدوات في السعودية. مواعيد الرواتب والدعم بانتظار التحقق؛ راجع المصادر الرسمية قبل الاعتماد على أي موعد.</p>
@@ -256,27 +248,17 @@ ${ARTICLES.map((a) => `        <li><a href="/articles/${a.slug}">${escapeHtml(a.
   },
   {
     path: '/salaries',
-    title: 'مواعيد صرف الرواتب والدعم في السعودية | تقويم السعودية',
+    title: 'مواعيد صرف الرواتب والدعم في السعودية | خليجي تايم',
     description:
       'اختر برنامج الرواتب أو الدعم وراجع مصدر الجهة المعنية لمعرفة موعد الصرف.',
     keywords:
       'مواعيد الرواتب, صرف الرواتب, حساب المواطن, رواتب المتقاعدين, الضمان الاجتماعي, الدعم السكني, موعد الراتب, تقويم الرواتب',
-    jsonLd: [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'WebApplication',
-        name: 'مواعيد الرواتب',
-        applicationCategory: 'FinanceApplication',
-        operatingSystem: 'Web',
-        inLanguage: 'ar-SA',
-      },
-    ],
     body: bodyWithNoscript(`
       <h1>مواعيد صرف الرواتب والدعم في السعودية</h1>
       <p>اختر البرنامج ثم راجع إعلان الجهة المعنية. لا نعرض موعداً قادماً هنا قبل التحقق من الجدول أو الإعلان الرسمي لكل دفعة.</p>
       <h2>برامج الصرف</h2>
       <ul>
-        <li><a href="/countdown/employee-salaries">رواتب الموظفين الحكوميين</a> — بانتظار التحقق. <a href="https://www.mof.gov.sa/mediacenter/Payroll/Pages/2026.aspx">وزارة المالية</a></li>
+        <li><a href="/countdown/employee-salaries">رواتب الموظفين الحكوميين</a> — بانتظار التحقق. <a href="https://www.mof.gov.sa/">وزارة المالية</a></li>
         <li><a href="/countdown/citizen-account">حساب المواطن</a> — بانتظار التحقق. <a href="https://portal.ca.gov.sa/">البرنامج</a></li>
         <li><a href="/countdown/retiree-salaries">معاشات المتقاعدين</a> — بانتظار التحقق. <a href="https://beta.gosi.gov.sa/pension-disbursement-date">التأمينات الاجتماعية</a></li>
         <li><a href="/countdown/social-security">الضمان الاجتماعي المطور</a> — بانتظار التحقق. <a href="https://www.hrsd.gov.sa/">وزارة الموارد البشرية والتنمية الاجتماعية</a></li>
@@ -286,7 +268,7 @@ ${ARTICLES.map((a) => `        <li><a href="/articles/${a.slug}">${escapeHtml(a.
   },
   {
     path: '/hijri-calendar',
-    title: 'التقويم الهجري وأم القرى | تقويم السعودية',
+    title: 'التقويم الهجري وأم القرى | خليجي تايم',
     description:
       'تقويم هجري حسابي مع مناسبات مختارة ومواعيد دراسية من وزارة التعليم؛ راجع الإعلانات الرسمية للتواريخ الحساسة.',
     keywords:
@@ -321,21 +303,11 @@ ${ARTICLES.map((a) => `        <li><a href="/articles/${a.slug}">${escapeHtml(a.
   },
   {
     path: '/school-calendar',
-    title: 'التقويم الدراسي 1448-1449هـ (2026-2027م) | تقويم السعودية',
+    title: 'التقويم الدراسي 1448-1449هـ (2026-2027م) | خليجي تايم',
     description:
       'مواعيد بداية الدراسة وإجازات المدارس 1448-1449هـ حسب صفحة التقويم الدراسي لوزارة التعليم، مع رابط المصدر وتاريخ المراجعة.',
     keywords:
       'التقويم الدراسي, 1448, وزارة التعليم, بداية الدراسة, الإجازات المدرسية, الاختبارات, العام الدراسي',
-    jsonLd: [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'WebApplication',
-        name: 'التقويم الدراسي',
-        applicationCategory: 'UtilitiesApplication',
-        operatingSystem: 'Web',
-        inLanguage: 'ar-SA',
-      },
-    ],
     body: bodyWithNoscript(`
       <h1>التقويم الدراسي 1448-1449هـ (2026-2027م)</h1>
       <p>راجع وزارة التعليم للمواعيد الرسمية. لا يعرض الموقع موعداً قبل مراجعة فريق التحرير واعتماده.</p>
@@ -347,7 +319,7 @@ ${ARTICLES.map((a) => `        <li><a href="/articles/${a.slug}">${escapeHtml(a.
   },
   {
     path: '/holidays',
-    title: 'الإجازات الرسمية في السعودية والمدارس | تقويم السعودية',
+    title: 'الإجازات الرسمية في السعودية والمدارس | خليجي تايم',
     description: 'دليل الإجازات بحسب الفئة ومصادر الأنظمة، مع التمييز بين المناسبات وإجازات المدارس.',
     keywords: 'الإجازات الرسمية, عطلات السعودية, إجازة عيد الفطر, إجازة عيد الأضحى, اليوم الوطني, يوم التأسيس',
     jsonLd: [],
@@ -363,7 +335,7 @@ ${ARTICLES.map((a) => `        <li><a href="/articles/${a.slug}">${escapeHtml(a.
   },
   {
     path: '/date-converter',
-    title: 'تحويل التاريخ بين الهجري والميلادي | تقويم السعودية',
+    title: 'تحويل التاريخ بين الهجري والميلادي | خليجي تايم',
     description:
       'أداة لتحويل التاريخ بين الهجري والميلادي بتقويم أم القرى المتاح في المتصفح، مع بيان الحدود والتنبيه إلى الإعلانات الرسمية.',
     keywords:
@@ -397,7 +369,7 @@ ${toolGuides.converter.map(item => `      <h3>${escapeHtml(item.question)}</h3><
   },
   {
     path: '/age-calculator',
-    title: 'حاسبة العمر بالهجري والميلادي | تقويم السعودية',
+    title: 'حاسبة العمر بالهجري والميلادي | خليجي تايم',
     description:
       'احسب العمر بالسنوات والأشهر والأيام الهجرية والميلادية، والأيام المتبقية لعيد الميلاد وفق يوم الرياض.',
     keywords: 'حاسبة العمر, حساب العمر, العمر بالهجري, العمر بالميلادي, كم عمري',
@@ -419,7 +391,8 @@ ${toolGuides.converter.map(item => `      <h3>${escapeHtml(item.question)}</h3><
       <p>يمكن مقارنة تاريخ الميلاد المدخل بتاريخ شخص ثانٍ ميلادياً، واحتساب الفرق بينهما بالأيام والسنوات والأشهر المكتملة دون ساعة الميلاد. تتطلب المقارنة تشغيل JavaScript.</p>
       <h2>عن حاسبة العمر</h2>
       <p>يُحسب العمر حسب يوم الرياض من دون ساعة الميلاد. يُحتسب الشهر الكامل من يوم الميلاد، وإذا لم يوجد ذلك اليوم في شهر أقصر يُستخدم آخر يوم فيه. يُحتسب عيد ميلاد 29 فبراير في 28 فبراير خلال السنوات غير الكبيسة؛ وقد تختلف طرق الحساب الأخرى أو الأحكام الرسمية.</p>
-      <p>يستخدم الحساب تقويم أم القرى الذي يوفره المتصفح إن اجتاز فحص التوافق؛ وإلا تتوقف الحاسبة. قد يختلف إعلان رؤية الهلال عن الحساب التقويمي؛ لا تستخدم النتيجة وثيقة رسمية وراجع الجهة المختصة.</p>
+      <p>يستخدم الحساب تقويم أم القرى الذي يوفره المتصفح إن اجتاز فحص التوافق؛ وإلا تتوقف الحاسبة. قد تختلف بداية الشهر الهجري حسب رؤية الهلال والجهة والدولة؛ لا تستخدم النتيجة وثيقة رسمية وراجع الجهة المختصة.</p>
+      <p>مثال ميلادي: من 31 يناير إلى 28 فبراير 2023 تُحسب المدة شهراً كاملاً وفق قاعدة نهاية الشهر المستخدمة هنا.</p>
       <p><a href="https://www.ummulqura.org.sa/ar/calendar">موقع تقويم أم القرى</a> مرجع للمراجعة ولا تتصل الأداة به لإجراء الحساب.</p>
       <h2>أسئلة عن الأداة</h2>
 ${toolGuides.age.map(item => `      <h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p>`).join('\n')}
@@ -429,7 +402,7 @@ ${toolGuides.age.map(item => `      <h3>${escapeHtml(item.question)}</h3><p>${es
   },
   {
     path: '/name-decoration',
-    title: 'زخرفة الأسماء أونلاين | 5 أدوات زخرفة مجانية | تقويم السعودية',
+    title: 'زخرفة الأسماء أونلاين | 5 أدوات زخرفة مجانية | خليجي تايم',
     description:
       'زخرف اسمك أونلاين مجاناً بأكثر من 75 نمط زخرفة: زخرفة الأسماء عربي، ببجي، بالإنجليزي، فري فاير، وبالفرنسية. أدوات زخرفة سريعة مع نسخ مباشر لكل نمط.',
     keywords:
@@ -457,13 +430,13 @@ ${toolGuides.age.map(item => `      <h3>${escapeHtml(item.question)}</h3><p>${es
         <li><a href="/name-decoration/french">زخرفة الأسماء بالفرنسية</a> — خطوط ورموز أنيقة بالفرنسية.</li>
       </ul>
       <h2>عن زخرفة الأسماء</h2>
-      <p>زخرفة الأسماء هي فن تحويل الاسم العادي إلى شكل جذاب ومميز باستخدام رموز يونيكود والحروف المزخرفة. تُستخدم زخرفة الأسماء على نطاق واسع في منصات التواصل الاجتماعي والألعاب الإلكترونية لإبراز الشخصية وجذب الانتباه. توفر بوابة تقويم السعودية 5 أدوات مجانية لزخرفة الأسماء بأكثر من 75 نمط مختلف.</p>
+      <p>زخرفة الأسماء هي فن تحويل الاسم العادي إلى شكل جذاب ومميز باستخدام رموز يونيكود والحروف المزخرفة. تُستخدم زخرفة الأسماء على نطاق واسع في منصات التواصل الاجتماعي والألعاب الإلكترونية لإبراز الشخصية وجذب الانتباه. توفر بوابة خليجي تايم 5 أدوات مجانية لزخرفة الأسماء بأكثر من 75 نمط مختلف.</p>
       <p>كل أداة توفر أكثر من 15 نمط زخرفة مختلف، مع زر نسخ مباشر لكل نمط لتسهيل نسخ الاسم المزخرف واستخدامه في أي مكان — وسائل التواصل الاجتماعي، الألعاب، الرسائل، أو أي تطبيق آخر. أدواتنا مجانية بالكامل ولا تتطلب تسجيل دخول، وتعمل على جميع الأجهزة.</p>
     `),
   },
   {
     path: '/name-decoration/arabic',
-    title: 'زخرفة الأسماء بالعربي أونلاين مجاناً | تقويم السعودية',
+    title: 'زخرفة الأسماء بالعربي أونلاين مجاناً | خليجي تايم',
     description:
       'أداة زخرفة الأسماء بالعربية أونلاين مجاناً — اكتب اسمك واحصل على أكثر من 15 نمط زخرفة عربي بأجنحة ونجوم وورود وألماس، مع زر نسخ مباشر لكل نمط.',
     keywords:
@@ -487,7 +460,7 @@ ${toolGuides.age.map(item => `      <h3>${escapeHtml(item.question)}</h3><p>${es
   },
   {
     path: '/name-decoration/pubg',
-    title: 'زخرفة الأسماء ببجي (PUBG) أونلاين مجاناً | تقويم السعودية',
+    title: 'زخرفة الأسماء ببجي (PUBG) أونلاين مجاناً | خليجي تايم',
     description:
       'أداة زخرفة الأسماء ببجي PUBG Mobile أونلاين — زخرف اسمك في ببجي بأكثر من 15 نمط: أجنحة، نجوم، تاج، سيوف، نار، وألماس مع نسخ مباشر لتغيير اسمك في اللعبة.',
     keywords:
@@ -511,7 +484,7 @@ ${toolGuides.age.map(item => `      <h3>${escapeHtml(item.question)}</h3><p>${es
   },
   {
     path: '/name-decoration/english',
-    title: 'زخرفة الأسماء بالإنجليزي (English Name Decoration) أونلاين | تقويم السعودية',
+    title: 'زخرفة الأسماء بالإنجليزي (English Name Decoration) أونلاين | خليجي تايم',
     description:
       'أداة زخرفة الأسماء بالإنجليزي أونلاين — اكتب اسمك بالإنجليزية واحصل على أكثر من 15 خطاً مزخرفاً: Script، Bold، Italic، Double، Circle، Monospace مع رموز ونسخ مباشر.',
     keywords:
@@ -535,7 +508,7 @@ ${toolGuides.age.map(item => `      <h3>${escapeHtml(item.question)}</h3><p>${es
   },
   {
     path: '/name-decoration/free-fire',
-    title: 'زخرفة الأسماء فري فاير (Free Fire) أونلاين مجاناً | تقويم السعودية',
+    title: 'زخرفة الأسماء فري فاير (Free Fire) أونلاين مجاناً | خليجي تايم',
     description:
       'أداة زخرفة الأسماء فري فاير Free Fire أونلاين — زخرف اسمك في فري فاير بأكثر من 15 نمط: أجنحة، نجوم، تاج، سيوف، نار، وورود مع نسخ مباشر لتغيير اسمك في اللعبة.',
     keywords:
@@ -559,7 +532,7 @@ ${toolGuides.age.map(item => `      <h3>${escapeHtml(item.question)}</h3><p>${es
   },
   {
     path: '/name-decoration/french',
-    title: 'زخرفة الأسماء بالفرنسية (Décoration de Noms) أونلاين | تقويم السعودية',
+    title: 'زخرفة الأسماء بالفرنسية (Décoration de Noms) أونلاين | خليجي تايم',
     description:
       'أداة زخرفة الأسماء بالفرنسية أونلاين — اكتب اسمك بالفرنسية واحصل على أكثر من 15 نمط زخرفة: Script، Bold، Italic، Double، Circle مع رموز ونسخ مباشر.',
     keywords:
@@ -583,7 +556,7 @@ ${toolGuides.age.map(item => `      <h3>${escapeHtml(item.question)}</h3><p>${es
   },
   {
     path: '/articles',
-    title: 'مقالات عن المواعيد والتقويم في السعودية | تقويم السعودية',
+    title: 'مقالات عن المواعيد والتقويم في السعودية | خليجي تايم',
     description:
       'مقالات ودلائل شاملة عن مواعيد الرواتب وحساب المواطن والضمان الاجتماعي المطور والتقويم الهجري والميلادي والإجازات الرسمية وتحويل التاريخ في المملكة العربية السعودية.',
     keywords:
@@ -610,7 +583,7 @@ ${ARTICLES.map((a) => `        <li><a href="/articles/${a.slug}">${escapeHtml(a.
   todayRoute(),
   {
     path: '/faq',
-    title: 'أسئلة شائعة عن مواعيد الرواتب والتقويم والإجازات في السعودية | تقويم السعودية',
+    title: 'أسئلة شائعة عن مواعيد الرواتب والتقويم والإجازات في السعودية | خليجي تايم',
     description:
       'إجابات على أكثر الأسئلة شيوعاً عن مواعيد الرواتب وحساب المواطن والضمان الاجتماعي والتقويم الهجري والميلادي والإجازات الرسمية وتحويل التاريخ في السعودية.',
     keywords: 'الأسئلة الشائعة, أسئلة, مواعيد الرواتب, حساب المواطن, التقويم الهجري, الإجازات الرسمية',
@@ -623,29 +596,29 @@ ${ARTICLES.map((a) => `        <li><a href="/articles/${a.slug}">${escapeHtml(a.
   },
   {
     path: '/about',
-    title: 'عن تقويم السعودية | تقويم السعودية',
-    description: 'تعرف على بوابة تقويم السعودية — منصة شاملة للمواعيد الرسمية والتقويمات والأدوات في المملكة العربية السعودية.',
-    keywords: 'عن تقويم السعودية, من نحن, البوابة السعودية',
+    title: 'عن خليجي تايم | خليجي تايم',
+    description: 'تعرف على بوابة خليجي تايم — منصة شاملة للمواعيد الرسمية والتقويمات والأدوات في المملكة العربية السعودية.',
+    keywords: 'عن خليجي تايم, من نحن, البوابة السعودية',
     jsonLd: [
       {
         '@context': 'https://schema.org',
         '@type': 'AboutPage',
-        name: 'عن تقويم السعودية',
+        name: 'عن خليجي تايم',
         inLanguage: 'ar-SA',
       },
     ],
     body: bodyWithNoscript(`
-      <h1>عن تقويم السعودية</h1>
-      <p>تقويم السعودية منصة مستقلة للتقويم والأدوات والمعلومات في السعودية. مواعيد الرواتب والدعم بانتظار التحقق؛ راجع الجهات الرسمية قبل الاعتماد على أي موعد.</p>
+      <h1>عن خليجي تايم</h1>
+      <p>خليجي تايم منصة مستقلة للتقويم والأدوات والمعلومات في السعودية. مواعيد الرواتب والدعم بانتظار التحقق؛ راجع الجهات الرسمية قبل الاعتماد على أي موعد.</p>
       <h2>التحرير</h2><p>يتولى ${escapeHtml(contact.editorialTeam)} مسؤولية مراجعة المحتوى والمواعيد واعتماد النشر. راجع المصادر الرسمية للتحديثات النهائية.</p>
       <p>للتواصل: <a href="mailto:${escapeHtml(contact.email)}">${escapeHtml(contact.email)}</a></p>
     `),
   },
   {
     path: '/contact',
-    title: 'تواصل معنا | تقويم السعودية',
-    description: 'تواصل مع فريق تقويم السعودية لأي استفسار أو اقتراح حول المواعيد الرسمية والتقويمات والأدوات.',
-    keywords: 'تواصل معنا, اتصال, استفسار, تقويم السعودية',
+    title: 'تواصل معنا | خليجي تايم',
+    description: 'تواصل مع فريق خليجي تايم لأي استفسار أو اقتراح حول المواعيد الرسمية والتقويمات والأدوات.',
+    keywords: 'تواصل معنا, اتصال, استفسار, خليجي تايم',
     jsonLd: [
       {
         '@context': 'https://schema.org',
@@ -656,14 +629,14 @@ ${ARTICLES.map((a) => `        <li><a href="/articles/${a.slug}">${escapeHtml(a.
     ],
     body: bodyWithNoscript(`
       <h1>تواصل معنا</h1>
-      <p>تواصل مع فريق تقويم السعودية لأي استفسار أو اقتراح حول المواعيد الرسمية والتقويمات والأدوات المتاحة على الموقع.</p>
+      <p>تواصل مع فريق خليجي تايم لأي استفسار أو اقتراح حول المواعيد الرسمية والتقويمات والأدوات المتاحة على الموقع.</p>
       <p>البريد الإلكتروني: <a href="mailto:${escapeHtml(contact.email)}">${escapeHtml(contact.email)}</a></p>
     `),
   },
   {
     path: '/privacy',
-    title: 'سياسة الخصوصية | تقويم السعودية',
-    description: 'سياسة الخصوصية لبوابة تقويم السعودية — كيف نجمع ونستخدم ونحمي بيانات المستخدمين.',
+    title: 'سياسة الخصوصية | خليجي تايم',
+    description: 'سياسة الخصوصية لبوابة خليجي تايم — كيف نجمع ونستخدم ونحمي بيانات المستخدمين.',
     keywords: 'سياسة الخصوصية, الخصوصية, حماية البيانات',
     jsonLd: [],
     body: bodyWithNoscript(`
@@ -674,13 +647,13 @@ ${privacyNotice.sections.map(section => `      <h2>${escapeHtml(section.heading)
   },
   {
     path: '/terms',
-    title: 'شروط الاستخدام | تقويم السعودية',
-    description: 'شروط استخدام بوابة تقويم السعودية — القواعد والأحكام لاستخدام الموقع وخدماته.',
+    title: 'شروط الاستخدام | خليجي تايم',
+    description: 'شروط استخدام بوابة خليجي تايم — القواعد والأحكام لاستخدام الموقع وخدماته.',
     keywords: 'شروط الاستخدام, الأحكام, القواعد',
     jsonLd: [],
     body: bodyWithNoscript(`
       <h1>شروط الاستخدام</h1>
-      <p>شروط استخدام بوابة تقويم السعودية — القواعد والأحكام لاستخدام الموقع وخدماته. المعلومات المعروضة على الموقع لأغراض معلوماتية فقط ولا تُغني عن الإعلانات الرسمية.</p>
+      <p>شروط استخدام بوابة خليجي تايم — القواعد والأحكام لاستخدام الموقع وخدماته. المعلومات المعروضة على الموقع لأغراض معلوماتية فقط ولا تُغني عن الإعلانات الرسمية.</p>
     `),
   },
 ];
@@ -696,7 +669,7 @@ function bodyWithNoscript(innerHtml) {
   return `<div id="root"><div class="prerender-shell" dir="rtl" lang="ar">
       <a class="prerender-skip" href="#main-content">انتقل إلى المحتوى الرئيسي</a>
       <header class="prerender-nav">
-        <a href="/"><strong>تقويم السعودية</strong></a>
+        <a href="/"><strong>خليجي تايم</strong></a>
         <nav>
           <a href="/countdown">كم باقي على…</a>
           <a href="/today">التاريخ اليوم</a>
@@ -789,7 +762,7 @@ for (const route of routes) {
     html = html.replace('</head>', `    ${PRERENDER_CSS}\n  </head>`);
   }
 
-  if (isPrivateDatePath(route.path)) {
+  if (isIsolatedPath(route.path)) {
     // This document must not inherit advertising/analytics scripts or fonts.
     // A restrictive CSP is defense in depth, not a substitute for network tests.
     html = html.replace(/<script\b[^>]*\bsrc="https:\/\/[^"]+"[^>]*><\/script>/gi, '');

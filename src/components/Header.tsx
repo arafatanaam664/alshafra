@@ -35,13 +35,13 @@ export default function Header() {
           to="/"
           onClick={close}
           className="group flex shrink-0 items-center gap-2.5"
-          aria-label="تقويم السعودية - الصفحة الرئيسية"
+          aria-label="خليجي تايم - الصفحة الرئيسية"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-xl gradient-brand text-white shadow-soft transition-transform group-hover:scale-105">
             <Calendar className="h-5 w-5" />
           </span>
           <span className="text-right leading-tight">
-            <span className="block font-display text-base font-bold text-brand-900">تقويم السعودية</span>
+            <span className="block font-display text-base font-bold text-brand-900">خليجي تايم</span>
             <span className="block text-[11px] text-brand-600/70">منصة مستقلة للتقويم والمواعيد</span>
           </span>
         </Link>

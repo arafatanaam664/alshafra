@@ -35,7 +35,7 @@ export default function DateConverterPage() {
   const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   useSeo({
-    title: 'تحويل التاريخ بين الهجري والميلادي | تقويم السعودية',
+    title: 'تحويل التاريخ بين الهجري والميلادي | خليجي تايم',
     description:
       'أداة لتحويل التاريخ بين الهجري والميلادي بتقويم أم القرى المتاح في المتصفح، مع بيان الحدود والتنبيه إلى الإعلانات الرسمية.',
     canonical: 'https://alshafra.com/date-converter',

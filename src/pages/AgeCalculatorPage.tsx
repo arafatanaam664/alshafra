@@ -3,6 +3,7 @@ import { Cake, CalendarDays, Sparkles } from 'lucide-react';
 import { useSeo } from '../lib/seo';
 import Link from '../components/Link';
 import ToolGuide from '../components/ToolGuide';
+import Breadcrumbs from '../components/Breadcrumbs';
 import {
   formatGregorian,
   formatHijri,
@@ -30,7 +31,7 @@ export default function AgeCalculatorPage() {
   const [hijriBirth, setHijriBirth] = useState(() => gregorianToHijri(2000, 1, 1));
 
   useSeo({
-    title: 'حاسبة العمر بالهجري والميلادي | تقويم السعودية',
+    title: 'حاسبة العمر بالهجري والميلادي | خليجي تايم',
     description:
       'احسب العمر بالسنوات والأشهر والأيام الهجرية والميلادية، والأيام المتبقية لعيد الميلاد وفق يوم الرياض.',
     canonical: 'https://alshafra.com/age-calculator',
@@ -68,7 +69,8 @@ export default function AgeCalculatorPage() {
     <div className="container-page py-10">
       <div className="grid items-start gap-8">
         <div className="min-w-0">
-          <header className="max-w-2xl">
+          <Breadcrumbs items={[{ name: 'الرئيسية', path: '/' }, { name: 'حاسبة العمر' }]} />
+          <header className="mt-4 max-w-2xl">
             <h1 className="section-title">حاسبة العمر بالهجري والميلادي</h1>
             <p className="mt-2 text-sm leading-relaxed text-brand-700/80">
               أدخل تاريخ ميلادك بالتقويم الميلادي أو الهجري لتحصل على عمرك بالسنوات والأشهر والأيام بالتقويمين
@@ -119,13 +121,15 @@ export default function AgeCalculatorPage() {
                   />
                 </label>
               </div>
+              <button type="button" className="btn-primary mt-5" onClick={() => document.getElementById('age-result')?.focus()}>عرض نتيجة العمر</button>
+              <p className="mt-2 text-xs text-brand-700/80">تتحدث النتيجة تلقائياً عند تغيير التاريخ.</p>
               <div className="mt-5 rounded-xl bg-brand-50 p-4 text-sm text-brand-700">
                 تاريخ الميلاد المُدخل: <strong>{resolvedBirth ? (mode === 'gregorian' ? formatGregorian(birth) : formatHijri(hijriBirth)) : 'تاريخ غير صحيح أو خارج النطاق أو التقويم غير متاح'}</strong>
                 {resolvedBirth && <p className="mt-1">يقابله: {mode === 'gregorian' ? formatHijri(gregorianToHijri(birth.year, birth.month, birth.day)) : formatGregorian(resolvedBirth)}</p>}
               </div>
             </div>
 
-            <div className="card overflow-hidden">
+            <div id="age-result" tabIndex={-1} className="card overflow-hidden focus:outline-none focus:ring-2 focus:ring-brand-500">
               <div className="border-b border-brand-900/5 bg-gradient-to-l from-brand-50 to-transparent px-6 py-4">
                 <h2 className="font-display text-lg font-bold text-brand-900">النتيجة</h2>
               </div>
@@ -172,8 +176,9 @@ export default function AgeCalculatorPage() {
               </p>
               <p>
                 يستخدم الحساب تقويم أم القرى الذي يوفره المتصفح إن اجتاز فحص التوافق؛ وإلا تتوقف الحاسبة.
-                قد يختلف إعلان رؤية الهلال عن الحساب التقويمي؛ لا تستخدم النتيجة وثيقة رسمية وراجع الجهة المختصة.
+                قد تختلف بداية الشهر الهجري حسب رؤية الهلال والجهة والدولة؛ لا تستخدم النتيجة وثيقة رسمية وراجع الجهة المختصة.
               </p>
+              <p>مثال ميلادي: من 31 يناير إلى 28 فبراير 2023 تُحسب المدة شهراً كاملاً وفق قاعدة نهاية الشهر المستخدمة هنا.</p>
               <p><a className="underline" href="https://www.ummulqura.org.sa/ar/calendar" target="_blank" rel="noopener noreferrer">موقع تقويم أم القرى</a> — مرجع للمراجعة، ولا تتصل الأداة به لإجراء الحساب.</p>
             </div>
           </section>

@@ -11,8 +11,8 @@ export default function ArticlePage({ slug }: { slug: string }) {
 
   useSeo({
     title: article
-      ? `${article.title} | تقويم السعودية`
-      : 'مقال غير موجود | تقويم السعودية',
+      ? `${article.title} | خليجي تايم`
+      : 'مقال غير موجود | خليجي تايم',
     description: article?.description,
     canonical: `https://alshafra.com/articles/${slug}`,
     keywords: article?.keywords.join(', '),
@@ -26,7 +26,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
             inLanguage: 'ar-SA',
             publisher: {
               '@type': 'Organization',
-              name: 'تقويم السعودية',
+              name: 'خليجي تايم',
               logo: { '@type': 'ImageObject', url: 'https://alshafra.com/favicon.svg' },
             },
           },
@@ -88,6 +88,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
         </h1>
         <p className="mt-3 text-base leading-relaxed text-brand-700/85">{article.description}</p>
 
+        {(article.slug === 'hijri-calendar-1448' || article.slug === 'hijri-to-gregorian-conversion') && <p className="mt-5 text-sm"><a className="underline" href="https://www.ummulqura.org.sa/ar/about-calendar" target="_blank" rel="noopener noreferrer">عن تقويم أم القرى</a> · <a className="underline" href="https://www.ummulqura.org.sa/ar/converter" target="_blank" rel="noopener noreferrer">المحول المرجعي</a></p>}
         {article.slug === 'salary-dates-saudi-arabia' && <p className="mt-5 text-sm"><a className="underline" href="https://www.mof.gov.sa/" target="_blank" rel="noopener noreferrer">وزارة المالية</a></p>}
         {article.slug === 'citizen-account-payment-dates' && <p className="mt-5 text-sm"><a className="underline" href="https://portal.ca.gov.sa/" target="_blank" rel="noopener noreferrer">بوابة حساب المواطن الرسمية</a></p>}
         {article.slug === 'official-holidays-saudi-arabia'  && <p className="mt-5 text-sm"><a className="underline" href="/holidays">جدول الإجازات والمصادر الرسمية</a></p>}
@@ -161,7 +162,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
 
 export function ArticlesListPage() {
   useSeo({
-    title: 'مقالات عن المواعيد والتقويم في السعودية | تقويم السعودية',
+    title: 'مقالات عن المواعيد والتقويم في السعودية | خليجي تايم',
     description:
       'مقالات ودلائل شاملة عن مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي والإجازات الرسمية وتحويل التاريخ في المملكة العربية السعودية.',
     canonical: 'https://alshafra.com/articles',

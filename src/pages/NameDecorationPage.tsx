@@ -10,7 +10,7 @@ import SmartlinkCard from '../components/SmartlinkCard';
 
 export function NameDecorationHubPage() {
   useSeo({
-    title: 'زخرفة الأسماء أونلاين | 5 أدوات زخرفة مجانية | تقويم السعودية',
+    title: 'زخرفة الأسماء أونلاين | 5 أدوات زخرفة مجانية | خليجي تايم',
     description:
       'زخرف اسمك أونلاين مجاناً بأكثر من 75 نمط زخرفة: زخرفة الأسماء عربي، ببجي، بالإنجليزي، فري فاير، وبالفرنسية. أدوات زخرفة سريعة مع نسخ مباشر لكل نمط.',
     canonical: 'https://alshafra.com/name-decoration',
@@ -98,7 +98,7 @@ export function NameDecorationHubPage() {
                 <strong className="text-brand-900">زخرفة الأسماء</strong> هي فن تحويل الاسم العادي إلى شكل
                 جذاب ومميز باستخدام رموز يونيكود والحروف المزخرفة. تُستخدم زخرفة الأسماء على نطاق واسع في
                 منصات التواصل الاجتماعي والألعاب الإلكترونية لإبراز الشخصية وجذب الانتباه. توفر بوابة
-                تقويم السعودية 5 أدوات مجانية لزخرفة الأسماء بأكثر من 75 نمط مختلف.
+                خليجي تايم 5 أدوات مجانية لزخرفة الأسماء بأكثر من 75 نمط مختلف.
               </p>
               <p>
                 تشمل أدواتنا: <strong>زخرفة الأسماء عربي</strong> لأسمائك بالعربية مع زخرفة الحروف
@@ -142,8 +142,8 @@ export default function NameDecorationToolPage({ slug }: { slug: string }) {
 
   useSeo({
     title: tool
-      ? `${tool.title} أونلاين مجاناً | تقويم السعودية`
-      : 'أداة زخرفة غير موجودة | تقويم السعودية',
+      ? `${tool.title} أونلاين مجاناً | خليجي تايم`
+      : 'أداة زخرفة غير موجودة | خليجي تايم',
     description: tool?.description,
     canonical: `https://alshafra.com/name-decoration/${slug}`,
     keywords: tool?.keywords.join(', '),

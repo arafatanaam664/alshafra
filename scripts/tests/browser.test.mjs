@@ -55,6 +55,9 @@ test('Chromium desktop and mobile: routes, overflow and key tools', { timeout: 1
     assert.equal(await page.getByLabel('السنة', { exact:true }).inputValue(), '1445');
     await page.getByRole('button', { name:'تبديل إلى الميلادي' }).click();
     assert.equal(await page.getByRole('combobox', { name:'اليوم', exact:true }).inputValue(), '29');
+    await page.getByRole('button', {name:'عرض نتيجة العمر'}).focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await page.evaluate(() => document.activeElement?.id), 'age-result');
     await page.getByLabel('تاريخ ميلاد الشخص الثاني').fill('2024-03-01');
     assert.match(await page.getByRole('status').last().textContent(), /الشخص الأول أكبر سناً/);
     assert.match(await page.getByRole('status').last().textContent(), /0 شهر و1 يوم/);
@@ -237,4 +240,56 @@ test('converter and custom countdown isolate date inputs across navigation', { t
   await page.locator('main h1').waitFor();
   assert.equal(await page.locator('meta[data-date-isolation]').count(),1);
   await context.close();
+});
+
+test('trust and navigation pages do not request or render advertisements', {timeout:60000}, async () => {
+  assert.ok(process.env.CHROMIUM_PATH);
+  const server = await preview({configFile:resolve('vite.config.ts'),preview:{host:'127.0.0.1',port:0}});
+  after(() => new Promise(done => server.httpServer.close(done)));
+  const origin = `http://127.0.0.1:${server.httpServer.address().port}`;
+  const browser = await chromium.launch({executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox','--disable-dev-shm-usage']});
+  after(async () => browser.close());
+  const context = await browser.newContext({viewport:{width:390,height:844}});
+  const external = [];
+  await context.route('**/*', route => {
+    if (new URL(route.request().url()).origin === origin) return route.continue();
+    external.push(route.request().url()); return route.abort();
+  });
+  const page = await context.newPage();
+  for (const path of ['/about','/contact','/privacy','/terms','/faq','/articles','/salaries','/school-calendar','/holidays','/today','/hijri-calendar','/name-decoration','/name-decoration/arabic','/countdown/employee-salaries','/countdown/school-start','/countdown/ramadan']) {
+    external.length = 0;
+    await page.goto(origin + path);
+    await page.locator('main h1').waitFor();
+    assert.equal(await page.locator('a[href*="araplhn.org"], iframe[src*="bauval.org"], .adsbygoogle').count(), 0, path);
+    assert.deepEqual(external, [], path);
+  }
+  await context.close();
+});
+
+test('automated accessibility checks on every generated page at mobile and desktop widths', {timeout:180000}, async () => {
+  assert.ok(process.env.CHROMIUM_PATH);
+  const server = await preview({configFile:resolve('vite.config.ts'), preview:{host:'127.0.0.1',port:0}});
+  after(() => new Promise(done => server.httpServer.close(done)));
+  const origin = `http://127.0.0.1:${server.httpServer.address().port}`;
+  const browser = await chromium.launch({executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox','--disable-dev-shm-usage']});
+  after(async () => browser.close());
+  const sitemap = readFileSync('dist/sitemap.xml','utf8');
+  const paths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => new URL(m[1]).pathname);
+  assert.equal(paths.length, 47);
+  const failures = [];
+  for (const viewport of [{width:390,height:844},{width:1365,height:768}]) {
+    const context = await browser.newContext({viewport, bypassCSP:true});
+    await context.route('**/*', route => new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
+    const page = await context.newPage();
+    for (const path of paths) {
+      await page.goto(origin + path);
+      await page.waitForFunction(() => !document.querySelector('.prerender-shell'));
+      await page.locator('main h1').waitFor();
+      await page.addScriptTag({path:resolve('node_modules/axe-core/axe.min.js')});
+      const violations = await page.evaluate(async () => (await window.axe.run(document, {runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}})).violations.map(v=>({id:v.id,impact:v.impact,count:v.nodes.length})));
+      if (violations.length) failures.push({path, width:viewport.width, violations});
+    }
+    await context.close();
+  }
+  assert.deepEqual(failures, []);
 });

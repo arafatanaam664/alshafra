@@ -4,7 +4,7 @@ import { SITE_URL, useSeo } from '../lib/seo';
 
 export default function NotFoundPage() {
   useSeo({
-    title: 'الصفحة غير موجودة | تقويم السعودية',
+    title: 'الصفحة غير موجودة | خليجي تايم',
     description: 'لم نعثر على الصفحة المطلوبة. يمكنك العودة إلى الصفحة الرئيسية.',
     canonical: `${SITE_URL}${window.location.pathname}`,
   });

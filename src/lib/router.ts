@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import articles from '../data/articles.json';
 import countdowns from '../data/countdowns.json';
 import { matchRoute } from './route-match.mjs';
-import { isPrivateDatePath } from './date-privacy.mjs';
+import { isIsolatedPath } from './date-privacy.mjs';
 
 export type RoutePath = string;
 
@@ -35,7 +35,7 @@ export function useRoute(): [RoutePath, (path: RoutePath) => void] {
     const target = next.startsWith('/') ? next : `/${next}`;
     // A fresh document is required when crossing the privacy boundary: scripts
     // loaded by a previous SPA page cannot be safely unloaded.
-    if (normalize(window.location.pathname) !== normalize(target) && (isPrivateDatePath(normalize(window.location.pathname)) || isPrivateDatePath(normalize(target)))) {
+    if (normalize(window.location.pathname) !== normalize(target) && (isIsolatedPath(normalize(window.location.pathname)) || isIsolatedPath(normalize(target)))) {
       window.location.assign(target);
       return;
     }

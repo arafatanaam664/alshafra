@@ -11,6 +11,7 @@ import {
   type AdsterraDisplaySize,
 } from '../lib/ads';
 import { parseRoute, useRoute } from '../lib/router';
+import { isIsolatedPath } from '../lib/date-privacy.mjs';
 import AdsterraBanner from './AdsterraBanner';
 import AdsterraDisplay from './AdsterraDisplay';
 
@@ -44,6 +45,7 @@ export default function AdPlacement({
     density: adDensityForRoute(routeName),
   };
 
+  if (isIsolatedPath(path)) return null;
   if (page.density === 'minimal' && name !== 'content') return null;
 
   if (name === 'header') {

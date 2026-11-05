@@ -37,28 +37,12 @@ export default function HomePage() {
   const weekday = weekdayName(today);
 
   useSeo({
-    title: 'تقويم السعودية | مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي',
+    title: 'خليجي تايم | مواعيد الرواتب وحساب المواطن والتقويم الهجري والميلادي',
     description:
       'منصة مستقلة للتقويم والمواعيد والأدوات في السعودية؛ مواعيد الرواتب والدعم بانتظار التحقق، والتواريخ الحسابية تحتاج إلى مراجعة المصادر الرسمية.',
     canonical: 'https://alshafra.com/',
     keywords:
       'التقويم الهجري, التقويم الميلادي, مواعيد الرواتب, حساب المواطن, رواتب المتقاعدين, الضمان الاجتماعي, التقويم الدراسي, الإجازات الرسمية, تحويل التاريخ, حاسبة العمر, تقويم أم القرى, السعودية',
-    jsonLd: [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'WebSite',
-        name: 'تقويم السعودية',
-        url: 'https://alshafra.com/',
-        inLanguage: 'ar-SA',
-      },
-      {
-        '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: 'https://alshafra.com/' },
-        ],
-      },
-    ],
   });
 
   const timeString = now.toLocaleTimeString('ar-SA', {
@@ -278,7 +262,7 @@ export default function HomePage() {
               <h3 className="mt-3 font-display text-sm font-bold leading-snug text-brand-900 group-hover:text-brand-700">
                 {a.title}
               </h3>
-              <p className="mt-2 text-xs leading-relaxed text-brand-700/70 line-clamp-2">{a.description}</p>
+              <p className="mt-2 text-xs leading-relaxed text-brand-700 line-clamp-2">{a.description}</p>
             </Link>
           ))}
         </div>
@@ -309,10 +293,10 @@ export default function HomePage() {
       {/* SEO content */}
       <section className="container-page mt-14">
         <div className="card p-6 sm:p-8">
-          <h2 className="font-display text-xl font-bold text-brand-900">عن بوابة تقويم السعودية</h2>
+          <h2 className="font-display text-xl font-bold text-brand-900">عن بوابة خليجي تايم</h2>
           <div className="mt-4 space-y-3 text-sm leading-relaxed text-brand-700/85">
             <p>
-              <strong className="text-brand-900">تقويم السعودية</strong> هي بوابة إلكترونية متخصصة في عرض
+              <strong className="text-brand-900">خليجي تايم</strong> هي بوابة إلكترونية متخصصة في عرض
               التقويمات ومعلومات المواعيد في المملكة العربية السعودية. مواعيد الرواتب والدعم بانتظار
               التحقق، وتتوفر مواعيد دراسية مختارة وروابط الجهات المختصة.
             </p>

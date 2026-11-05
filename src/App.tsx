@@ -5,7 +5,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import AdPlacement from './components/AdPlacement';
 import { adDensityForRoute, PAGES_WITH_OWN_NATIVE } from './lib/ads';
-import { isPrivateDatePath } from './lib/date-privacy.mjs';
+import { isIsolatedPath } from './lib/date-privacy.mjs';
 import HomePage from './pages/HomePage';
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -47,7 +47,7 @@ export default function App({ initialPath, InitialPage }: { initialPath?: string
   const { name, param } = useMemo(() => parseRoute(path), [path]);
   const trackedPath = useRef<string | null>(null);
   const mainRef = useRef<HTMLElement>(null);
-  const density = isPrivateDatePath(path) ? 'minimal' : adDensityForRoute(name);
+  const density = isIsolatedPath(path) ? 'minimal' : adDensityForRoute(name);
   const hasOwnNative = PAGES_WITH_OWN_NATIVE.has(name);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function App({ initialPath, InitialPage }: { initialPath?: string
     <div className="flex min-h-screen flex-col">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-50 focus:rounded-lg focus:bg-white focus:p-3 focus:text-brand-900 focus:ring-2 focus:ring-brand-600">انتقل إلى المحتوى الرئيسي</a>
       <Header />
-      {!isPrivateDatePath(path) && <AdPlacement name="header" />}
+      {!isIsolatedPath(path) && <AdPlacement name="header" />}
       <main id="main-content" ref={mainRef} tabIndex={-1} className="flex-1 focus:outline-none">
         <Suspense fallback={<PageLoader />}>
           {name === 'salaries' && <SalariesPage />}
@@ -97,7 +97,7 @@ export default function App({ initialPath, InitialPage }: { initialPath?: string
           <AdPlacement name="content" unit="native" />
         </div>
       )}
-      {!isPrivateDatePath(path) && <AdPlacement name="footer" />}
+      {!isIsolatedPath(path) && <AdPlacement name="footer" />}
       <Footer />
     </div>
   );

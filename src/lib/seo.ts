@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 export const SITE_URL = 'https://alshafra.com';
-export const SITE_NAME = 'تقويم السعودية';
+export const SITE_NAME = 'خليجي تايم';
 
 interface SeoOptions {
   title?: string;

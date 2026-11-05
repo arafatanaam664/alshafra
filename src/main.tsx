@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { installAnalyticsWatcher } from './lib/analytics';
-import { isPrivateDatePath } from './lib/date-privacy.mjs';
+import { isIsolatedPath, isPrivateDatePath } from './lib/date-privacy.mjs';
 
 // Watch the dataLayer from the very first tick: a history change that happens
 // before the watcher exists would be counted twice (once by GA4, once by us).
@@ -22,8 +22,8 @@ async function start() {
   };
   // Never show birth inputs in the generic SPA shell: third-party scripts may
   // already have run there. The built age document carries this CSP marker.
-  if (isPrivateDatePath(path) && !document.querySelector('meta[http-equiv="Content-Security-Policy"][data-date-isolation]')) {
-    document.getElementById('root')!.textContent = 'أداة التاريخ غير متاحة حالياً لعدم تفعيل حماية الصفحة. حاول لاحقاً.';
+  if (isIsolatedPath(path) && !document.querySelector('meta[http-equiv="Content-Security-Policy"][data-date-isolation]')) {
+    document.getElementById('root')!.textContent = isPrivateDatePath(path) ? 'أداة التاريخ غير متاحة حالياً لعدم تفعيل حماية الصفحة. حاول لاحقاً.' : 'الصفحة غير متاحة حالياً لعدم تفعيل حماية الصفحة. حاول لاحقاً.';
     return;
   }
   let InitialPage: React.ComponentType | undefined;

@@ -48,7 +48,7 @@ export default function TodayPage() {
   const gregorianText = formatGregorian(today);
 
   useSeo({
-    title: 'تاريخ اليوم هجري وميلادي في السعودية | تقويم السعودية',
+    title: 'تاريخ اليوم هجري وميلادي في السعودية | خليجي تايم',
     description: 'اعرف التاريخ الهجري والميلادي اليوم في السعودية بتوقيت الرياض، مع تفاصيل التقويم وأدوات التحويل.',
     canonical: `${SITE_URL}/today`,
     keywords:

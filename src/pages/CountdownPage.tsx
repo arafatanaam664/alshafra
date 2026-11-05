@@ -49,7 +49,7 @@ export function CountdownHubPage() {
       {
         '@context': 'https://schema.org',
         '@type': 'ItemList',
-        name: 'العدّادات التنازلية في تقويم السعودية',
+        name: 'العدّادات التنازلية في خليجي تايم',
         itemListElement: list.map((c, i) => ({
           '@type': 'ListItem',
           position: i + 1,
@@ -229,7 +229,7 @@ export default function CountdownDetailPage({ slug }: { slug: string }) {
 
   const item = resolveCountdown(def, today);
   const related = resolveRelated(def, today);
-  const title = `${def.question} العدّ التنازلي | تقويم السعودية`;
+  const title = `${def.question} العدّ التنازلي | خليجي تايم`;
   const description = `${def.question} — ${def.summary}`;
 
   return (
@@ -425,8 +425,8 @@ function CountdownDetailView({
 
 function CountdownNotFound() {
   useSeo({
-    title: 'العدّاد غير موجود | تقويم السعودية',
-    description: 'لم نعثر على العدّاد التنازلي المطلوب. تصفّح جميع العدّادات المتاحة في تقويم السعودية.',
+    title: 'العدّاد غير موجود | خليجي تايم',
+    description: 'لم نعثر على العدّاد التنازلي المطلوب. تصفّح جميع العدّادات المتاحة في خليجي تايم.',
     canonical: `${SITE_URL}/countdown`,
   });
 

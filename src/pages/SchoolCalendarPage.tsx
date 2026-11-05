@@ -11,7 +11,7 @@ export default function SchoolCalendarPage() {
   const today = useRiyadhToday();
   const events = approvedSchoolEvents(schoolCalendar, today);
   useSeo({
-    title: 'التقويم الدراسي 1448-1449هـ (2026-2027م) | تقويم السعودية',
+    title: 'التقويم الدراسي 1448-1449هـ (2026-2027م) | خليجي تايم',
     description: 'مواعيد بداية الدراسة وإجازات المدارس 1448-1449هـ حسب صفحة التقويم الدراسي لوزارة التعليم، مع رابط المصدر وتاريخ المراجعة.',
     canonical: 'https://alshafra.com/school-calendar',
   });
@@ -28,7 +28,7 @@ export default function SchoolCalendarPage() {
       </div>
       <section className="mt-8" aria-labelledby="school-dates">
         <h2 id="school-dates" className="font-display text-xl font-bold">مواعيد الدراسة والإجازات المدرسية</h2>
-        {events.length === 0 ? <p role="status" className="mt-4 text-sm text-brand-800">المواعيد بانتظار التحقق والاعتماد؛ راجع صفحة الوزارة أعلاه.</p> : <div className="mt-4 overflow-x-auto rounded-xl bg-white ring-1 ring-brand-900/10">
+        {events.length === 0 ? <p role="status" className="mt-4 text-sm text-brand-800">المواعيد بانتظار التحقق والاعتماد؛ راجع صفحة الوزارة أعلاه.</p> : <div role="region" aria-label="جدول مواعيد التقويم الدراسي" tabIndex={0} className="mt-4 overflow-x-auto rounded-xl bg-white ring-1 ring-brand-900/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-700">
           <table className="w-full min-w-[34rem] text-right text-sm">
             <caption className="sr-only">مواعيد التقويم الدراسي وتواريخها كما في وزارة التعليم</caption>
             <thead className="bg-brand-50"><tr><th scope="col" className="p-4">المناسبة</th><th scope="col" className="p-4">اليوم والميلادي</th><th scope="col" className="p-4">الهجري كما في المصدر</th></tr></thead>

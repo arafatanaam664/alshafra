@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { preview } from 'vite';
+import { isIsolatedPath } from '../../src/lib/date-privacy.mjs';
 
 const dist = resolve('dist');
 const sitemap = readFileSync(join(dist, 'sitemap.xml'), 'utf8');
@@ -108,4 +109,34 @@ test('built date-input pages use restrictive CSP and exclude external executable
   assert.doesNotMatch(html, /<link\b[^>]*\bhref="https:\/\/(?:fonts\.googleapis\.com|fonts\.gstatic\.com|bauval\.org|araplhn\.org)/i);
   }
   assert.match(readPage('https://alshafra.com/'), /googletagmanager\.com/);
+});
+
+test('trust and article-index pages isolate advertising and external scripts in static documents', () => {
+  for (const path of ['/about', '/contact', '/privacy', '/terms', '/faq', '/articles']) {
+    const html = readPage(`https://alshafra.com${path}`);
+    assert.match(html, /http-equiv="Content-Security-Policy"/);
+    assert.doesNotMatch(html, /<script\b[^>]*\bsrc="https:\/\//i, path);
+    assert.doesNotMatch(html, /window\.dataLayer|bauval\.org|araplhn\.org/i, path);
+  }
+});
+
+// Check every generated isolated route, not just a hand-picked sample.
+test('all isolated routes exclude third-party executables and ad links', () => {
+  const isolated = urls.filter(url => isIsolatedPath(new URL(url).pathname));
+  assert.ok(isolated.length > 30);
+  for (const url of isolated) {
+    const html = readPage(url);
+    assert.match(html, /http-equiv="Content-Security-Policy"/, url);
+    assert.doesNotMatch(html, /<script\b[^>]*\bsrc="https:\/\//i, url);
+    assert.doesNotMatch(html, /window\.dataLayer|bauval\.org|araplhn\.org/i, url);
+  }
+});
+
+test('calendar articles provide reference links and pending school claim is clear', () => {
+  for (const path of ['/articles/hijri-calendar-1448', '/articles/hijri-to-gregorian-conversion']) {
+    const html = readPage(`https://alshafra.com${path}`);
+    assert.match(html, /https:\/\/www\.ummulqura\.org\.sa\/ar\/about-calendar/);
+    assert.match(html, /https:\/\/www\.ummulqura\.org\.sa\/ar\/converter/);
+  }
+  assert.match(readPage('https://alshafra.com/articles/school-calendar-1448'), /بانتظار الاعتماد/);
 });

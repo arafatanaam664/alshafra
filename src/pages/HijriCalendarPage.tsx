@@ -24,7 +24,7 @@ export default function HijriCalendarPage() {
   const [month, setMonth] = useState(today.month);
 
   useSeo({
-    title: 'التقويم الهجري وأم القرى | تقويم السعودية',
+    title: 'التقويم الهجري وأم القرى | خليجي تايم',
     description:
       'تقويم هجري حسابي مع مناسبات مختارة ومواعيد دراسية من وزارة التعليم؛ راجع الإعلانات الرسمية للتواريخ الحساسة.',
     canonical: 'https://alshafra.com/hijri-calendar',
@@ -140,7 +140,7 @@ export default function HijriCalendarPage() {
                     }`}
                   >
                     <span className="font-display font-bold">{c.day}</span>
-                    <span className={`text-[10px] ${isToday ? 'text-brand-50/80' : 'text-brand-600/60'}`}>
+                    <span className={`text-[10px] ${isToday ? 'text-brand-50/80' : 'text-brand-700'}`}>
                       {greg.day}/{greg.month}
                     </span>
                     {events.length > 0 && (
